@@ -28,10 +28,11 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
   if (!dir.exists(out_file)){
       dir.create(out_file)
   }
-
+  reg=""
   if (region==""){
       out_file=paste0(out_file,"/",sample_name,".UNFILTERED_MUTECT2.vcf")
   }else{
+      reg=paste0(" -L ",region)
       out_file=paste0(out_file,"/",sample_name,".",region,".UNFILTERED_MUTECT2.vcf")
   }
 
@@ -47,10 +48,10 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
     pn=paste0(" --panel-of-normals ",pon)
   }
   if(verbose){
-      print(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor_bam,norm," --germline-resource ",germ_resource,pn," -O ",out_file))
+      print(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor_bam,norm," --germline-resource ",germ_resource,pn," -O ",out_file,reg))
 
   }
-  system(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor_bam, norm, " --germline-resource ",germ_resource, pn, " -O ",out_file))
+  system(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor_bam, norm, " --germline-resource ",germ_resource, pn, " -O ",out_file,reg))
 
 }
 
