@@ -111,8 +111,8 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
     sep=""
   }
 
-  sample_name=get_sample_name(vcf)
-  file_ext=get_sample_extension(vcf)
+  sample_name=ULPwgs::get_sample_name(vcf)
+  file_ext=ULPwgs::get_sample_extension(vcf)
   out_file_dir=paste0(output_dir,sep,sample_name,"_SORTED.",toupper(file_ext))
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
@@ -164,7 +164,7 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
     sep=""
   }
 
-  sample_name=get_sample_name(tumor_bam)
+  sample_name=ULPwgs::get_sample_name(tumor_bam)
 
   out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
 
@@ -205,7 +205,7 @@ vcf_platypus=function(bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_
     sep=""
   }
 
-  sample_name=get_sample_name(tumor_bam)
+  sample_name=ULPwgs::get_sample_name(tumor_bam)
 
   out_file=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   if (!dir.exists(out_file)){
