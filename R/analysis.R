@@ -15,7 +15,7 @@
 #' @export
 
 
-vcf_mutect2=function(bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",verbose=FALSE){
+vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",verbose=FALSE){
   sep="/"
 
   if(output_dir==""){
@@ -153,7 +153,7 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 #' @import pbapply
 
 
-vcf_mutect2_parallel=function(region="",bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",threads=3,verbose=FALSE){
+vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",threads=3,verbose=FALSE){
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
   dat=dat %>% mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
