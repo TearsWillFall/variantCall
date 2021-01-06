@@ -84,9 +84,9 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
   out_file=paste0(out_file_dir,"/",sample_name,".CONCATENATED.vcf.gz")
 
   if(verbose){
-    print(paste(bin_path,"concat -O z -o",out_file, paste0(vcf_dir,"/*.vcf*")))
+    print(paste(bin_path,"concat -O z -o",out_file, paste0(vcf_dir,"/*.vcf")))
   }
-  system(paste(bin_path,"concat -O z -o",out_file, paste0(vcf_dir,"/*.vcf*")))
+  system(paste(bin_path,"concat -O z -o",out_file, paste0(vcf_dir,"/*.vcf")))
 }
 
 
