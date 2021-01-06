@@ -1,16 +1,22 @@
 Package: variantCall
-Title: What the Package Does (One Line, Title Case)
+Title: An implementation of a wrapper for variant calling using MuTECT2 and Platypus GNU/Unix based systems
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
+Authors@R:
+    person(given = "Osvaldas",
+           family = "Vainauskas",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+           email = "o.vainauskas@ucl.ac.uk")
+Description: A convenient way to call variants using MuTECT2 and Platypus callers.
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
+Imports:
+    magrittr,
+    dplyr,
+    tictoc,
+    pbapply
+biocViews:
+Remotes:
+    git::https://github.com/TearsWillFall/ULPwgs.git    
