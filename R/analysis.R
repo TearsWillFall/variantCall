@@ -74,7 +74,8 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
   if(output_dir==""){
     sep=""
   }
-
+  files=list.files(vcf_dir,full.names=TRUE)
+  files=files[grepl(".vcf$",files)]
   sample_name=ULPwgs::get_sample_name(list.files(vcf_dir)[1])
   out_file_dir=paste0(output_dir,sep,sample_name,"_CONCATENATED")
   if (!dir.exists(out_file_dir)){
@@ -84,9 +85,9 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
   out_file=paste0(out_file_dir,"/",sample_name,".CONCATENATED.vcf.gz")
 
   if(verbose){
-    print(paste(bin_path,"concat -O z -o",out_file, paste0(vcf_dir,"/*.vcf")))
+    print(paste(bin_path,"concat -Oz -o",out_file, paste(files, collapse=' ' ) ))
   }
-  system(paste(bin_path,"concat -O z -o",out_file, paste0(vcf_dir,"/*.vcf")))
+  system(paste(bin_path,"concat -Oz -o",out_file, paste(files, collapse=' ' )))
 }
 
 
