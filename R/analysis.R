@@ -22,7 +22,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
     sep=""
   }
 
-  sample_name=get_sample_name(tumor_bam)
+  sample_name=ULPwgs::get_sample_name(tumor_bam)
 
   out_file=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   if (!dir.exists(out_file)){
@@ -74,7 +74,7 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
     sep=""
   }
 
-  sample_name=get_sample_name(list.files(vcf_dir)[1])
+  sample_name=ULPwgs::get_sample_name(list.files(vcf_dir)[1])
   out_file_dir=paste0(output_dir,sep,sample_name,"_CONCATENATED")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
@@ -156,7 +156,7 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",threads=3,verbose=FALSE){
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
-  dat=dat %>% mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
+  dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
   cl=parallel::makeCluster(threads)
   pbapply(X=dat$Region,1,FUN=vcf_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,verbose=verbose,cl=cl)
 
