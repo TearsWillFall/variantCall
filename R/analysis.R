@@ -138,13 +138,15 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 #' This function calls somatic variants in a pair of tumor-normal matched samples, or
 #' just in a tumor sample if no matched sample is not available.
 #'
-#' @param tumor_bam Path to tumor bam file.
+#' @param tumor_bam [Required] Path to tumor bam file.
 #' @param normal_bam Path to germline bam file.
-#' @param bin_path Path to fastQC executable. Default path tools/gatk/gatk.
+#' @param bin_path [Required] Path to gatk binary. Default path tools/gatk/gatk.
+#' @param bin_path2 [Required] Path to bcftools binary. Default path tools/bcftools/bcftools.
 #' @param ref_genome Path to reference genome fasta file.
-#' @param region Region to analyze. Optional
 #' @param germ_resource Path to germline resources vcf file.
 #' @param pon [Optional] Path to panel of normal.
+#' @param threads [Optional] Number of threads. Default 3
+#' @param region_bed Path to bed file with regions to analyze.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @export

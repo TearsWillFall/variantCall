@@ -20,11 +20,11 @@ vcf_mutect2_parallel(
 )
 }
 \arguments{
-\item{region}{Region to analyze. Optional}
+\item{bin_path}{\link{Required} Path to gatk binary. Default path tools/gatk/gatk.}
 
-\item{bin_path}{Path to fastQC executable. Default path tools/gatk/gatk.}
+\item{bin_path2}{\link{Required} Path to bcftools binary. Default path tools/bcftools/bcftools.}
 
-\item{tumor_bam}{Path to tumor bam file.}
+\item{tumor_bam}{\link{Required} Path to tumor bam file.}
 
 \item{normal_bam}{Path to germline bam file.}
 
@@ -35,6 +35,10 @@ vcf_mutect2_parallel(
 \item{pon}{\link{Optional} Path to panel of normal.}
 
 \item{output_dir}{Path to the output directory.}
+
+\item{region_bed}{Path to bed file with regions to analyze.}
+
+\item{threads}{\link{Optional} Number of threads. Default 3}
 
 \item{verbose}{Enables progress messages. Default False.}
 }
