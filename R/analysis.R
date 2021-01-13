@@ -240,10 +240,8 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
   vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz",output_dir=out_file_dir),verbose=verbose)
   vcf_stats_merge(bin_path=bin_path2,vcf_stats_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
-  vcf_filtering(bin_path=bin_path,unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF","/",sample_name,".SORTED.CONCATENATED.vcf"),unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir),verbose=verbose)
+  vcf_filtering(bin_path=bin_path,ref_genome=ref_genome,unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF","/",sample_name,".SORTED.CONCATENATED.vcf"),unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir,verbose=verbose)
 }
-
-
 
 
 
