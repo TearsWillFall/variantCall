@@ -82,12 +82,12 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
       dir.create(out_file_dir)
   }
 
-  out_file=paste0(out_file_dir,"/",sample_name,".CONCATENATED.vcf.gz")
+  out_file=paste0(out_file_dir,"/",sample_name,".CONCATENATED.vcf")
 
   if(verbose){
-    print(paste(bin_path,"concat -Oz -o",out_file, paste(files, collapse=' ' ) ))
+    print(paste(bin_path,"concat -o",out_file, paste(files, collapse=' ' ) ))
   }
-  system(paste(bin_path,"concat -Oz -o",out_file, paste(files, collapse=' ' )))
+  system(paste(bin_path,"concat -o",out_file, paste(files, collapse=' ' )))
 }
 
 
