@@ -235,14 +235,12 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
   if(output_dir==""){
     sep=""
   }
-
   sample_name=ULPwgs::get_sample_name(tumor_bam)
-
   out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
-
-  vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir)
-  vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz",output_dir=out_file_dir))
-  vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats",output_dir=out_file_dir))
+  vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
+  vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz",output_dir=out_file_dir),verbose=verbose)
+  vcf_stats_merge(bin_path=bin_path2,vcf_stats_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
+  vcf_filtering(bin_path=bin_path,unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF","/",sample_name,".SORTED.CONCATENATED.vcf"),unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir),verbose=verbose)
 }
 
 
@@ -281,8 +279,6 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",unfil_vcf="",ref_genome="",unf
   }
   system(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats))
 }
-
-
 
 
 
