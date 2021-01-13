@@ -114,12 +114,12 @@ vcf_stats_merge=function(bin_path="tools/gatk/gatk",vcf_stats_dir="",verbose=FAL
   files=list.files(vcf_stats_dir,full.names=TRUE)
   files=files[grepl(".vcf.stats$",files)]
   sample_name=ULPwgs::get_sample_name(list.files(vcf_stats_dir)[1])
-  out_file_dir=paste0(output_dir,sep,sample_name,"_MERGED_STATS")
+  out_file_dir=paste0(output_dir,sep,sample_name,"_MERGED_VCF_STATS")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
 
-  out_file=paste0(out_file_dir,"/",sample_name,".MERGED_STATS.vcf.gz")
+  out_file=paste0(out_file_dir,"/",sample_name,".MERGED.vcf.stats")
 
   if(verbose){
     print(paste(bin_path,"MergeMutectStats -O",out_file," -stats ",paste(files, collapse=' -stats ' ) ))
@@ -210,12 +210,45 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 
   vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir)
   vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz",output_dir=out_file_dir))
+  vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats",output_dir=out_file_dir))
 }
 
 
 
 
 
+#' VCF filtering using GATK
+#'
+#' This function filters VCF calls using GATK statistics
+#'
+#' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
+#' @param unfil_vcf Path to unfiltered vcf file.
+#' @param unfil_vcf_stats Path to unfiltered vcf file stats.
+#' @param ref_genome Path to reference genome fasta file.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+
+
+vcf_filtering=function(bin_path="tools/gatk/gatk",unfil_vcf="",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
+
+  if(output_dir==""){
+    sep=""
+  }
+  sample_name=ULPwgs::get_sample_name(unfil_vcf)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_FILTERED")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  out_file=paste0(out_file_dir,"/",sample_name,".FILTERED.vcf")
+
+  if(verbose){
+    print(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats))
+  }
+  system(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats))
+}
 
 
 
