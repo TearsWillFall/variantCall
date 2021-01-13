@@ -93,6 +93,44 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
 
 
 
+
+#' VCF file concatenation
+#'
+#' This function merges VCF stat files found in a directory.
+#'
+#' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
+#' @param vcf_stats_dir Path to directory with vcf stats files to merge.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+
+
+vcf_stats_merge=function(bin_path="tools/gatk/gatk",vcf_stats_dir="",verbose=FALSE,output_dir=""){
+
+  if(output_dir==""){
+    sep=""
+  }
+  files=list.files(vcf_dir,full.names=TRUE)
+  files=files[grepl(".vcf.stats$",files)]
+  sample_name=ULPwgs::get_sample_name(list.files(vcf_dir)[1])
+  out_file_dir=paste0(output_dir,sep,sample_name,"_MERGED_STATS")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  out_file=paste0(out_file_dir,"/",sample_name,".MERGED_STATS.vcf.gz")
+
+  if(verbose){
+    print(paste(bin_path,"MergeMutectStats -O",out_file," -stats ",paste(files, collapse=' -stats ' ) ))
+  }
+  system(paste(bin_path,"MergeMutectStats -O",out_file," -stats ", paste(files, collapse=' -stats ' )))
+}
+
+
+
+
+
 #' Sort VCF file
 #'
 #' This function takes a VCF file and sorts it genomic order
