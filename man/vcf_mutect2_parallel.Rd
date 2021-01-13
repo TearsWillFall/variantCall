@@ -5,7 +5,6 @@
 \title{Variant calling using MuTECT2 on parallel per genomic region}
 \usage{
 vcf_mutect2_parallel(
-  region = "",
   bin_path = "tools/gatk/gatk",
   bin_path2 = "tools/bcftools/bcftools",
   tumor_bam = "",

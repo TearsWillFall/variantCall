@@ -111,9 +111,9 @@ vcf_stats_merge=function(bin_path="tools/gatk/gatk",vcf_stats_dir="",verbose=FAL
   if(output_dir==""){
     sep=""
   }
-  files=list.files(vcf_dir,full.names=TRUE)
+  files=list.files(vcf_stats_dir,full.names=TRUE)
   files=files[grepl(".vcf.stats$",files)]
-  sample_name=ULPwgs::get_sample_name(list.files(vcf_dir)[1])
+  sample_name=ULPwgs::get_sample_name(list.files(vcf_stats_dir)[1])
   out_file_dir=paste0(output_dir,sep,sample_name,"_MERGED_STATS")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)

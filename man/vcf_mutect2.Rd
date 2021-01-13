@@ -5,6 +5,7 @@
 \title{Variant calling using MuTECT2}
 \usage{
 vcf_mutect2(
+  region = "",
   bin_path = "tools/gatk/gatk",
   tumor_bam = "",
   normal_bam = "",
@@ -16,6 +17,8 @@ vcf_mutect2(
 )
 }
 \arguments{
+\item{region}{Region to analyze. Optional}
+
 \item{bin_path}{Path to fastQC executable. Default path tools/gatk/gatk.}
 
 \item{tumor_bam}{Path to tumor bam file.}
@@ -31,8 +34,6 @@ vcf_mutect2(
 \item{output_dir}{Path to the output directory.}
 
 \item{verbose}{Enables progress messages. Default False.}
-
-\item{region}{Region to analyze. Optional}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or
