@@ -2,21 +2,20 @@
 % Please edit documentation in R/analysis.R
 \name{vcf_platypus}
 \alias{vcf_platypus}
-\title{Variant calling using MuTECT2}
+\title{Variant calling using Platypus}
 \usage{
 vcf_platypus(
   bin_path = "tools/platypus/Platypus.py",
   tumor_bam = "",
   normal_bam = "",
   ref_genome = "",
-  germ_resource = "",
-  pon = "",
+  vcf_overlay = "",
   output_dir = "",
   verbose = FALSE
 )
 }
 \arguments{
-\item{bin_path}{Path to fastQC executable. Default path tools/gatk/gatk.}
+\item{bin_path}{Path to fastQC executable. Default path tools/platypus/Platypus.py.}
 
 \item{tumor_bam}{Path to tumor bam file.}
 
@@ -24,9 +23,7 @@ vcf_platypus(
 
 \item{ref_genome}{Path to reference genome fasta file.}
 
-\item{germ_resource}{Path to germline resources vcf file.}
-
-\item{pon}{\link{Optional} Path to panel of normal.}
+\item{vcf_overlay}{Path to vcf overlay to use as source.}
 
 \item{output_dir}{Path to the output directory.}
 
