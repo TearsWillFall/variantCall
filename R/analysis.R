@@ -36,19 +36,30 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
       out_file=paste0(out_file,"/",sample_name,".",region,".UNFILTERED_MUTECT2.vcf")
   }
 
+as.vector(sapply(c("Data.txt","SRARS.asdasd","DSAA/DS/DAsd.d"),FUN=ULPwgs::get_sample_name))
+
 
 # TO DO FIX THIS MESS
 
+  if (is.vector(tumor_bam)){
+    tumor=paste0(" -I ",paste(tumor_bam,collapse=" -I "))
+  }else{
+    tumor=paste0(" -I ",tumor_bam)
+  }
   norm=" "
   if (normal_bam!=""){
-    norm=paste0(" -I ",normal_bam," -normal ",sample_name)
+    if (is.vector(normal_bam)){
+      norm=paste0(" -I ",paste(normal_bam,collapse=" -I ")," -normal ",paste(as.vector(sapply(normal_bam,FUN=ULPwgs::get_sample_name)),collapse=" -normal "))
+  }else{
+      norm=paste0(" -I ",normal_bam," -normal ",ULPwgs::get_sample_name(normal_bam))
+      }
   }
   pn=" "
   if (pon!=""){
     pn=paste0(" --panel-of-normals ",pon)
   }
   if(verbose){
-      print(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor_bam,norm," --germline-resource ",germ_resource,pn," -O ",out_file,reg))
+      print(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor, norm," --germline-resource ",germ_resource,pn," -O ",out_file,reg))
 
   }
   system(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor_bam, norm, " --germline-resource ",germ_resource, pn, " -O ",out_file,reg))
@@ -250,6 +261,8 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 #' This function filters VCF calls using GATK statistics
 #'
 #' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
 #' @param unfil_vcf Path to unfiltered vcf file.
 #' @param unfil_vcf_stats Path to unfiltered vcf file stats.
 #' @param ref_genome Path to reference genome fasta file.
@@ -259,7 +272,7 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 
 
 
-vcf_filtering=function(bin_path="tools/gatk/gatk",unfil_vcf="",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
+vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
 
   if(output_dir==""){
     sep=""
@@ -276,28 +289,30 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",unfil_vcf="",ref_genome="",unf
     print(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats))
   }
   system(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
 }
 
 
 
 
-#' Variant calling using MuTECT2
+#' Variant calling using Platypus
 #'
 #' This function calls somatic variants in a pair of tumor-normal matched samples, or
 #' just in a tumor sample if no matched sample is not available.
 #'
 #' @param tumor_bam Path to tumor bam file.
 #' @param normal_bam Path to germline bam file.
-#' @param bin_path Path to fastQC executable. Default path tools/gatk/gatk.
+#' @param bin_path Path to fastQC executable. Default path tools/platypus/Platypus.py.
 #' @param ref_genome Path to reference genome fasta file.
-#' @param germ_resource Path to germline resources vcf file.
-#' @param pon [Optional] Path to panel of normal.
+#' @param vcf_overlay Path to vcf overlay to use as source.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
 
-vcf_platypus=function(bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",verbose=FALSE){
+vcf_platypus=function(bin_path="tools/platypus/Platypus.py",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE){
+
   sep="/"
 
   if(output_dir==""){
@@ -306,20 +321,30 @@ vcf_platypus=function(bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_
 
   sample_name=ULPwgs::get_sample_name(tumor_bam)
 
-  out_file=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
+  out_file=paste0(output_dir,sep,sample_name,"_PLATYPUS_VARIANTS_VCF")
   if (!dir.exists(out_file)){
       dir.create(out_file)
   }
+  if (is.vector(normal_bam)){
+    norm=paste0(paste(normal_bam,collapse=","))
+  }else{
+    norm=normal_bam
+  }
 
-  out_file=paste0(out_file,"/",sample_name,"_platypus.vcf")
+  if (is.vector(tumor_bam)){
+    tumor=paste0(paste(tumor_bam,collapse=","))
+  }else{
+    tumor=tumor_bam
+  }
+  out_file=paste0(out_file,"/",sample_name,"_PLATYPUS.vcf")
 
 # TO DO FIX THIS MESS
 
   if(verbose){
-      print(paste0(bin_path," callVariants --refFile=",ref_genome, " --bamFiles=",tumor_bam,",",norm," --source=",vcf," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")))
+      print(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm)," --source=",vcf," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")))
 
   }
-  system(paste0(bin_path," callVariants --refFile=",ref_genome, " --bamFiles=",tumor_bam,",",norm, " --source=",vcf," --output",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")))
+  system(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm), " --source=",vcf," --output",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")))
 
 
 

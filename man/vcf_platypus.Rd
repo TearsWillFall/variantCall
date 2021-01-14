@@ -5,7 +5,7 @@
 \title{Variant calling using MuTECT2}
 \usage{
 vcf_platypus(
-  bin_path = "tools/gatk/gatk",
+  bin_path = "tools/platypus/Platypus.py",
   tumor_bam = "",
   normal_bam = "",
   ref_genome = "",

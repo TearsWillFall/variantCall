@@ -6,6 +6,8 @@
 \usage{
 vcf_filtering(
   bin_path = "tools/gatk/gatk",
+  bin_path2 = "tools/htslib/bgzip",
+  bin_path3 = "tools/htslib/tabix",
   unfil_vcf = "",
   ref_genome = "",
   unfil_vcf_stats = "",
@@ -15,6 +17,10 @@ vcf_filtering(
 }
 \arguments{
 \item{bin_path}{Path to gatk binary. Default tools/gatk/gatk.}
+
+\item{bin_path2}{Path to bgzip binary. Default tools/htslib/bgzip.}
+
+\item{bin_path3}{Path to tabix binary. Default tools/htslib/tabix.}
 
 \item{unfil_vcf}{Path to unfiltered vcf file.}
 
