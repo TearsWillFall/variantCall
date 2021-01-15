@@ -81,7 +81,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
 
 
 vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=FALSE,output_dir=""){
-
+  sep="/"
   if(output_dir==""){
     sep=""
   }
@@ -114,7 +114,7 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
 
 
 vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir=""){
-
+  sep="/"
   if(output_dir==""){
     sep=""
   }
@@ -150,7 +150,7 @@ vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir=""
 
 
 vcf_stats_merge=function(bin_path="tools/gatk/gatk",vcf_stats_dir="",verbose=FALSE,output_dir=""){
-
+  sep="/"
   if(output_dir==""){
     sep=""
   }
@@ -189,7 +189,7 @@ vcf_stats_merge=function(bin_path="tools/gatk/gatk",vcf_stats_dir="",verbose=FAL
 
 
 vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output_dir="",ram=4,tmp_dir=""){
-
+  sep="/"
   if(output_dir==""){
     sep=""
   }
@@ -243,6 +243,7 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
   cl=parallel::makeCluster(threads)
   pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,verbose=verbose,cl=cl)
   on.exit(parallel::stopCluster(cl))
+  sep="/"
   if(output_dir==""){
     sep=""
   }
@@ -273,7 +274,7 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 
 
 vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
-
+  sep="/"
   if(output_dir==""){
     sep=""
   }
