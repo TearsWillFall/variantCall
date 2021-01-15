@@ -36,7 +36,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
       out_file=paste0(out_file,"/",sample_name,".",region,".UNFILTERED_MUTECT2.vcf")
   }
 
-is.vector(c("asdasd","assasad"))
+
 
 
 # TO DO FIX THIS MESS
