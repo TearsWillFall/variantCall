@@ -22,7 +22,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
     sep=""
   }
 
-  sample_name=ULPwgs::get_sample_name(tumor_bam)
+  sample_name=ULPwgs::get_sample_name(tumor_bam[1])
 
   out_file=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   if (!dir.exists(out_file)){
@@ -247,7 +247,7 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
   if(output_dir==""){
     sep=""
   }
-  sample_name=ULPwgs::get_sample_name(tumor_bam)
+  sample_name=ULPwgs::get_sample_name(tumor_bam[1])
   out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz",output_dir=out_file_dir),verbose=verbose)
