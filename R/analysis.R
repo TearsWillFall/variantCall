@@ -38,7 +38,6 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
 
 
 
-
 # TO DO FIX THIS MESS
 
   if (is.vector(tumor_bam)){
@@ -59,10 +58,10 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
     pn=paste0(" --panel-of-normals ",pon)
   }
   if(verbose){
-      print(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor, norm," --germline-resource ",germ_resource,pn," -O ",out_file,reg))
+      print(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm," --germline-resource ",germ_resource,pn," -O ",out_file,reg))
 
   }
-  system(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor, norm, " --germline-resource ",germ_resource, pn, " -O ",out_file,reg))
+  system(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm, " --germline-resource ",germ_resource, pn, " -O ",out_file,reg))
 
 }
 
