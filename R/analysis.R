@@ -36,7 +36,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
       out_file=paste0(out_file,"/",sample_name,".",region,".UNFILTERED_MUTECT2.vcf")
   }
 
-
+is.vector(c("asdasd","assasad"))
 
 
 # TO DO FIX THIS MESS
@@ -62,7 +62,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
       print(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor, norm," --germline-resource ",germ_resource,pn," -O ",out_file,reg))
 
   }
-  system(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor_bam, norm, " --germline-resource ",germ_resource, pn, " -O ",out_file,reg))
+  system(paste0(bin_path," Mutect2 -R ",ref_genome, " -I ",tumor, norm, " --germline-resource ",germ_resource, pn, " -O ",out_file,reg))
 
 }
 
