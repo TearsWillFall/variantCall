@@ -274,7 +274,7 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 
 
 
-vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
+vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
