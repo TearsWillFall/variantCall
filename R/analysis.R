@@ -129,7 +129,7 @@ vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir=""
   if(verbose){
     print(paste(bin_path,"-i",,vcf,"-o",out_file,"--cache --everything --force_overwrite --vcf --offline"))
   }
-  system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --everything --force_overwrite --vcf --ofline"))
+  system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --everything --force_overwrite --vcf --offline"))
 }
 
 
