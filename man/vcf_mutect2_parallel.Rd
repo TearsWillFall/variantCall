@@ -7,6 +7,8 @@
 vcf_mutect2_parallel(
   bin_path = "tools/gatk/gatk",
   bin_path2 = "tools/bcftools/bcftools",
+  bin_path3 = "tools/htslib/bgzip",
+  bin_path4 = "tools/htslib/tabix",
   tumor_bam = "",
   normal_bam = "",
   ref_genome = "",
@@ -22,6 +24,10 @@ vcf_mutect2_parallel(
 \item{bin_path}{\link{Required} Path to gatk binary. Default path tools/gatk/gatk.}
 
 \item{bin_path2}{\link{Required} Path to bcftools binary. Default path tools/bcftools/bcftools.}
+
+\item{bin_path3}{\link{Required} Path to tabix binary. Default path tools/htslib/tabix.}
+
+\item{bin_path4}{\link{Required} Path to bgzip binary. Default path tools/htslib/bgzip.}
 
 \item{tumor_bam}{\link{Required} Path to tumor bam file.}
 
