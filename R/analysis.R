@@ -319,12 +319,11 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 #' @export
 #' @import pbapply
 
-
 vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_genome="",output_dir="",region_bed="",threads=3,verbose=FALSE){
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
-  dat=dat %>% filter(!grepl("_",Region))
+  dat=dat %>% filter(!grepl("_|MT|M",Region))
   cl=parallel::makeCluster(threads)
   pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_bcftools,bin_path=bin_path,bam=bam,ref_genome=ref_genome,verbose=verbose,cl=cl)
   on.exit(parallel::stopCluster(cl))
