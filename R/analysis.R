@@ -70,7 +70,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
 #' This function calls variants in a sample.
 #'
 #'
-#' @param tumor_bam Path to tumor bam file.
+#' @param bam Path to bam file.
 #' @param bin_path Path to fastQC executable. Default path tools/gatk/gatk.
 #' @param ref_genome Path to reference genome fasta file.
 #' @param region Region to analyze. Optional
@@ -78,7 +78,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
 #' @param verbose Enables progress messages. Default False.
 
 
-vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",tumor_bam="",ref_genome="",output_dir="",verbose=FALSE){
+vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",bam="",ref_genome="",output_dir="",verbose=FALSE){
 
   sep="/"
 
@@ -86,7 +86,7 @@ vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",tumor_bam="",
     sep=""
   }
 
-  sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+  sample_name=ULPwgs::get_sample_name(bam[1])
 
   out_file=paste0(output_dir,sep,sample_name,"_BCF_MPILEUP_VARIANTS_VCF")
   if (!dir.exists(out_file)){
@@ -100,22 +100,19 @@ vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",tumor_bam="",
       out_file=paste0(out_file,"/",sample_name,".",region,".UNFILTERED_MPILEUP.vcf")
   }
 
-  if (is.vector(tumor_bam)){
-    tumor=paste(tumor_bam,collapse=" ")
+  if (is.vector(bam)){
+    bam=paste(bam,collapse=" ")
   }else{
-    tumor=paste0(" ",tumor_bam)
+    bam=paste0(" ",bam)
   }
 
   if(verbose){
-      print(paste0(bin_path," mpileup -f ",ref_genome,reg,tumor," | " ,bin_path," call --multiallelic-caller --variants-only -Ov >",out_file))
+      print(paste0(bin_path," mpileup -f ",ref_genome,reg,bam," | " ,bin_path," call --multiallelic-caller --variants-only -Ov >",out_file))
 
   }
-  system(paste0(bin_path," mpileup -f ",ref_genome,reg,tumor," | " ,bin_path," call --multiallelic-caller --variants-only -Ov >",out_file))
+  system(paste0(bin_path," mpileup -f ",ref_genome,reg,bam," | " ,bin_path," call --multiallelic-caller --variants-only -Ov >",out_file))
 
 }
-
-
-
 
 
 
@@ -312,7 +309,7 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 #'
 #' This function calls SNPs in a sample
 #'
-#' @param tumor_bam [Required] Path to tumor bam file.
+#' @param bam [Required] Path to bam file.
 #' @param bin_path [Required] Path to bcftools binary. Default path tools/bcftools/bcftools.
 #' @param ref_genome Path to reference genome fasta file.
 #' @param threads [Optional] Number of threads. Default 3
@@ -323,18 +320,18 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 #' @import pbapply
 
 
-vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",tumor_bam="",ref_genome="",output_dir="",region_bed="",threads=3,verbose=FALSE){
+vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_genome="",output_dir="",region_bed="",threads=3,verbose=FALSE){
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
   cl=parallel::makeCluster(threads)
-  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_bcftools,bin_path=bin_path,tumor_bam=tumor_bam,ref_genome=ref_genome,verbose=verbose,cl=cl)
+  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_bcftools,bin_path=bin_path,bam=bam,ref_genome=ref_genome,verbose=verbose,cl=cl)
   on.exit(parallel::stopCluster(cl))
   sep="/"
   if(output_dir==""){
     sep=""
   }
-  sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+  sample_name=ULPwgs::get_sample_name(bam[1])
   out_file_dir=paste0(output_dir,sep,sample_name,"_BCF_MPILEUP_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz"),output_dir=out_file_dir,verbose=verbose)
