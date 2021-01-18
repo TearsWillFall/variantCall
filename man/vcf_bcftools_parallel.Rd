@@ -6,7 +6,7 @@
 \usage{
 vcf_bcftools_parallel(
   bin_path = "tools/bcftools/bcftools",
-  tumor_bam = "",
+  bam = "",
   ref_genome = "",
   output_dir = "",
   region_bed = "",
@@ -17,7 +17,7 @@ vcf_bcftools_parallel(
 \arguments{
 \item{bin_path}{\link{Required} Path to bcftools binary. Default path tools/bcftools/bcftools.}
 
-\item{tumor_bam}{\link{Required} Path to tumor bam file.}
+\item{bam}{\link{Required} Path to bam file.}
 
 \item{ref_genome}{Path to reference genome fasta file.}
 

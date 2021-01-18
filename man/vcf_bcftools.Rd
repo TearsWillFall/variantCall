@@ -7,7 +7,7 @@
 vcf_bcftools(
   region = "",
   bin_path = "tools/bcftools/bcftools",
-  tumor_bam = "",
+  bam = "",
   ref_genome = "",
   output_dir = "",
   verbose = FALSE
@@ -18,7 +18,7 @@ vcf_bcftools(
 
 \item{bin_path}{Path to fastQC executable. Default path tools/gatk/gatk.}
 
-\item{tumor_bam}{Path to tumor bam file.}
+\item{bam}{Path to bam file.}
 
 \item{ref_genome}{Path to reference genome fasta file.}
 

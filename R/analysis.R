@@ -107,10 +107,10 @@ vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",bam="",ref_ge
   }
 
   if(verbose){
-      print(paste0(bin_path," mpileup -f ",ref_genome,reg,bam," | " ,bin_path," call --multiallelic-caller --variants-only -Ov >",out_file))
+      print(paste0(bin_path," mpileup ",reg," -f ",ref_genome, bam," | " ,bin_path," call --multiallelic-caller --variants-only -Ov >",out_file))
 
   }
-  system(paste0(bin_path," mpileup -f ",ref_genome,reg,bam," | " ,bin_path," call --multiallelic-caller --variants-only -Ov >",out_file))
+  system(paste0(bin_path," mpileup ", reg ," -f ",ref_genome, bam," | " ,bin_path," call --multiallelic-caller --variants-only -Ov >",out_file))
 
 }
 
