@@ -3,6 +3,7 @@
 export("%>%")
 export(bgzip)
 export(tab_indx)
+export(vcf_bcftools_parallel)
 export(vcf_concatenate)
 export(vcf_filtering)
 export(vcf_mutect2)
