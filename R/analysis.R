@@ -458,9 +458,9 @@ vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools
     ref=paste(" & ID!=\"",ref,"\"")
   }
   if(verbose){
-    print(paste(bin_path,"view  -i \'%QUAL>",qual,state,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+    print(paste(bin_path,"view  -i \'%QUAL>",qual,state,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
   }
-  system(paste(bin_path,"view  -i \'%QUAL>",qual,state,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+  system(paste(bin_path,"view  -i \'%QUAL>",qual,state,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
