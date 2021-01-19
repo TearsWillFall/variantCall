@@ -564,7 +564,7 @@ vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
-vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",expr="'%CHROM\tt%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FILTER\t%INFO\n'",verbose=FALSE,output_dir=""){
+vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
