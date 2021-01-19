@@ -2,18 +2,8 @@
 % Please edit documentation in R/analysis.R
 \name{vcf_annotate}
 \alias{vcf_annotate}
-\title{VCF anotation using bcftools}
+\title{VCF annotation using bcftools}
 \usage{
-vcf_annotate(
-  bin_path = "tools/bcftools/bcftools",
-  bin_path2 = "tools/htslib/bgzip",
-  bin_path3 = "tools/htslib/tabix",
-  vcf = "",
-  db = "",
-  verbose = FALSE,
-  output_dir = ""
-)
-
 vcf_annotate(
   bin_path = "tools/bcftools/bcftools",
   bin_path2 = "tools/htslib/bgzip",
@@ -42,7 +32,5 @@ vcf_annotate(
 \item{state}{Variant state. Default het.}
 }
 \description{
-This function annotates VCF file using bcftools
-
 This function annotates VCF file using bcftools
 }

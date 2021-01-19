@@ -479,11 +479,12 @@ vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools
 #' @param state Variant state. Default het.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
+#' @param threads Additional in/out compression threads. Default 1.
 #' @export
 
 
 
-vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",db="",verbose=FALSE,output_dir=""){
+vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",db="",verbose=FALSE,output_dir="",threads=1){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -497,11 +498,9 @@ vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib
   out_file=paste0(out_file_dir,"/",sample_name,".ANNOTATED.vcf")
 
   if(verbose){
-    print(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file))
+    print(paste(bin_path,"annotate -a ",db,"-c ID --threads",threads, vcf,">",out_file))
   }
-  system(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file))
-  bgzip(bin_path=bin_path2,file=out_file)
-  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste(bin_path,"annotate -a ",db,"-c ID --threads", threads,vcf,">",out_file))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
@@ -539,14 +538,11 @@ vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/b
     print(paste(bin_path,"query -f ",expr, vcf,">",out_file))
   }
   system(paste(bin_path,"query -f ",expr, vcf,">",out_file))
-  bgzip(bin_path=bin_path2,file=out_file)
-  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", paste0(out_file,".tmp"), out_file))
 }
-
 
 
 
