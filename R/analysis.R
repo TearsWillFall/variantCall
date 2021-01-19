@@ -467,8 +467,6 @@ vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools
   system(paste("cp", paste0(out_file,".tmp"), out_file))
 }
 
-
-=
 #' VCF annotation using bcftools
 #'
 #' This function annotates VCF file using bcftools
@@ -501,7 +499,7 @@ vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib
   if(verbose){
     print(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file))
   }
-  system(print(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file)))
+  system(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
@@ -540,7 +538,7 @@ vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/b
   if(verbose){
     print(paste(bin_path,"query -f ",expr, vcf,">",out_file))
   }
-  system(print(paste(bin_path,"query -f ",expr, vcf,">",out_file)))
+  system(paste(bin_path,"query -f ",expr, vcf,">",out_file))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
