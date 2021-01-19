@@ -323,7 +323,7 @@ vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_gen
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
-  dat=dat %>% filter(!grepl("_|MT|M",Region))
+  dat=dat %>% dplyr::filter(!grepl("_|MT|M",Region))
   cl=parallel::makeCluster(threads)
   pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_bcftools,bin_path=bin_path,bam=bam,ref_genome=ref_genome,verbose=verbose,cl=cl)
   on.exit(parallel::stopCluster(cl))
