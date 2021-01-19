@@ -13,6 +13,16 @@ vcf_bcftools_parallel(
   threads = 3,
   verbose = FALSE
 )
+
+vcf_bcftools_parallel(
+  bin_path = "tools/bcftools/bcftools",
+  bam = "",
+  ref_genome = "",
+  output_dir = "",
+  region_bed = "",
+  threads = 3,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{bin_path}{\link{Required} Path to bcftools binary. Default path tools/bcftools/bcftools.}
@@ -30,5 +40,7 @@ vcf_bcftools_parallel(
 \item{verbose}{Enables progress messages. Default False.}
 }
 \description{
+This function calls SNPs in a sample
+
 This function calls SNPs in a sample
 }
