@@ -334,7 +334,7 @@ vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_gen
   sample_name=ULPwgs::get_sample_name(bam[1])
   out_file_dir=paste0(output_dir,sep,sample_name,"_BCF_MPILEUP_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
-  vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz"),output_dir=out_file_dir,verbose=verbose)
+  vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf"),output_dir=out_file_dir,verbose=verbose)
 
 }
 
