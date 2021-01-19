@@ -335,13 +335,39 @@ vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_gen
   out_file_dir=paste0(output_dir,sep,sample_name,"_BCF_MPILEUP_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf"),output_dir=out_file_dir,verbose=verbose)
-
 }
 
+#' Variant calling using bcftools on parallel per genomic region
+#'
+#' This function calls SNPs in a sample
+#'
+#' @param bam [Required] Path to bam file.
+#' @param bin_path [Required] Path to bcftools binary. Default path tools/bcftools/bcftools.
+#' @param ref_genome Path to reference genome fasta file.
+#' @param threads [Optional] Number of threads. Default 3
+#' @param region_bed Path to bed file with regions to analyze.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+#' @import pbapply
 
-
-
-
+vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_genome="",output_dir="",region_bed="",threads=3,verbose=FALSE){
+  dat=read.table(region_bed)
+  dat$V2=dat$V2+1
+  dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
+  dat=dat %>% dplyr::filter(!grepl("_|MT|M",Region))
+  cl=parallel::makeCluster(threads)
+  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_bcftools,bin_path=bin_path,bam=bam,ref_genome=ref_genome,verbose=verbose,cl=cl)
+  on.exit(parallel::stopCluster(cl))
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  sample_name=ULPwgs::get_sample_name(bam[1])
+  out_file_dir=paste0(output_dir,sep,sample_name,"_BCF_MPILEUP_VARIANTS_VCF")
+  vcf_concatenate(bin_path=bin_path,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
+  vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf"),output_dir=out_file_dir,verbose=verbose)
+}
 
 
 
@@ -402,14 +428,15 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
 #' @param unfil_vcf Path to unfiltered vcf file.
 #' @param qual Quality filter. Default 30.
 #' @param mq Mapping quality filter. Default 40.
-#' @param state Variant state. Default het.
+#' @param ref [Optional] Filter variants with ID.
+#' @param state [Optional] Variant state to select. Options: het/homo
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
 
 
-vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",qual=30,mq=40,state="het",verbose=FALSE,output_dir=""){
+vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",qual=30,mq=40,state="",ref="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -422,10 +449,140 @@ vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools
 
   out_file=paste0(out_file_dir,"/",sample_name,".FILTERED.vcf")
 
-  if(verbose){
-    print(paste(bin_path,"view  -i \'%QUAL>",qual," & GT[0]=\"",state,"\"","& MQ>",mq,"\'",unfil_vcf,">",out_file))
+
+  if (state!=""){
+    state=paste(" & GT[0]=\"",state,"\"")
   }
-  system(paste(bin_path,"view  -i \'%QUAL>",qual," & GT[0]=\"",state,"\"","& MQ>",mq,"\'",unfil_vcf,">",out_file))
+
+  if (ref!=""){
+    ref=paste(" & ID!=\"",ref,"\"")
+  }
+  if(verbose){
+    print(paste(bin_path,"view  -i \'%QUAL>",qual,state,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+  }
+  system(paste(bin_path,"view  -i \'%QUAL>",qual,state,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+  system(paste("cp", out_file, paste0(out_file,".tmp")))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", paste0(out_file,".tmp"), out_file))
+}
+
+
+#' VCF anotation using bcftools
+#'
+#' This function annotates VCF file using bcftools
+#'
+#' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param vcf Path to vcf file.
+#' @param db Path to vcf file with SNPs database.
+#' @param state Variant state. Default het.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+
+
+vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",db="",verbose=FALSE,output_dir=""){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  sample_name=ULPwgs::get_sample_name(vcf)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_ANNOTATED")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  out_file=paste0(out_file_dir,"/",sample_name,".ANNOTATED.vcf")
+
+  if(verbose){
+    print(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file))
+  }
+  print(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", out_file, paste0(out_file,".tmp")))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", paste0(out_file,".tmp"), out_file))
+}
+
+#' VCF annotation using bcftools
+#'
+#' This function annotates VCF file using bcftools
+#'
+#' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param vcf Path to vcf file.
+#' @param db Path to vcf file with SNPs database.
+#' @param state Variant state. Default het.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+
+
+vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",db="",verbose=FALSE,output_dir=""){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  sample_name=ULPwgs::get_sample_name(vcf)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_ANNOTATED")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  out_file=paste0(out_file_dir,"/",sample_name,".ANNOTATED.vcf")
+
+  if(verbose){
+    print(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file))
+  }
+  print(paste(bin_path,"annotate -a ",db,"-c ID", vcf,">",out_file))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", out_file, paste0(out_file,".tmp")))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", paste0(out_file,".tmp"), out_file))
+}
+
+
+#' VCF formating using bcftools
+#'
+#' This function formats VCF file using bcftools
+#'
+#' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param vcf Path to vcf file.
+#' @param expr Expresion by which to format VCF. Default '%CHROM\tt%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FILTER\t%INFO\n'
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",expr="'%CHROM\tt%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FILTER\t%INFO\n'",verbose=FALSE,output_dir=""){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  sample_name=ULPwgs::get_sample_name(vcf)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATTED")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  out_file=paste0(out_file_dir,"/",sample_name,".FORMATTED.vcf")
+
+  if(verbose){
+    print(paste(bin_path,"query -f ",expr, vcf,">",out_file))
+  }
+  print(paste(bin_path,"query -f ",expr, vcf,">",out_file))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
