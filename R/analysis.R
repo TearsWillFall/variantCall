@@ -559,7 +559,7 @@ vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib
 #' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
 #' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
 #' @param vcf Path to vcf file.
-#' @param expr Expresion by which to format VCF. Default '%CHROM\tt%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FILTER\t%INFO\n'
+#' @param expr Expresion by which to format VCF. Default %CHROM\t%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FILTER\t%INFO\n
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @export
