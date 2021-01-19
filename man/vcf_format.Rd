@@ -9,7 +9,8 @@ vcf_format(
   bin_path2 = "tools/htslib/bgzip",
   bin_path3 = "tools/htslib/tabix",
   vcf = "",
-  expr = "'\%CHROM\\tt\%POS\\t\%ID\\t\%REF\\t\%ALT\\t\%QUAL\\t\%FILTER\\t\%INFO\\n'",
+ 
+    expr = "'\%CHROM\\\\t\%POS\\\\t\%ID\\\\t\%REF\\\\t\%ALT\\\\t\%QUAL\\\\t\%FILTER\\\\t\%INFO\\\\n'",
   verbose = FALSE,
   output_dir = ""
 )
@@ -23,7 +24,7 @@ vcf_format(
 
 \item{vcf}{Path to vcf file.}
 
-\item{expr}{Expresion by which to format VCF. Default '\%CHROM\tt\%POS\t\%ID\t\%REF\t\%ALT\t\%QUAL\t\%FILTER\t\%INFO\n'}
+\item{expr}{Expresion by which to format VCF. Default \%CHROM\\t\%POS\\t\%ID\\t\%REF\\t\%ALT\\t\%QUAL\\t\%FILTER\\t\%INFO\\n}
 
 \item{verbose}{Enables progress messages. Default False.}
 
