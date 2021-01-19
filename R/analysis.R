@@ -451,11 +451,11 @@ vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools
 
 
   if (state!=""){
-    state=paste(" & GT[0]=\"",state,"\"")
+    state=paste0(" & GT[0]=\"",state,"\" ")
   }
 
   if (ref!=""){
-    ref=paste(" & ID!=\"",ref,"\"")
+    ref=paste0(" & ID!=\"",ref,"\" ")
   }
   if(verbose){
     print(paste(bin_path,"view  -i \'%QUAL>",qual,state,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
