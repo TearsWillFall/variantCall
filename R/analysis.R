@@ -549,14 +549,13 @@ vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/b
 #' This function formats ASEQ pileup file for downstream analysis.
 #'
 #' @param file Path to file to format.
-#' @param filter_indels Filter indels from variants. Default false.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @import data.table
 #' @export
 
 
-format_ASEQ_pileup=function(file="",filter_indels=FALSE,verbose=FALSE,output_dir=""){
+format_ASEQ_pileup=function(file="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -570,11 +569,9 @@ format_ASEQ_pileup=function(file="",filter_indels=FALSE,verbose=FALSE,output_dir
   out_file=paste0(out_file_dir,"/",sample_name,".snps")
   dat=read.table(file,header=TRUE)
   dat=dat %>% select(chr,pos,dbsnp,ref,alt,A,C,G,T,RD)
-  if(filter_indels){
-    dat=dat %>% dplyr::filter(nchar(as.character(alt))>1)
-  }
+  dat=dat %>% dplyr::filter(nchar(as.character(alt))>1)
   dat=dat[,Value := get(as.character(alt)), by = alt]
-  dat=dat %>% mutate(af=Value/RD,cov=RD) %>% select(chr, pos,dbsnp,ref,alt,A,C,G,T,af,cov) %>% rename (dbsnp="rsid")
+  dat=dat %>% dplyr::mutate(af=Value/RD,cov=RD) %>% dplyr::select(chr, pos,dbsnp,ref,alt,A,C,G,T,af,cov) %>% dplyr::rename (dbsnp="rsid")
   write.table(dat,file=out_file)
 }
 
