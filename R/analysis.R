@@ -544,8 +544,8 @@ vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/b
 }
 
 
-#' VCF formating using bcftools
-#'
+#' ASEQ pileup formatting for downstream aalysis
+
 #' This function formats ASEQ pileup file for downstream analysis.
 #'
 #' @param file Path to file to format.
@@ -553,6 +553,7 @@ vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/b
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @import data.table
+#' @export
 
 
 format_ASEQ_pileup=function(file="",filter_indels=FALSE,verbose=FALSE,output_dir=""){
