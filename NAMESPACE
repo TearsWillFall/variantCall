@@ -2,6 +2,7 @@
 
 export("%>%")
 export(bgzip)
+export(format_ASEQ_pileup)
 export(tab_indx)
 export(vcf_annotate)
 export(vcf_bcftools_parallel)

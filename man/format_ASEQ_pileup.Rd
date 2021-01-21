@@ -2,7 +2,8 @@
 % Please edit documentation in R/analysis.R
 \name{format_ASEQ_pileup}
 \alias{format_ASEQ_pileup}
-\title{VCF formating using bcftools}
+\title{ASEQ pileup formatting for downstream aalysis
+This function formats ASEQ pileup file for downstream analysis.}
 \usage{
 format_ASEQ_pileup(
   file = "",
@@ -21,5 +22,6 @@ format_ASEQ_pileup(
 \item{output_dir}{Path to the output directory.}
 }
 \description{
+ASEQ pileup formatting for downstream aalysis
 This function formats ASEQ pileup file for downstream analysis.
 }
