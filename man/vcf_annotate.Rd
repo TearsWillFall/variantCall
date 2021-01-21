@@ -11,7 +11,8 @@ vcf_annotate(
   vcf = "",
   db = "",
   verbose = FALSE,
-  output_dir = ""
+  output_dir = "",
+  threads = 1
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ vcf_annotate(
 \item{verbose}{Enables progress messages. Default False.}
 
 \item{output_dir}{Path to the output directory.}
+
+\item{threads}{Additional in/out compression threads. Default 1.}
 
 \item{state}{Variant state. Default het.}
 }

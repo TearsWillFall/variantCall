@@ -260,6 +260,7 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
   }
   system(paste0(bin_path," sort ",vcf," -m ",ram, "G ",tmp," -o ",out_file,".SORTED.",file_ext))
 
+
 }
 
 
@@ -335,6 +336,10 @@ vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_gen
   out_file_dir=paste0(output_dir,sep,sample_name,"_BCF_MPILEUP_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf"),output_dir=out_file_dir,verbose=verbose)
+  system(paste("cp", out_file, paste0(out_file,".tmp")))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", paste0(out_file,".tmp"), out_file))
 }
 
 #' Variant calling using bcftools on parallel per genomic region
@@ -368,12 +373,6 @@ vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_gen
   vcf_concatenate(bin_path=bin_path,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf"),output_dir=out_file_dir,verbose=verbose)
 }
-
-
-
-
-
-
 
 
 
@@ -545,6 +544,39 @@ vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/b
 }
 
 
+#' VCF formating using bcftools
+#'
+#' This function formats ASEQ pileup file for downstream analysis.
+#'
+#' @param file Path to file to format.
+#' @param filter_indels Filter indels from variants. Default false.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @import data.table
+
+
+format_ASEQ_pileup=function(file="",filter_indels=FALSE,verbose=FALSE,output_dir=""){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  sample_name=ULPwgs::get_sample_name(file)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATTED_ASEQ_PILEUP")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  out_file=paste0(out_file_dir,"/",sample_name,".snps")
+  dat=read.table(file,header=TRUE)
+  dat=dat %>% select(chr,pos,dbsnp,ref,alt,A,C,G,T,RD)
+  if(filter_indels){
+    dat=dat %>% dplyr::filter(nchar(as.character(alt))>1)
+  }
+  dat=dat[,Value := get(as.character(alt)), by = alt]
+  dat=dat %>% mutate(af=Value/RD,cov=RD) %>% select(chr, pos,dbsnp,ref,alt,A,C,G,T,af,cov) %>% rename (dbsnp="rsid")
+  write.table(dat,file=out_file)
+}
+
 
 #' Variant calling using Platypus
 #'
@@ -595,9 +627,5 @@ vcf_platypus=function(bin_path="tools/platypus/Platypus.py",tumor_bam="",normal_
 
   }
   system(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm), " --source=",vcf," --output",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")))
-
-
-
-
 
 }
