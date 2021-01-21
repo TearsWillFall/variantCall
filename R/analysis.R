@@ -572,7 +572,7 @@ format_ASEQ_pileup=function(file="",verbose=FALSE,output_dir=""){
   dat=dat %>% dplyr::filter(!nchar(as.character(alt))>1)
   dat=as.data.table(dat)
   dat=dat[,Value := get(as.character(alt)), by = alt]
-  dat=dat %>% dplyr::mutate(af=Value/RD,cov=RD) %>% dplyr::select(chr, pos,dbsnp,ref,alt,A,C,G,T,af,cov) %>% dplyr::rename (dbsnp="rsid")
+  dat=dat %>% dplyr::mutate(af=Value/RD,cov=RD) %>% dplyr::select(chr, pos,dbsnp,ref,alt,A,C,G,T,af,cov) %>% dplyr::rename (rsid="dbsnp")
   write.table(dat,file=out_file)
 }
 
