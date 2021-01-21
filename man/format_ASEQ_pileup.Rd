@@ -5,17 +5,10 @@
 \title{ASEQ pileup formatting for downstream aalysis
 This function formats ASEQ pileup file for downstream analysis.}
 \usage{
-format_ASEQ_pileup(
-  file = "",
-  filter_indels = FALSE,
-  verbose = FALSE,
-  output_dir = ""
-)
+format_ASEQ_pileup(file = "", verbose = FALSE, output_dir = "")
 }
 \arguments{
 \item{file}{Path to file to format.}
-
-\item{filter_indels}{Filter indels from variants. Default false.}
 
 \item{verbose}{Enables progress messages. Default False.}
 
