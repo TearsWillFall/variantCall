@@ -544,7 +544,7 @@ vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/b
 }
 
 
-#' ASEQ pileup formatting for downstream aalysis
+#' ASEQ pileup formatting for downstream analysis
 
 #' This function formats ASEQ pileup file for downstream analysis.
 #'
@@ -575,6 +575,138 @@ format_ASEQ_pileup=function(file="",verbose=FALSE,output_dir=""){
   dat=dat %>% dplyr::mutate(af=Value/RD,cov=RD) %>% dplyr::select(chr, pos,dbsnp,ref,alt,A,C,G,T,af,cov) %>% dplyr::rename (rsid="dbsnp")
   write.table(dat,file=out_file,quote=FALSE,row.names=FALSE)
 }
+
+
+
+
+
+#' Call segments for panel, exome and WGS data using CNVkit
+
+#' This function takes a single or multiple tumor samples and a single or multiple normal samples,
+#' creates a reference of a pool of normal samples, estimates the coverage and normalizes its log2 ratio using gc and accessibility information.
+#' Ultimately, it calls the segments of binned data and identifies the state of CNA.
+#'
+#' @param bin_path Path to cnvkit binary.
+#' @param tumor_samples [REQUIRED] Path to tumor samples bam files. For multiple samples pass as vector with their paths.
+#' @param normal_samples [OPTIONAL] Path to normal samples bam files. For multiple samples pass as vector with their paths. Used to create a reference.
+#' @param targets [OPTIONAL] Path to exome capture targets. Required if targeted or panel.
+#' @param access [OPTIONAL] Path to bed with accessibility information.
+#' @param diagram [DEFAULT==TRUE] Plot diagram of segments.
+#' @param scatter [DEFAULT==TRUE] Plot scatter plot of segments.
+#' @param ref_output [OPTIONAL] Name of the reference file output.
+#' @param threads [DEFAULT==3] Number of threads to use.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [DEFAULT==FALSE] Enables progress messages.
+#' @export
+
+
+call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",normal_samples="",targets="",fasta="",access="",ref_output="",output_dir="",diagram=TRUE,scatter=TRUE,threads=3,verbose=FALSE){
+
+
+  if (is.vector(tumor_samples)){
+    tumor_samples=paste(tumor_samples,collapse=" ")
+  }else{
+    tumor_samples=paste0(" ",tumor_samples)
+  }
+
+
+  if (is.vector(normal_samples)){
+    normal_samples=paste(normal_samples,collapse=" ")
+  }else{
+    normal_samples=paste0(" --normal ",normal_samples)
+  }
+
+  add=""
+  if(scatter){
+    add=paste(add," --scatter ")
+  }
+  if(diagram){
+    add=paste(add," --diagram ")
+  }
+  if (output_dir!=""){
+    output_dir=paste(" --output-dir ",output_dir)
+  }
+
+  if (ref_output!=""){
+    ref_output=paste(" --output-reference ",ref_output)
+  }
+
+  if (access!=""){
+    access=paste(" --access",access)
+  }
+
+
+  if (fasta!=""){
+    fasta=paste(" --fasta",fasta)
+  }
+
+  if (targets!=""){
+    targets=paste(  " --targets ",targets)
+  }
+
+  if(verbose){
+    print(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,ref_output,output_dir," --p ",threads,add))
+  }
+  system(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,ref_output,output_dir," --p ",threads,add))
+
+}
+
+#' Format segmentation data for downstream analysis using CLONETv2
+#'
+#' This function takes the segmentation data of multiple samples produced by any segment caller (mainly CNVkit) and generates
+#' a single BED file with all the segment information (chr/start/end/log2) with an additional column for sample ID.
+#' The default columns to select from original segmentation files are 1,2,3,5, which correspond to chr/start/end/log2 in CNVkit.
+#' Use argument cols_to_keep to select other columns if needed or if order is different from different segment callers.
+#'
+#' @param seg_file [REQUIRED] Path/s to segmentation file/s. dir_segment and seg_file are mutually excluding.
+#' @param dir_segment [REQUIRED] Path to directory with segmentation files.
+#' @param pattern [FALSE] Pattern to use if directory for segmentation files is given.
+#' @param cols_to_keep [DEFAULT==c(1,2,3,5)] Columns to keep from original segmentation bed files
+#' @param output_dir Path to the output directory.
+#' @param output_name Name of the file to output.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+
+
+format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep="",output_dir="",output_name="",verbose=FALSE){
+
+if(dir_segment!="" & seg_file!=""){
+
+  stop("Only seg_file or dir_segment can be provided, not both.")
+}
+
+if (dir_segment!=""){
+  files=list.files(path=dir_segment,pattern=pattern)
+}else {
+  files=seg_file
+}
+
+
+
+data=lapply(files,FUN=function(x) {dat=read.table(file=x,header=TRUE);
+dat$sample=ULPwgs::get_sample_name(x)
+})
+data=dplyr::bind_rows(data)
+data=data[,c(cols_to_keep,ncol(data))]
+names(data)=c("chr","start","end","log2","sample")
+sep="/"
+if(output_dir==""){
+  sep=""
+}
+
+if(output_name==""){
+  output_name="SegmentData"
+}
+out_file_dir=paste0(output_dir,sep,"FORMATTED_SEGMENTS")
+if (!dir.exists(out_file_dir)){
+    dir.create(out_file_dir)
+}
+
+out_file=paste0(out_file_dir,"/",output_name,".bed")
+write.table(data,file=out_file,quote=FALSE,row.names=FALSE)
+}
+
 
 
 #' Variant calling using Platypus

@@ -2,7 +2,9 @@
 
 export("%>%")
 export(bgzip)
+export(call_segments)
 export(format_ASEQ_pileup)
+export(format_segment_data)
 export(tab_indx)
 export(vcf_annotate)
 export(vcf_bcftools_parallel)

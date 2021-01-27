@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{format_ASEQ_pileup}
 \alias{format_ASEQ_pileup}
-\title{ASEQ pileup formatting for downstream aalysis
+\title{ASEQ pileup formatting for downstream analysis
 This function formats ASEQ pileup file for downstream analysis.}
 \usage{
 format_ASEQ_pileup(file = "", verbose = FALSE, output_dir = "")
@@ -15,6 +15,6 @@ format_ASEQ_pileup(file = "", verbose = FALSE, output_dir = "")
 \item{output_dir}{Path to the output directory.}
 }
 \description{
-ASEQ pileup formatting for downstream aalysis
+ASEQ pileup formatting for downstream analysis
 This function formats ASEQ pileup file for downstream analysis.
 }
