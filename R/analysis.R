@@ -685,7 +685,8 @@ if (dir_segment!=""){
 
 
 data=lapply(files,FUN=function(x) {dat=read.table(file=x,header=TRUE);
-dat$sample=ULPwgs::get_sample_name(x)
+dat$sample=ULPwgs::get_sample_name(x);
+return (dat)
 })
 data=dplyr::bind_rows(data)
 data=data[,c(cols_to_keep,ncol(data))]
