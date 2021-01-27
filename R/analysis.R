@@ -677,7 +677,7 @@ if(dir_segment!="" & seg_file!=""){
 }
 
 if (dir_segment!=""){
-  files=list.files(path=dir_segment,pattern=pattern)
+  files=list.files(path=dir_segment,pattern=pattern,full.names=TRUE)
 }else {
   files=seg_file
 }
