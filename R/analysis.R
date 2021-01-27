@@ -669,7 +669,7 @@ call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",norm
 
 
 
-format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep="",output_dir="",output_name="",verbose=FALSE){
+format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=c(1,2,3,5),output_dir="",output_name="",verbose=FALSE){
 
 if(dir_segment!="" & seg_file!=""){
 
