@@ -718,6 +718,8 @@ write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 #' @param tumor_bam Path to tumor bam file.
 #' @param normal_bam Path to germline bam file.
 #' @param bin_path Path to fastQC executable. Default path tools/platypus/Platypus.py.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
 #' @param ref_genome Path to reference genome fasta file.
 #' @param vcf_overlay Path to vcf overlay to use as source.
 #' @param output_dir Path to the output directory.
@@ -726,7 +728,7 @@ write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 #' @export
 
 
-vcf_platypus=function(bin_path="tools/platypus/Platypus.py",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3){
+vcf_platypus=function(bin_path="tools/platypus/Platypus.py",,bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3){
 
   sep="/"
 
@@ -760,5 +762,8 @@ vcf_platypus=function(bin_path="tools/platypus/Platypus.py",tumor_bam="",normal_
 
   }
   system(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm), " --source=",vcf_overlay," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")," --nCPU=",threads))
-
+  system(paste("cp", out_file, paste0(out_file,".tmp")))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", paste0(out_file,".tmp"), out_file))
 }
