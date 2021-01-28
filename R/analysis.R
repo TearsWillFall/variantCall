@@ -722,10 +722,11 @@ write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 #' @param vcf_overlay Path to vcf overlay to use as source.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
+#' @param threads Number of threads to use. Default 3.
 #' @export
 
 
-vcf_platypus=function(bin_path="tools/platypus/Platypus.py",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE){
+vcf_platypus=function(bin_path="tools/platypus/Platypus.py",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3){
 
   sep="/"
 
@@ -755,9 +756,9 @@ vcf_platypus=function(bin_path="tools/platypus/Platypus.py",tumor_bam="",normal_
 # TO DO FIX THIS MESS
 
   if(verbose){
-      print(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm)," --source=",vcf," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")))
+      print(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm)," --source=",vcf," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log"),"--nCPU",threads))
 
   }
-  system(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm), " --source=",vcf," --output",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")))
+  system(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm), " --source=",vcf," --output",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log"),"--nCPU",threads))
 
 }
