@@ -6,16 +6,23 @@
 \usage{
 vcf_platypus(
   bin_path = "tools/platypus/Platypus.py",
+  bin_path2 = "tools/htslib/bgzip",
+  bin_path3 = "tools/htslib/tabix",
   tumor_bam = "",
   normal_bam = "",
   ref_genome = "",
   vcf_overlay = "",
   output_dir = "",
-  verbose = FALSE
+  verbose = FALSE,
+  threads = 3
 )
 }
 \arguments{
 \item{bin_path}{Path to fastQC executable. Default path tools/platypus/Platypus.py.}
+
+\item{bin_path2}{Path to bgzip binary. Default tools/htslib/bgzip.}
+
+\item{bin_path3}{Path to tabix binary. Default tools/htslib/tabix.}
 
 \item{tumor_bam}{Path to tumor bam file.}
 
@@ -28,6 +35,8 @@ vcf_platypus(
 \item{output_dir}{Path to the output directory.}
 
 \item{verbose}{Enables progress messages. Default False.}
+
+\item{threads}{Number of threads to use. Default 3.}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or

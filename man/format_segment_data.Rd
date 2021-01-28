@@ -8,7 +8,7 @@ format_segment_data(
   seg_file = "",
   dir_segment = "",
   pattern = "",
-  cols_to_keep = "",
+  cols_to_keep = c(1, 2, 3, 5),
   output_dir = "",
   output_name = "",
   verbose = FALSE

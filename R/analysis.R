@@ -728,7 +728,7 @@ write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 #' @export
 
 
-vcf_platypus=function(bin_path="tools/platypus/Platypus.py",,bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3){
+vcf_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3){
 
   sep="/"
 
