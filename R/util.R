@@ -69,8 +69,8 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
     })
   }
 
-  names=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
-  apply(names,1,function(x){system(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(out_file,"/",x,".vcf.gz"),vcf))
+  name=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
+  sapply(name,function(x){system(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(out_file,"/",x,".vcf.gz"),vcf))
   })
 
 }
