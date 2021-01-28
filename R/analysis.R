@@ -157,11 +157,12 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
 #' @param vcf Path to vcf file.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
+#' @param threads Number of threads to use. Default 3.
 #' @export
 
 
 
-vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir=""){
+vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir="",threads=3){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -176,9 +177,9 @@ vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir=""
   out_file=paste0(out_file_dir,"/",sample_name,".VEP.vcf")
 
   if(verbose){
-    print(paste(bin_path,"-i",,vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf"))
+    print(paste(bin_path,"-i",,vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
   }
-  system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf"))
+  system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
 }
 
 

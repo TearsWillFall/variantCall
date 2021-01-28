@@ -8,7 +8,8 @@ vep(
   bin_path = "tools/ensembl-vep/vep",
   vcf = "",
   verbose = FALSE,
-  output_dir = ""
+  output_dir = "",
+  threads = 3
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ vep(
 \item{verbose}{Enables progress messages. Default False.}
 
 \item{output_dir}{Path to the output directory.}
+
+\item{threads}{Number of threads to use. Default 3.}
 }
 \description{
 This function predicts the effect of variant found in a VCF file
