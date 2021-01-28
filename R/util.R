@@ -42,7 +42,7 @@ bgzip=function(bin_path="tools/htslib/bgzip",file="",verbose=FALSE){
 #' This function takes a multisample VCF and splits into multiple VCFS for each sample
 #'
 #' @param bin_path [Required] Path to bcftools binary. Default "tools/bcftools/bcftools"
-#' @param file [Required] Path to VCF file to split.
+#' @param vcf [Required] Path to VCF file to split.
 #' @param verbose [Optional] Enables progress messages. Default False.
 #' @param output_dir [Optional] Path to the output directory.
 #' @export
