@@ -433,13 +433,14 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
 #' @param ref [Optional] Filter variants with ID.
 #' @param state [Optional] Variant state to select. Options: het/homo
 #' @param type [Optional] Variant type to include. Options: snp/indel. Default includes both
+#' @param filter [Optional] Filter to include Options: PASS/.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
 
 
-vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",qual=30,mq=40,state="",ref="",type="",verbose=FALSE,output_dir=""){
+vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -465,11 +466,15 @@ vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools
     type=paste0(" & TYPE=\"",type,"\" ")
   }
 
+  if (filter!=""){
+    filter=paste0(" & FILTER=\"",filter,"\" ")
+  }
+
 
   if(verbose){
-    print(paste(bin_path,"view  -i \'%QUAL>",qual,state,type,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+    print(paste(bin_path,"view  -i \'%QUAL>",qual,state,type,,filter,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
   }
-  system(paste(bin_path,"view  -i \'%QUAL>",qual,state,type,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+  system(paste(bin_path,"view  -i \'%QUAL>",qual,state,type,filter,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
