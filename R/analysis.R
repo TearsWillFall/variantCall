@@ -341,6 +341,7 @@ vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_gen
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", paste0(out_file,".tmp"), out_file))
+  system(paste("rm -rf", paste0(out_file,".tmp")))
 }
 
 #' Variant calling using bcftools on parallel per genomic region
@@ -414,6 +415,7 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", paste0(out_file,".tmp"), out_file))
+  system(paste("rm -rf", paste0(out_file,".tmp")))
 }
 
 
@@ -430,13 +432,14 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
 #' @param mq Mapping quality filter. Default 40.
 #' @param ref [Optional] Filter variants with ID.
 #' @param state [Optional] Variant state to select. Options: het/homo
+#' @param type [Optional] Variant type to include. Options: snp/indel. Default includes both
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
 
 
-vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",qual=30,mq=40,state="",ref="",verbose=FALSE,output_dir=""){
+vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",qual=30,mq=40,state="",ref="",type="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -457,14 +460,21 @@ vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools
   if (ref!=""){
     ref=paste0(" & ID!=\"",ref,"\" ")
   }
-  if(verbose){
-    print(paste(bin_path,"view  -i \'%QUAL>",qual,state,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+
+  if (type!=""){
+    type=paste0(" & TYPE=\"",type,"\" ")
   }
-  system(paste(bin_path,"view  -i \'%QUAL>",qual,state,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+
+
+  if(verbose){
+    print(paste(bin_path,"view  -i \'%QUAL>",qual,state,type,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+  }
+  system(paste(bin_path,"view  -i \'%QUAL>",qual,state,type,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", paste0(out_file,".tmp"), out_file))
+  system(paste("rm -rf", paste0(out_file,".tmp")))
 }
 
 #' VCF annotation using bcftools
@@ -505,6 +515,7 @@ vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", paste0(out_file,".tmp"), out_file))
+  system(paste("rm -rf", paste0(out_file,".tmp")))
 }
 
 
@@ -542,6 +553,7 @@ vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/b
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", paste0(out_file,".tmp"), out_file))
+  system(paste("rm -rf", paste0(out_file,".tmp")))
 }
 
 
@@ -754,7 +766,7 @@ vcf_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/hts
   }else{
     tumor=tumor_bam
   }
-  out_file=paste0(out_file,"/",sample_name,"_PLATYPUS.vcf")
+  out_file=paste0(out_file,"/",sample_name,".PLATYPUS.vcf")
 
 # TO DO FIX THIS MESS
 
@@ -767,4 +779,5 @@ vcf_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/hts
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
   system(paste("cp", paste0(out_file,".tmp"), out_file))
+  system(paste("rm -rf", paste0(out_file,".tmp")))
 }
