@@ -863,8 +863,6 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",patter
     files=vcf
   }
 
-  sample_name=ULPwgs::get_sample_name(vcf)
-
   if(output_name==""){
     output_name="PMreadsCount"
   }
@@ -874,8 +872,8 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",patter
     sep=""
   }
 
-  out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATTED_PM_ANALYSIS")
-  out_file=paste0(out_file_dir,"/",sample_name,".tsv")
+  out_file_dir=paste0(output_dir,sep,"FORMATTED_PM_ANALYSIS")
+  out_file=paste0(out_file_dir,"/",output_name,".tsv")
 
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
