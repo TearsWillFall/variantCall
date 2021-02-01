@@ -804,24 +804,24 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
   }
 
   if (mode!=""){
-    mode=paste(" mode=",mode)
+    mode=paste0(" mode=",mode)
     if(mode=="GENOTYPE"){
         if (htperc!=""){
-          htperc=paste(" htperc=",htperc)
+          htperc=paste0(" htperc=",htperc)
     }
         if (pht!=""){
-          pht=paste(" pht=",pht)
+          pht=paste0(" pht=",pht)
     }
   }
 }
   if (mqr!=""){
-    mqr=paste(" mqr=",mqr)
+    mqr=paste0(" mqr=",mqr)
   }
   if (mbq!=""){
-    mbq=paste(" mbq=",mbq)
+    mbq=paste0(" mbq=",mbq)
   }
   if (mdc!=""){
-    mdc=paste(" mdc=",mdc)
+    mdc=paste0(" mdc=",mdc)
   }
 
   if(verbose){
