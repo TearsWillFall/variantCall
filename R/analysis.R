@@ -880,9 +880,9 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",patter
   }
 
   if(verbose){
-    lapply(files,FUN=function(x){print(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[,]\' \'{ print  $1, ",x,", $2, $3 }\' OFS=\'\\t\' >> ",out_file))})
+    lapply(files,FUN=function(x){print(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[,]\' \'{ print  $1, \" ",ULPwgs::get_sample_name(x)," \", $2, $3 }\' OFS=\'\\t\' >> ",out_file))})
 }
-    lapply(files,FUN=function(x){system(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[,]\' \'{ print  $1,",x,", $2, $3 }\' OFS=\'\\t\' >> ",out_file))})
+    lapply(files,FUN=function(x){system(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[,]\' \'{ print  $1, \" ",ULPwgs::get_sample_name(x)," \", $2, $3 }\' OFS=\'\\t\' >> ",out_file))})
 }
 
 
