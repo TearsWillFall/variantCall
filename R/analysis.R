@@ -798,7 +798,7 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
     out_file_dir=paste0(output_dir,sep,sample_name,"_ASEQ_PILEUP")}
   else{
     out_file_dir=paste0(output_dir,sep,sample_name,"_ASEQ_GENOTYPING")}
-  }
+
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
