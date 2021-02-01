@@ -781,6 +781,10 @@ write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 
 ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
 
+
+
+  sample_name=ULPwgs::get_sample_name(bam)
+
   sep="/"
   if(output_dir==""){
     sep=""
