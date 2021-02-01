@@ -838,18 +838,35 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
 #' This function takes a VCF file and outputs a tab delimited file with data for downstream analysis in CLONETv2 point mutations analysis.
 #'
 #' @param bin_path [REQUIRED] Path to ASEQ binary. Default tools/bcftools/bcftools
-#' @param vcf [REQUIRED] Path to vcf file.
-#' @param threads [OPTIONAL] Number of threads to use. Default value 3.
+#' @param vcf_dir [REQUIRED] Path to vcf file directory.
+#' @param vcf [OPTIONAL] Path to vcf file. Only if vcf directory not provided.
 #' @param output_dir [OPTIONAL]  Path to the output directory.
+#' @param output_name [OPTIONAL]  Name of output file.
 #' @param verbose [OPTIONAL]  Enables progress messages. Default False.
 #' @export
 
 
-format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf="",output_dir="",verbose=FALSE){
+format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",vcf="",output_dir="",output_name="",verbose=FALSE){
 
   system(paste0("export BCFTOOLS_PLUGINS=",sub("bcftools$", "plugins\\1",bin_path)))
 
+
+  if(vcf!="" & vcf_dir!=""){
+
+    stop("Only vcf or vcf_dir arguments can be provided, not both.")
+  }
+
+  if (vcf_dir!=""){
+    files=list.files(path=vcf_dir,pattern=pattern,full.names=TRUE)
+  }else {
+    files=vcf
+  }
+
   sample_name=ULPwgs::get_sample_name(vcf)
+
+  if(output_name==""){
+    output_name="PMreadsCount"
+  }
 
   sep="/"
   if(output_dir==""){
@@ -857,17 +874,17 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf="",output_dir
   }
 
   out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATTED_PM_ANALYSIS")
-
+  out_file=paste0(out_file_dir,"/",sample_name,".tsv")
 
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
 
   if(verbose){
-    print(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",vcf," | awk -F \'[,]\' \'{ print  $1, $2",sample_name," $3 }\' OFS=\'\\t\' > ",out_file_dir))
-
+    lapply(files,FUN=function(x){print(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[,]\' \'{ print  $1, $2 ,",sample_name," $3 }\' OFS=\'\\t\' >> ",out_file_dir))})
+}
   }
-    system(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",vcf," | awk -F \'[,]\' \'{ print  $1, $2 ,",sample_name," $3 }\' OFS=\'\\t\' > ",out_file_dir))
+    lapply(files,FUN=function(x){system(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[,]\' \'{ print  $1, $2 ,",sample_name," $3 }\' OFS=\'\\t\' >> ",out_file_dir))})
 }
 
 
