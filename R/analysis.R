@@ -883,7 +883,6 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",vcf=""
   if(verbose){
     lapply(files,FUN=function(x){print(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[,]\' \'{ print  $1, $2 ,",sample_name," $3 }\' OFS=\'\\t\' >> ",out_file_dir))})
 }
-  }
     lapply(files,FUN=function(x){system(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[,]\' \'{ print  $1, $2 ,",sample_name," $3 }\' OFS=\'\\t\' >> ",out_file_dir))})
 }
 
