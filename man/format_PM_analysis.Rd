@@ -6,21 +6,25 @@
 \usage{
 format_PM_analysis(
   bin_path = "tools/bcftools/bcftools",
+  vcf_dir = "",
   vcf = "",
   output_dir = "",
+  output_name = "",
   verbose = FALSE
 )
 }
 \arguments{
 \item{bin_path}{\link{REQUIRED} Path to ASEQ binary. Default tools/bcftools/bcftools}
 
-\item{vcf}{\link{REQUIRED} Path to vcf file.}
+\item{vcf_dir}{\link{REQUIRED} Path to vcf file directory.}
+
+\item{vcf}{\link{OPTIONAL} Path to vcf file. Only if vcf directory not provided.}
 
 \item{output_dir}{\link{OPTIONAL}  Path to the output directory.}
 
-\item{verbose}{\link{OPTIONAL}  Enables progress messages. Default False.}
+\item{output_name}{\link{OPTIONAL}  Name of output file.}
 
-\item{threads}{\link{OPTIONAL} Number of threads to use. Default value 3.}
+\item{verbose}{\link{OPTIONAL}  Enables progress messages. Default False.}
 }
 \description{
 This function takes a VCF file and outputs a tab delimited file with data for downstream analysis in CLONETv2 point mutations analysis.

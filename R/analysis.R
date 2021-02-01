@@ -839,6 +839,7 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
 #'
 #' @param bin_path [REQUIRED] Path to ASEQ binary. Default tools/bcftools/bcftools
 #' @param vcf_dir [REQUIRED] Path to vcf file directory.
+#' @param pattern [OPTIONAL] Pattern to filter vcfs by.
 #' @param vcf [OPTIONAL] Path to vcf file. Only if vcf directory not provided.
 #' @param output_dir [OPTIONAL]  Path to the output directory.
 #' @param output_name [OPTIONAL]  Name of output file.
@@ -846,7 +847,7 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
 #' @export
 
 
-format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",vcf="",output_dir="",output_name="",verbose=FALSE){
+format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern="",vcf="",output_dir="",output_name="",verbose=FALSE){
 
   system(paste0("export BCFTOOLS_PLUGINS=",sub("bcftools$", "plugins\\1",bin_path)))
 
