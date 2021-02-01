@@ -789,12 +789,19 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
   if(output_dir==""){
     sep=""
   }
+  if (grepl(".gz",vcf)){
+    system(paste("gunzip -d",vcf))
+    vcf=sub(".gz","",vcf)
+  }
 
-  out_file_dir=paste0(output_dir,sep,sample_name,"ASEQ_PILEUP")
+  if (mode=""|mode="PILEUP"){
+    out_file_dir=paste0(output_dir,sep,sample_name,"_ASEQ_PILEUP")}
+  else{
+    out_file_dir=paste0(output_dir,sep,sample_name,"_ASEQ_GENOTYPING")}
+  }
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
-
 
   if (mode!=""){
     mode=paste(" mode=",mode)
