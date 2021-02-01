@@ -864,10 +864,10 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf="",output_dir
   }
 
   if(verbose){
-    print(paste0(bin_path,"+split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst",vcf,"| awk -F \'[,]\' \'{ print  $1, $2, $3 }\' OFS=\'\\t\' > ",out_file_dir))
+    print(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",vcf," | awk -F \'[,]\' \'{ print  $1, $2",sample_name," $3 }\' OFS=\'\\t\' > ",out_file_dir))
 
   }
-    system(paste0(bin_path,"+split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst",vcf,"| awk -F \'[,]\' \'{ print  $1, $2, $3 }\' OFS=\'\\t\' > ",out_file_dir))
+    system(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",vcf," | awk -F \'[,]\' \'{ print  $1, $2 ,",sample_name," $3 }\' OFS=\'\\t\' > ",out_file_dir))
 }
 
 
