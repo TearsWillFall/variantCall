@@ -849,7 +849,7 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
 
 format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern="",vcf="",output_dir="",output_name="",verbose=FALSE){
 
-  system(paste0("export BCFTOOLS_PLUGINS=",sub("bcftools$", "plugins\\1",bin_path)))
+
 
 
   if(vcf!="" & vcf_dir!=""){
@@ -881,10 +881,10 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",patter
 
   if(verbose){
     print(paste("echo",paste("Gene.id","chr","start","end","sample","ref.count",collapse="\t"),">",out_file))
-    lapply(files,FUN=function(x){print(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[\t,]\' \'{ print  $1,$2,$3,$3, \"",ULPwgs::get_sample_name(x),"\", $5, $6 }\' OFS=\'\\t\' >> ",out_file))})
+    lapply(files,FUN=function(x){print(paste0(bin_path," +", paste0("export BCFTOOLS_PLUGINS=",sub("bcftools$", "plugins\\1",bin_path),"/split-vep.so")," -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[\t,]\' \'{ print  $1,$2,$3,$3, \"",ULPwgs::get_sample_name(x),"\", $5, $6 }\' OFS=\'\\t\' >> ",out_file))})
   }
     system(paste("echo",paste("Gene.id","chr","start","end","sample","ref.count",collapse="\t"),">",out_file))
-    lapply(files,FUN=function(x){system(paste0(bin_path," +split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[\t,]\' \'{ print  $1,$2,$3,$3, \"",ULPwgs::get_sample_name(x),"\", $5, $6 }\' OFS=\'\\t\' >> ",out_file))})
+    lapply(files,FUN=function(x){system(paste0(bin_path," +",paste0("export BCFTOOLS_PLUGINS=",sub("bcftools$", "plugins\\1",bin_path),"/split-vep.so"), " -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst ",x," | awk -F \'[\t,]\' \'{ print  $1,$2,$3,$3, \"",ULPwgs::get_sample_name(x),"\", $5, $6 }\' OFS=\'\\t\' >> ",out_file))})
   }
 
 
