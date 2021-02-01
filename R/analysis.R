@@ -856,7 +856,7 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf="",output_dir
     sep=""
   }
 
-  out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATTED_PM_ANALYSIS")}
+  out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATTED_PM_ANALYSIS")
 
 
   if (!dir.exists(out_file_dir)){
