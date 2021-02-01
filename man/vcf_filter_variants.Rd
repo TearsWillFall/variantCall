@@ -13,6 +13,8 @@ vcf_filter_variants(
   mq = 40,
   state = "",
   ref = "",
+  type = "",
+  filter = "",
   verbose = FALSE,
   output_dir = ""
 )
@@ -33,6 +35,10 @@ vcf_filter_variants(
 \item{state}{\link{Optional} Variant state to select. Options: het/homo}
 
 \item{ref}{\link{Optional} Filter variants with ID.}
+
+\item{type}{\link{Optional} Variant type to include. Options: snp/indel. Default includes both}
+
+\item{filter}{\link{Optional} Filter to include Options: PASS/.}
 
 \item{verbose}{Enables progress messages. Default False.}
 

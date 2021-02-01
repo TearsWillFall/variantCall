@@ -14,11 +14,11 @@ split_vcf(
 \arguments{
 \item{bin_path}{\link{Required} Path to bcftools binary. Default "tools/bcftools/bcftools"}
 
+\item{vcf}{\link{Required} Path to VCF file to split.}
+
 \item{verbose}{\link{Optional} Enables progress messages. Default False.}
 
 \item{output_dir}{\link{Optional} Path to the output directory.}
-
-\item{file}{\link{Required} Path to VCF file to split.}
 }
 \description{
 This function takes a multisample VCF and splits into multiple VCFS for each sample

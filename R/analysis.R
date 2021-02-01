@@ -184,6 +184,31 @@ vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir=""
 
 
 
+clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_dir="",threads=3){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  sample_name=ULPwgs::get_sample_name(vcf)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_VEP")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  out_file=paste0(out_file_dir,"/",sample_name,".VEP.vcf")
+
+  if(verbose){
+    print(paste(bin_path,"-i",,vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
+  }
+  system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
+}
+
+
+
+
+
+
 
 
 #' VCF file concatenation
@@ -725,6 +750,80 @@ if (!dir.exists(out_file_dir)){
 out_file=paste0(out_file_dir,"/",output_name,".bed")
 write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 }
+
+
+
+#' Wrapper around ASEQ tool for pileup data.
+#'
+#'
+#' This function takes a VCF and BAM files and generates a pileup for all the variants in the vcf file. See https://demichelislab.unitn.it/lib/exe/fetch.php?media=manual.pdf for ASEQ manual.
+#' Two modes:
+#'    -PILEUP: Default use. Generates a pileup from the BAM file
+#'    -GENOTYPE: Generates genotype at VCF marked positions
+#' The output is a ASEQ pileup format that can be used for downstream analysis. In addition, genotype mode generates a VCF file with all heterozygous calls.
+#'
+#'
+#' @param bin_path [REQUIRED] Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ
+#' @param vcf [REQUIRED] Path to vcf file.
+#' @param bam [REQUIRED] Path to bam file.
+#' @param mqr [OPTIONAL] Filter by read mapping quality >=. Default value 1. See ASEQ doc.
+#' @param mbq [OPTIONAL] Filter by base quality >=. Default value 1. See ASEQ doc.
+#' @param mdc [OPTIONAL] Filter by coverage per base >=. Default value 1. See ASEQ doc.
+#' @param htperc [OPTIONAL] Heterozigosity test based on percentage. Default value 0.2. Only in GENOTYPE mode. See ASEQ doc.
+#' @param pht [OPTIONAL] P-value for heterozigosity test. Default value 0.2. Only in GENOTYPE mode. See ASEQ doc.
+#' @param mode [OPTIONAL] Usage mode. Default value PILEUP. See ASEQ doc.7
+#' @param threads [OPTIONAL] Number of threads to use. Default value 3.
+#' @param output_dir [OPTIONAL]  Path to the output directory.
+#' @param verbose [OPTIONAL]  Enables progress messages. Default False.
+#' @export
+
+
+
+ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  out_file_dir=paste0(output_dir,sep,sample_name,"ASEQ_PILEUP")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+
+  if (mode!=""){
+    mode=paste(" mode=",mode)
+    if(mode=="GENOTYPE"){
+        if (htperc!=""){
+          htperc=paste(" htperc=",htperc)
+    }
+        if (pht!=""){
+          pht=paste(" pht=",pht)
+    }
+  }
+}
+  if (mqr!=""){
+    mqr=paste(" mqr=",mqr)
+  }
+  if (mbq!=""){
+    mbq=paste(" mbq=",mbq)
+  }
+  if (mdc!=""){
+    mdc=paste(" mdc=",mdc)
+  }
+
+  if(verbose){
+    print(paste0(bin_path," vcf=",vcf, " bam=",bam,mode,mqr,mbq,mdc,htperc, " threads=",threads, " out=",out_file_dir))
+
+  }
+  system(paste0(bin_path," vcf=",vcf, " bam=",bam,mode,mqr,mbq,mdc,htperc, " threads=",threads, " out=",out_file_dir))
+
+}
+
+
+
+
 
 
 
