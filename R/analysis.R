@@ -832,7 +832,43 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
 
 }
 
+#' Format vcf for downstream point mutatation analysis.
+#'
+#'
+#' This function takes a VCF file and outputs a tab delimited file with data for downstream analysis in CLONETv2 point mutations analysis.
+#'
+#' @param bin_path [REQUIRED] Path to ASEQ binary. Default tools/bcftools/bcftools
+#' @param vcf [REQUIRED] Path to vcf file.
+#' @param threads [OPTIONAL] Number of threads to use. Default value 3.
+#' @param output_dir [OPTIONAL]  Path to the output directory.
+#' @param verbose [OPTIONAL]  Enables progress messages. Default False.
+#' @export
 
+
+format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf="",output_dir="",verbose=FALSE){
+
+  system(paste0("export BCFTOOLS_PLUGINS=",sub("bcftools$", "plugins\\1",bin_path)))
+
+  sample_name=ULPwgs::get_sample_name(vcf)
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATTED_PM_ANALYSIS")}
+
+
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  if(verbose){
+    print(paste0(bin_path,"+split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst",vcf,"| awk -F \'[,]\' \'{ print  $1, $2, $3 }\' OFS=\'\\t\' > ",out_file_dir))
+
+  }
+    system(paste0(bin_path,"+split-vep -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\"\' -s worst",vcf,"| awk -F \'[,]\' \'{ print  $1, $2, $3 }\' OFS=\'\\t\' > ",out_file_dir))
+}
 
 
 
