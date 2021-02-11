@@ -648,14 +648,14 @@ format_ASEQ_pileup=function(file="",verbose=FALSE,output_dir=""){
 call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",normal_samples="",targets="",fasta="",access="",ref_output="",output_dir="",diagram=TRUE,scatter=TRUE,threads=3,verbose=FALSE,male=TRUE){
 
 
-  if (is.vector(tumor_samples)){
+  if (is.vector(tumor_samples) & length(tumor_samples)>1){
     tumor_samples=paste(tumor_samples,collapse=" ")
   }else{
     tumor_samples=paste0(" ",tumor_samples)
   }
 
 
-  if (is.vector(normal_samples)){
+  if (is.vector(tumor_samples) & length(tumor_samples)>1){
     normal_samples=paste(normal_samples,collapse=" ")
   }else{
     normal_samples=paste0(" --normal ",normal_samples)
