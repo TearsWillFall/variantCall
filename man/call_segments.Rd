@@ -19,7 +19,8 @@ call_segments(
   diagram = TRUE,
   scatter = TRUE,
   threads = 3,
-  verbose = FALSE
+  verbose = FALSE,
+  male = TRUE
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ call_segments(
 \item{threads}{\link{DEFAULT==3} Number of threads to use.}
 
 \item{verbose}{\link{DEFAULT==FALSE} Enables progress messages.}
+
+\item{male}{\link{DEFAULT==TRUE} Reference is a male.}
 }
 \description{
 Call segments for panel, exome and WGS data using CNVkit
