@@ -162,19 +162,20 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=F
 
 
 
-vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir="",threads=3){
+call_vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir="",threads=3){
   sep="/"
   if(output_dir==""){
     sep=""
   }
 
   sample_name=ULPwgs::get_sample_name(vcf)
+  file_ext=ULPwgs::get_file_extension(vcf)
   out_file_dir=paste0(output_dir,sep,sample_name,"_VEP")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
 
-  out_file=paste0(out_file_dir,"/",sample_name,".VEP.vcf")
+  out_file=paste0(out_file_dir,"/",sample_name,".VEP.",file_ext)
 
   if(verbose){
     print(paste(bin_path,"-i",,vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
@@ -184,7 +185,7 @@ vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir=""
 
 
 
-clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_dir="",threads=3){
+call_clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_dir="",threads=3){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -313,7 +314,7 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 #' @import pbapply
 
 
-vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",threads=3,verbose=FALSE){
+call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",threads=3,verbose=FALSE){
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
@@ -346,7 +347,7 @@ vcf_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
 #' @export
 #' @import pbapply
 
-vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_genome="",output_dir="",region_bed="",threads=3,verbose=FALSE){
+call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_genome="",output_dir="",region_bed="",threads=3,verbose=FALSE){
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
@@ -383,7 +384,7 @@ vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_gen
 #' @export
 #' @import pbapply
 
-vcf_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_genome="",output_dir="",region_bed="",threads=3,verbose=FALSE){
+call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_genome="",output_dir="",region_bed="",threads=3,verbose=FALSE){
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
@@ -639,11 +640,12 @@ format_ASEQ_pileup=function(file="",verbose=FALSE,output_dir=""){
 #' @param ref_output [OPTIONAL] Name of the reference file output.
 #' @param threads [DEFAULT==3] Number of threads to use.
 #' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param male [DEFAULT==TRUE] Reference is a male.
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
 
-call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",normal_samples="",targets="",fasta="",access="",ref_output="",output_dir="",diagram=TRUE,scatter=TRUE,threads=3,verbose=FALSE){
+call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",normal_samples="",targets="",fasta="",access="",ref_output="",output_dir="",diagram=TRUE,scatter=TRUE,threads=3,verbose=FALSE,male=TRUE){
 
 
   if (is.vector(tumor_samples)){
@@ -659,6 +661,9 @@ call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",norm
     normal_samples=paste0(" --normal ",normal_samples)
   }
 
+  if(male){
+    mal=" -y "
+  }
   add=""
   if(scatter){
     add=paste(add," --scatter ")
@@ -688,9 +693,9 @@ call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",norm
   }
 
   if(verbose){
-    print(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,ref_output,output_dir," --p ",threads,add))
+    print(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,mal,ref_output,output_dir," --p ",threads,add))
   }
-  system(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,ref_output,output_dir," --p ",threads,add))
+  system(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,mal,ref_output,output_dir," --p ",threads,add))
 
 }
 
@@ -779,7 +784,7 @@ write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 
 
 
-ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
+call_ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
 
 
 
@@ -847,7 +852,7 @@ ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",m
 #' @export
 
 
-format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern="",vcf="",output_dir="",output_name="",verbose=FALSE){
+format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern="",vcf="",output_dir="",output_name="",verbose=FALSE){
 
 
 
@@ -908,7 +913,7 @@ format_PM_analysis=function(bin_path="tools/bcftools/bcftools",vcf_dir="",patter
 #' @export
 
 
-vcf_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3){
+call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3){
 
   sep="/"
 
