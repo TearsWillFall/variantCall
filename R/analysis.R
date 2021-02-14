@@ -22,7 +22,11 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
     sep=""
   }
 
-  sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+  if (output_name==""){
+    sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+  }else{
+    sample_name=output_name
+  }
 
   out_file=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   if (!dir.exists(out_file)){
@@ -316,22 +320,21 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 
 
 call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",region_bed="",threads=3,verbose=FALSE){
-  dat=read.table(region_bed)
-  dat$V2=dat$V2+1
-  dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
-  cl=parallel::makeCluster(round(threads/4), digits = 0)
-  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=output_dir,verbose=verbose,cl=cl)
-  on.exit(parallel::stopCluster(cl))
-  sep="/"
-  if(output_dir==""){
-    sep=""
-  }
   if (output_name==""){
     sample_name=ULPwgs::get_sample_name(tumor_bam[1])
   }else{
     sample_name=output_name
   }
-
+  dat=read.table(region_bed)
+  dat$V2=dat$V2+1
+  dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
+  cl=parallel::makeCluster(round(threads/4), digits = 0)
+  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=output_dir,output_name=output_name,verbose=verbose,cl=cl)
+  on.exit(parallel::stopCluster(cl))
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
   out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz"),output_dir=out_file_dir,verbose=verbose)
