@@ -595,7 +595,7 @@ call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcft
     if(output_dir==""){
       sep=""
     }
-    out_file_dir=paste0(output_dir,sep,sample_name,"_VARIANTS")
+    out_file_dir=paste0(output_dir,sep,patient_id,"_VARIANTS")
     if (!dir.exists(out_file_dir)){
         dir.create(out_file_dir)
     }
