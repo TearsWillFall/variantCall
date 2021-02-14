@@ -15,37 +15,40 @@ call_mutect2_parallel(
   germ_resource = "",
   pon = "",
   output_dir = "",
+  output_name = "",
   region_bed = "",
   threads = 3,
   verbose = FALSE
 )
 }
 \arguments{
-\item{bin_path}{\link{Required} Path to gatk binary. Default path tools/gatk/gatk.}
+\item{bin_path}{\link{REQUIRED} Path to gatk binary. Default path tools/gatk/gatk.}
 
-\item{bin_path2}{\link{Required} Path to bcftools binary. Default path tools/bcftools/bcftools.}
+\item{bin_path2}{\link{REQUIRED} Path to bcftools binary. Default path tools/bcftools/bcftools.}
 
-\item{bin_path3}{\link{Required} Path to tabix binary. Default path tools/htslib/tabix.}
+\item{bin_path3}{\link{REQUIRED} Path to tabix binary. Default path tools/htslib/tabix.}
 
-\item{bin_path4}{\link{Required} Path to bgzip binary. Default path tools/htslib/bgzip.}
+\item{bin_path4}{\link{REQUIRED} Path to bgzip binary. Default path tools/htslib/bgzip.}
 
-\item{tumor_bam}{\link{Required} Path to tumor bam file.}
+\item{tumor_bam}{\link{REQUIRED} Path to tumor bam file/s.}
 
-\item{normal_bam}{Path to germline bam file.}
+\item{normal_bam}{\link{OPTIONAL} Path to germline bam file/s.}
 
-\item{ref_genome}{Path to reference genome fasta file.}
+\item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
 
-\item{germ_resource}{Path to germline resources vcf file.}
+\item{germ_resource}{\link{REQUIRED} Path to germline resources vcf file.}
 
-\item{pon}{\link{Optional} Path to panel of normal.}
+\item{pon}{\link{OPTIONAL} Path to panel of normal.}
 
-\item{output_dir}{Path to the output directory.}
+\item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 
-\item{region_bed}{Path to bed file with regions to analyze.}
+\item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of one of the samples will be used.}
 
-\item{threads}{\link{Optional} Number of threads. Default 3}
+\item{region_bed}{\link{REQUIRED} Path to bed file with regions to analyze.}
 
-\item{verbose}{Enables progress messages. Default False.}
+\item{threads}{\link{OPTIONAL} Number of threads. Default 3}
+
+\item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or

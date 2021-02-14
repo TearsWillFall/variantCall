@@ -297,24 +297,25 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 #' This function calls somatic variants in a pair of tumor-normal matched samples, or
 #' just in a tumor sample if no matched sample is not available.
 #'
-#' @param tumor_bam [Required] Path to tumor bam file.
-#' @param normal_bam Path to germline bam file.
-#' @param bin_path [Required] Path to gatk binary. Default path tools/gatk/gatk.
-#' @param bin_path2 [Required] Path to bcftools binary. Default path tools/bcftools/bcftools.
-#' @param bin_path3 [Required] Path to tabix binary. Default path tools/htslib/tabix.
-#' @param bin_path4 [Required] Path to bgzip binary. Default path tools/htslib/bgzip.
-#' @param ref_genome Path to reference genome fasta file.
-#' @param germ_resource Path to germline resources vcf file.
-#' @param pon [Optional] Path to panel of normal.
-#' @param threads [Optional] Number of threads. Default 3
-#' @param region_bed Path to bed file with regions to analyze.
-#' @param output_dir Path to the output directory.
-#' @param verbose Enables progress messages. Default False.
+#' @param tumor_bam [REQUIRED] Path to tumor bam file/s.
+#' @param normal_bam [OPTIONAL] Path to germline bam file/s.
+#' @param bin_path [REQUIRED] Path to gatk binary. Default path tools/gatk/gatk.
+#' @param bin_path2 [REQUIRED] Path to bcftools binary. Default path tools/bcftools/bcftools.
+#' @param bin_path3 [REQUIRED] Path to tabix binary. Default path tools/htslib/tabix.
+#' @param bin_path4 [REQUIRED] Path to bgzip binary. Default path tools/htslib/bgzip.
+#' @param ref_genome [REQUIRED] Path to reference genome fasta file.
+#' @param germ_resource [REQUIRED] Path to germline resources vcf file.
+#' @param output_name [OPTIONAL] Name for the output. If not given the name of one of the samples will be used.
+#' @param pon [OPTIONAL] Path to panel of normal.
+#' @param threads [OPTIONAL] Number of threads. Default 3
+#' @param region_bed [REQUIRED] Path to bed file with regions to analyze.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
 #' @export
 #' @import pbapply
 
 
-call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",threads=3,verbose=FALSE){
+call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",region_bed="",threads=3,verbose=FALSE){
   dat=read.table(region_bed)
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
@@ -325,12 +326,22 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   if(output_dir==""){
     sep=""
   }
-  sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+  if (output_name==""){
+    sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+  }else{
+    sample_name=output_name
+  }
+
   out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz"),output_dir=out_file_dir,verbose=verbose)
   vcf_stats_merge(bin_path=bin_path,vcf_stats_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_filtering(bin_path=bin_path,bin_path2=bin_path3,bin_path3=bin_path4,ref_genome=ref_genome,unfil_vcf=paste0(out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF","/",sample_name,".SORTED.CONCATENATED.vcf"),unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir,verbose=verbose)
+  system(paste0("rm -rf",out_file_dir,"/*:*"))
+  system(paste0("rm -rf",out_file_dir,"/",sample_name,"_CONCATENATED"))
+  system(paste0("rm -rf",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
+  system(paste0("rm -rf",out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF"))
+
 }
 
 #' Variant calling using bcftools on parallel per genomic region
@@ -467,6 +478,7 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
 
 
 vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
+
   sep="/"
   if(output_dir==""){
     sep=""
@@ -548,6 +560,55 @@ vcf_annotate=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib
   system(paste("cp", paste0(out_file,".tmp"), out_file))
   system(paste("rm -rf", paste0(out_file,".tmp")))
 }
+
+
+#' Variant calling of Somatic and Germline (MuTECT2 and Platypus) mutations and their subsequent annotation (VEP)
+#'
+#' This function calls somatic and germline mutations, in previously pre-processed sequencing data.
+#' This function takes a path to a directory with BAM files and a patients ID. Then it subsets all BAM
+#' files specific to the patient, identifying between cancer and normal Samples using the germline identifier.
+#' Afterwards, it calls the MuTECT2 somatic variant caller, to indentify somatics variants, and Platypus genotyper all variants found in the samples.
+#' Finally, it calls Varant Effect Predictor (VEP) and annotates all the variants.
+#'
+#'
+#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path2 [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path3 [REQUIRED] Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path4 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
+#' @param bin_path5 [REQUIRED] Path to platypus binary. Default tools/platypus/Platypus.py.
+#' @param bin_path6 [REQUIRED] Path to vep binary. tools/ensembl-vep/vep
+#' @param bam_dir [REQUIRED] Path to directory with BAM files.
+#' @param patient_id [REQUIRED] Patient ID to analyze. Has to be in file names to subselect samples.
+#' @param germ_pattern [REQUIRED] Pattern used to identify germline samples. Ex GL
+#' @param ref_genome [REQUIRED] Path to reference genome fasta file.
+#' @param germ_resource [REQUIRED] Path to germline resources vcf file.
+#' @param output_name [OPTIONAL] Name for the output. If not given the name of one of the samples will be used.
+#' @param pon [OPTIONAL] Path to panel of normal.
+#' @param threads [OPTIONAL] Number of threads. Default 3
+#' @param region_bed [REQUIRED] Path to bed file with regions to analyze.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @export
+
+call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bin_path5="tools/platypus/Platypus.py",bin_path6="tools/ensembl-vep/vep",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",threads=3,verbose=FALSE){
+    sep="/"
+    if(output_dir==""){
+      sep=""
+    }
+    out_file_dir=paste0(output_dir,sep,sample_name,"_VARIANTS")
+    if (!dir.exists(out_file_dir)){
+        dir.create(out_file_dir)
+    }
+    files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    files=files[grepl("bam$",files)]
+    tumor_bam=files[!grepl(germ_pattern,files)]
+    normal_bam=files[!grepl(germ_pattern,files)]
+    call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=output_dir,region_bed=region_bed,threads=threads,verbose=verbose)
+    call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(output_dir,sep,patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),output_dir=output_dir,verbose=verbose,threads=threads)
+    call_vep(bin_path=bin_path6,vcf=paste0(out_file_dir,patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,patient_id,"_MUTECT2_VARIANTS_VCF"),threads=threads)
+    call_vep(bin_path=bin_path6,vcf=paste0(out_file_dir,patient_id,"_PLATYPUS_VARIANTS_VCF/",patient_id,".PLATYPUS.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,patient_id,"_PLATYPUS_VARIANTS_VCF"),threads=threads)
+}
+
 
 
 #' VCF formating using bcftools
@@ -716,44 +777,43 @@ call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",norm
 #' @export
 
 
-
 format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=c(1,2,3,5),output_dir="",output_name="",verbose=FALSE){
 
-if(dir_segment!="" & seg_file!=""){
+  if(dir_segment!="" & seg_file!=""){
 
-  stop("Only seg_file or dir_segment can be provided, not both.")
-}
+    stop("Only seg_file or dir_segment can be provided, not both.")
+  }
 
-if (dir_segment!=""){
-  files=list.files(path=dir_segment,pattern=pattern,full.names=TRUE)
-}else {
-  files=seg_file
-}
+  if (dir_segment!=""){
+    files=list.files(path=dir_segment,pattern=pattern,full.names=TRUE)
+  }else {
+    files=seg_file
+  }
 
 
 
-data=lapply(files,FUN=function(x) {dat=read.table(file=x,header=TRUE);
-dat$sample=ULPwgs::get_sample_name(x);
-return (dat)
-})
-data=dplyr::bind_rows(data)
-data=data[,c(cols_to_keep,ncol(data))]
-names(data)=c("chr","start","end","log2","sample")
-sep="/"
-if(output_dir==""){
-  sep=""
-}
+  data=lapply(files,FUN=function(x) {dat=read.table(file=x,header=TRUE);
+  dat$sample=ULPwgs::get_sample_name(x);
+  return (dat)
+  })
+  data=dplyr::bind_rows(data)
+  data=data[,c(cols_to_keep,ncol(data))]
+  names(data)=c("chr","start","end","log2","sample")
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
 
-if(output_name==""){
-  output_name="SegmentData"
-}
-out_file_dir=paste0(output_dir,sep,"FORMATTED_SEGMENTS")
-if (!dir.exists(out_file_dir)){
-    dir.create(out_file_dir)
-}
+  if(output_name==""){
+    output_name="SegmentData"
+  }
+  out_file_dir=paste0(output_dir,sep,"FORMATTED_SEGMENTS")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
 
-out_file=paste0(out_file_dir,"/",output_name,".bed")
-write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
+  out_file=paste0(out_file_dir,"/",output_name,".bed")
+  write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 }
 
 
@@ -786,8 +846,6 @@ write.table(data,file=out_file,quote=FALSE,row.names=FALSE,sep="\t")
 
 call_ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
 
-
-
   sample_name=ULPwgs::get_sample_name(bam)
 
   sep="/"
@@ -816,9 +874,9 @@ call_ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr
     }
         if (pht!=""){
           pht=paste0(" pht=",pht)
+      }
     }
   }
-}
   if (mqr!=""){
     mqr=paste0(" mqr=",mqr)
   }
