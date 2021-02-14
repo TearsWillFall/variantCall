@@ -610,7 +610,6 @@ call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcft
 }
 
 
-
 #' VCF formating using bcftools
 #'
 #' This function formats VCF file using bcftools
