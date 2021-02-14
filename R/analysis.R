@@ -967,10 +967,11 @@ format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern=""
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @param threads Number of threads to use. Default 3.
+#' @param output_name [OPTIONAL] Name for the output. If not given the name of one of the samples will be used.
 #' @export
 
 
-call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3){
+call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3,output_name=""){
 
   sep="/"
 
@@ -978,7 +979,12 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/ht
     sep=""
   }
 
-  sample_name=ULPwgs::get_sample_name(tumor_bam)
+  if (output_name==""){
+    sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+  }else{
+    sample_name=output_name
+  }
+
 
   out_file=paste0(output_dir,sep,sample_name,"_PLATYPUS_VARIANTS_VCF")
   if (!dir.exists(out_file)){
