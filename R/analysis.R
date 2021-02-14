@@ -16,7 +16,7 @@
 #' @export
 
 
-vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",verbose=FALSE){
+vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",verbose=FALSE){
   sep="/"
 
   if(output_dir==""){
