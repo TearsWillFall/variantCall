@@ -9,6 +9,7 @@
 #' @param ref_genome Path to reference genome fasta file.
 #' @param region Region to analyze. Optional
 #' @param germ_resource Path to germline resources vcf file.
+#' @param output_name [OPTIONAL] Name for the output. If not given the name of one of the samples will be used.
 #' @param pon [Optional] Path to panel of normal.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
