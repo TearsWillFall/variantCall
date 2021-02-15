@@ -590,7 +590,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
   files=dplyr::left_join(files2,files3,by="Sample")
   pbapply::pblapply(X=1:nrow(files), FUN=function(x){
-    call_ASEQ(vcf=files[x,]$VCF_path,bin_path=bin_path,bam=files[x,]$BAM_path,output_dir=output_dir,threads=1,verbose=verbose)},cl=cl)
+    call_ASEQ(vcf=files[x,]$VCF_path,bin_path=bin_path,bam=files[x,]$BAM_path,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
   files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
   pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
   on.exit(parallel::stopCluster(cl))
