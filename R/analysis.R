@@ -556,12 +556,8 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   pbapply::pbapply(X=as.data.frame(files),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
   files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FORMATED")
   files=files[grepl("vcf$",files)]
-  vcf="",bin_path=bin_path4,bam="",output_dir=output_dir,threads=1,verbose=verbose)
   on.exit(parallel::stopCluster(cl))
 
-
-  dat=data.frame(S=c("asdasd","adsd"),B=c("amb","green"))
-  pbapply::pbapply(X=dat,1,FUN=print)
 }
 
 
