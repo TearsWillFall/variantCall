@@ -320,13 +320,25 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 #' @import pbapply
 
 
-call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",region_bed="",threads=3,verbose=FALSE){
+call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",region_bed="",threads=3,verbose=FALSE,chr_filter="canonical"){
+
+
   if (output_name==""){
     sample_name=ULPwgs::get_sample_name(tumor_bam[1])
   }else{
     sample_name=output_name
   }
   dat=read.table(region_bed)
+  ## Dont include unplaced contigs, a.k.a autosomal+sexual+M +MT chromosomes
+  if(chr_filter=="canonical"){
+    dat=dat[grepl(paste0(c(1:22,"X","Y","M","MT",dat$V1),collapse="|"),dat$V1),]
+  ## Include autosomal chromosomal and nothing else
+  }else if(chr_filter=="autosomal"){
+    dat=dat[grepl(paste0(c(1:22,dat$V1),collapse="|"),dat$V1),]
+  ## Include only specific chromosomes
+  }else if(chr_filter!="all"){
+    dat=dat[grepl(paste0(chr_filter,collapse="|"),dat$V1),]
+  }
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
   cl=parallel::makeCluster(round(threads/4), digits = 0)
