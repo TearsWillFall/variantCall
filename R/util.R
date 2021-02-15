@@ -329,6 +329,24 @@ format_ASEQ_pileup=function(file="",verbose=FALSE,output_dir=""){
 }
 
 
+#' Format segmentation data for downstream analysis using CLONETv2
+#'
+#' This function takes the segmentation data of multiple samples produced by any segment caller (mainly CNVkit) and generates
+#' a single BED file with all the segment information (chr/start/end/log2) with an additional column for sample ID.
+#' The default columns to select from original segmentation files are 1,2,3,5, which correspond to chr/start/end/log2 in CNVkit.
+#' Use argument cols_to_keep to select other columns if needed or if order is different from different segment callers.
+#'
+#' @param seg_file [REQUIRED] Path/s to segmentation file/s. dir_segment and seg_file are mutually excluding.
+#' @param dir_segment [REQUIRED] Path to directory with segmentation files.
+#' @param pattern [FALSE] Pattern to use if directory for segmentation files is given.
+#' @param cols_to_keep [DEFAULT==c(1,2,3,5)] Columns to keep from original segmentation bed files
+#' @param output_dir Path to the output directory.
+#' @param output_name Name of the file to output.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+
+
 format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=c(1,2,3,5),output_dir="",output_name="",verbose=FALSE){
 
   if(dir_segment!="" & seg_file!=""){

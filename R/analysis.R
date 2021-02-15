@@ -358,9 +358,9 @@ call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcft
     tumor_bam=files[!grepl(germ_pattern,files)]
     normal_bam=files[grepl(germ_pattern,files)]
     call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,output_name=patient_id,chr_filter=chr_filter)
-    call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id)
-    call_vep(bin_path=bin_path6,vcf=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF"),threads=threads)
-    call_vep(bin_path=bin_path6,vcf=paste0(out_file_dir,"/",patient_id,"_PLATYPUS_VARIANTS_VCF/",patient_id,".PLATYPUS.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_PLATYPUS_VARIANTS_VCF"),threads=threads)
+    call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id)
+    call_vep(bin_path=bin_path6,vcf=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF"),threads=threads)
+    call_vep(bin_path=bin_path6,vcf=paste0(out_file_dir,"/",patient_id,"_PLATYPUS_VARIANTS_VCF/",patient_id,".PLATYPUS.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_PLATYPUS_VARIANTS_VCF"),threads=threads)
 }
 
 
@@ -440,23 +440,6 @@ call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",norm
   system(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,mal,ref_output,output_dir," --p ",threads,add))
 
 }
-
-#' Format segmentation data for downstream analysis using CLONETv2
-#'
-#' This function takes the segmentation data of multiple samples produced by any segment caller (mainly CNVkit) and generates
-#' a single BED file with all the segment information (chr/start/end/log2) with an additional column for sample ID.
-#' The default columns to select from original segmentation files are 1,2,3,5, which correspond to chr/start/end/log2 in CNVkit.
-#' Use argument cols_to_keep to select other columns if needed or if order is different from different segment callers.
-#'
-#' @param seg_file [REQUIRED] Path/s to segmentation file/s. dir_segment and seg_file are mutually excluding.
-#' @param dir_segment [REQUIRED] Path to directory with segmentation files.
-#' @param pattern [FALSE] Pattern to use if directory for segmentation files is given.
-#' @param cols_to_keep [DEFAULT==c(1,2,3,5)] Columns to keep from original segmentation bed files
-#' @param output_dir Path to the output directory.
-#' @param output_name Name of the file to output.
-#' @param verbose Enables progress messages. Default False.
-#' @export
-
 
 
 
