@@ -277,7 +277,7 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 
   sample_name=ULPwgs::get_sample_name(vcf)
   file_ext=ULPwgs::get_file_extension(vcf)
-  out_file_dir=paste0(output_dir,sep,sample_name,"_SORTED.",toupper(file_ext))
+  out_file_dir=paste0(output_dir,sep,sample_name,"_SORTED")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
@@ -330,7 +330,8 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
     sample_name=output_name
   }
   dat=read.table(region_bed)
-  ## Dont include unplaced contigs, a.k.a autosomal+sexual+M +MT chromosomes
+
+  ## Dont include unplaced contigs, a.k.a only autosomal+sexual+MT chromosomes
   if(chr_filter=="canonical"){
     dat=dat[grepl(paste0(paste0(paste0("^",c(1:22,"X","Y","M","MT")),"$"),collapse="|"),dat$V1),]
   ## Include autosomal chromosomal and nothing else
@@ -353,11 +354,12 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf.gz"),output_dir=out_file_dir,verbose=verbose)
   vcf_stats_merge(bin_path=bin_path,vcf_stats_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
-  vcf_filtering(bin_path=bin_path,bin_path2=bin_path3,bin_path3=bin_path4,ref_genome=ref_genome,unfil_vcf=paste0(out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF","/",sample_name,".SORTED.CONCATENATED.vcf"),unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir,verbose=verbose)
-  system(paste0("rm -rf ",out_file_dir,"/*:*"))
-  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
-  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
-  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF"))
+  vcf_filtering(bin_path=bin_path,bin_path2=bin_path3,bin_path3=bin_path4,ref_genome=ref_genome,unfil_vcf=paste0(out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF.GZ","/",sample_name,".SORTED.CONCATENATED.vcf"),
+  unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir,verbose=verbose)
+  ##system(paste0("rm -rf ",out_file_dir,"/*:*"))
+  ##system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
+  ##system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
+  ##system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF.GZ"))
 
 
 }
@@ -538,7 +540,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
   system(paste("rm -rf", paste0(out_file,".tmp")))
 }
 
-format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
+format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -547,20 +549,36 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
-  files=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
-  files=files[grepl("vcf$",files)]
-  cl=parallel::makeCluster(threads, digits = 0)
-  pbapply::pbapply(X=as.data.frame(files),1,FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,cl=cl)
-  files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
-  files=files[grepl("vcf$",files)]
-  pbapply::pbapply(X=as.data.frame(files),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
-  files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FORMATED")
-  files=files[grepl("vcf$",files)]
+  files0=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+  files0=files0[grepl("vcf$",files0)]
+
+
+
+  cl=parallel::makeCluster(threads)
+  pbapply::pbapply(X=as.data.frame(files0),1,FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,cl=cl)
+  files1=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
+  files1=files[grepl("vcf$",files1)]
+  pbapply::pbapply(X=as.data.frame(files1),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
+  files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FORMATED")
+  files2=files[grepl("vcf$",files2)]
+  files2=as.data.frame(files2)
+  names(files2)="VCF_path"
+  files2$Sample=lapply(files2$VCF_path,FUN=ULPwgs::get_sample_name)
+
+  files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+  files3=files3[grepl("bam$",file3)]
+  files3=as.data.frame(files3)
+  names(files3)="BAM_path"
+  files3$Sample=lapply(files3$BAM_path,FUN=ULPwgs::get_sample_name)
+  files=left_join(files2,files3,by="Sample")
+  pbapply::pbapply(FUN=function(x){
+    call_ASEQ(vcf=files[x,]$VCF_path,bin_path=bin_path,bam=files[x,]$BAM_path,output_dir=output_dir,threads=1,verbose=verbose)},cl=cl)
+
+  files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
+  pbapply::pbapply(X=as.data.frame(files1),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
+
   on.exit(parallel::stopCluster(cl))
 }
-
-
-
 
 #' VCF annotation using bcftools
 #'
