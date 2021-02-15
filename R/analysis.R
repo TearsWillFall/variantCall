@@ -584,14 +584,13 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   files2$Sample=lapply(files2$VCF_path,FUN=ULPwgs::get_sample_name)
 
   files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
-  files3=files3[grepl("bam$",file3)]
+  files3=files3[grepl("bam$",files3)]
   files3=as.data.frame(files3)
   names(files3)="BAM_path"
   files3$Sample=lapply(files3$BAM_path,FUN=ULPwgs::get_sample_name)
   files=left_join(files2,files3,by="Sample")
   pbapply::pbapply(FUN=function(x){
     call_ASEQ(vcf=files[x,]$VCF_path,bin_path=bin_path,bam=files[x,]$BAM_path,output_dir=output_dir,threads=1,verbose=verbose)},cl=cl)
-
   files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
   pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
   on.exit(parallel::stopCluster(cl))
