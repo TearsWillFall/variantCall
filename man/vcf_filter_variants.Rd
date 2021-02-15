@@ -5,10 +5,10 @@
 \title{VCF filtering using bcftools}
 \usage{
 vcf_filter_variants(
+  unfil_vcf = "",
   bin_path = "tools/bcftools/bcftools",
   bin_path2 = "tools/htslib/bgzip",
   bin_path3 = "tools/htslib/tabix",
-  unfil_vcf = "",
   qual = 30,
   mq = 40,
   state = "",
@@ -20,13 +20,13 @@ vcf_filter_variants(
 )
 }
 \arguments{
+\item{unfil_vcf}{Path to unfiltered vcf file.}
+
 \item{bin_path}{Path to gatk binary. Default tools/gatk/gatk.}
 
 \item{bin_path2}{Path to bgzip binary. Default tools/htslib/bgzip.}
 
 \item{bin_path3}{Path to tabix binary. Default tools/htslib/tabix.}
-
-\item{unfil_vcf}{Path to unfiltered vcf file.}
 
 \item{qual}{Quality filter. Default 30.}
 

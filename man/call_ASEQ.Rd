@@ -5,8 +5,8 @@
 \title{Wrapper around ASEQ tool for pileup data.}
 \usage{
 call_ASEQ(
-  bin_path = "tools/ASEQ/binaries/linux64/ASEQ",
   vcf = "",
+  bin_path = "tools/ASEQ/binaries/linux64/ASEQ",
   bam = "",
   mqr = "",
   mbq = "",
@@ -20,9 +20,9 @@ call_ASEQ(
 )
 }
 \arguments{
-\item{bin_path}{\link{REQUIRED} Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ}
-
 \item{vcf}{\link{REQUIRED} Path to vcf file.}
+
+\item{bin_path}{\link{REQUIRED} Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ}
 
 \item{bam}{\link{REQUIRED} Path to bam file.}
 

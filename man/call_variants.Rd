@@ -19,6 +19,7 @@ call_variants(
   pon = "",
   output_dir = "",
   region_bed = "",
+  chr_filter = "canonical",
   threads = 3,
   verbose = FALSE
 )
@@ -51,6 +52,8 @@ call_variants(
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 
 \item{region_bed}{\link{REQUIRED} Path to bed file with regions to analyze.}
+
+\item{chr_filter}{\link{OPTIONAL} Chromosomes to analyze. canonical/autosomal/all or a list of chromosomes}
 
 \item{threads}{\link{OPTIONAL} Number of threads. Default 3}
 

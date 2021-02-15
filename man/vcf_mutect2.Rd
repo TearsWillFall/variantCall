@@ -13,6 +13,7 @@ vcf_mutect2(
   germ_resource = "",
   pon = "",
   output_dir = "",
+  output_name = "",
   verbose = FALSE
 )
 }
@@ -32,6 +33,8 @@ vcf_mutect2(
 \item{pon}{\link{Optional} Path to panel of normal.}
 
 \item{output_dir}{Path to the output directory.}
+
+\item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of one of the samples will be used.}
 
 \item{verbose}{Enables progress messages. Default False.}
 }

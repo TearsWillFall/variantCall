@@ -18,7 +18,8 @@ call_mutect2_parallel(
   output_name = "",
   region_bed = "",
   threads = 3,
-  verbose = FALSE
+  verbose = FALSE,
+  chr_filter = "canonical"
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ call_mutect2_parallel(
 \item{threads}{\link{OPTIONAL} Number of threads. Default 3}
 
 \item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
+
+\item{chr_filter}{\link{OPTIONAL} Chromosomes to analyze. canonical/autosomal/all or a list of chromosomes}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or

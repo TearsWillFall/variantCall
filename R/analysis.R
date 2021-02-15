@@ -540,7 +540,25 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
   system(paste("rm -rf", paste0(out_file,".tmp")))
 }
 
-format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
+#' This function filter and formats heterozygous SNP data for downstream analysis using clonet
+#'
+#' This function takes a path of a directory of unfiltered VCFs files generated using Platypus and
+#' the a path of the directory of BAMs from which those VCFs were generated.
+#'
+#' @param bin_path Path to gatk binary. Default tools/bcftools/bcftools.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param bin_path4 Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ
+#' @param unfil_vcf_dir Path to unfiltered VCF file directory.
+#' @param qual Quality filter. Default 30.
+#' @param mq Mapping quality filter. Default 40.
+#' @param bam_dir Path to BAM file directory.
+#' @param patient_id Patient identifier.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,patient_id="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -550,14 +568,13 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
       dir.create(out_file_dir)
   }
   files0=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
-  files0=files0[grepl("vcf$",files0)]
-
-
+  files0=files0[grepl("vcf.gz$",files0)]
 
   cl=parallel::makeCluster(threads)
   pbapply::pbapply(X=as.data.frame(files0),1,FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,cl=cl)
   files1=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
   files1=files[grepl("vcf$",files1)]
+
   pbapply::pbapply(X=as.data.frame(files1),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
   files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FORMATED")
   files2=files[grepl("vcf$",files2)]
@@ -575,8 +592,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
     call_ASEQ(vcf=files[x,]$VCF_path,bin_path=bin_path,bam=files[x,]$BAM_path,output_dir=output_dir,threads=1,verbose=verbose)},cl=cl)
 
   files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
-  pbapply::pbapply(X=as.data.frame(files1),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
-
+  pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
   on.exit(parallel::stopCluster(cl))
 }
 
