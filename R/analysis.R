@@ -33,6 +33,7 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
   if (!dir.exists(out_file)){
       dir.create(out_file)
   }
+
   reg=""
   if (region==""){
       out_file=paste0(out_file,"/",sample_name,".UNFILTERED_MUTECT2.vcf")
@@ -323,7 +324,6 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 
 call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",region_bed="",threads=3,verbose=FALSE,chr_filter="canonical"){
 
-
   if (output_name==""){
     sample_name=ULPwgs::get_sample_name(tumor_bam[1])
   }else{
@@ -332,13 +332,13 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   dat=read.table(region_bed)
   ## Dont include unplaced contigs, a.k.a autosomal+sexual+M +MT chromosomes
   if(chr_filter=="canonical"){
-    dat=dat[grepl(paste0(c(1:22,"X","Y","M","MT",dat$V1),collapse="|"),dat$V1),]
+    dat=dat[grepl(paste0(paste0(paste0("^",c(1:22,"X","Y","M","MT",dat$V1)),"$"),collapse="|"),dat$V1),]
   ## Include autosomal chromosomal and nothing else
   }else if(chr_filter=="autosomal"){
-    dat=dat[grepl(paste0(c(1:22,dat$V1),collapse="|"),dat$V1),]
+    dat=dat[grepl(paste0(paste0(paste0("^",c(1:22,dat$V1)),"$"),collapse="|"),dat$V1),]
   ## Include only specific chromosomes
   }else if(chr_filter!="all"){
-    dat=dat[grepl(paste0(chr_filter,collapse="|"),dat$V1),]
+    dat=dat[grepl(paste0(dat[grepl(paste0(paste0(paste0("^",chr_filter),"$"),collapse="|"),dat$V1),],collapse="|"),dat$V1),]
   }
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
@@ -358,6 +358,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF"))
+
 
 }
 
@@ -494,7 +495,7 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
 
 
 
-vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
+vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
 
   sep="/"
   if(output_dir==""){
@@ -536,6 +537,35 @@ vcf_filter_variants=function(bin_path="tools/bcftools/bcftools",bin_path2="tools
   system(paste("cp", paste0(out_file,".tmp"), out_file))
   system(paste("rm -rf", paste0(out_file,".tmp")))
 }
+
+format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  out_file_dir=paste0(output_dir,sep,patient_id,"_PROCESSED_SNPs")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+  files=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+  files=files[grepl("vcf$",files)]
+  cl=parallel::makeCluster(threads, digits = 0)
+  pbapply::pbapply(X=as.data.frame(files),1,FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,cl=cl)
+  files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
+  files=files[grepl("vcf$",files)]
+  pbapply::pbapply(X=as.data.frame(files),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
+  files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FORMATED")
+  files=files[grepl("vcf$",files)]
+  vcf="",bin_path=bin_path4,bam="",output_dir=output_dir,threads=1,verbose=verbose)
+  on.exit(parallel::stopCluster(cl))
+
+
+  dat=data.frame(S=c("asdasd","adsd"),B=c("amb","green"))
+  pbapply::pbapply(X=dat,1,FUN=print)
+}
+
+
+
 
 #' VCF annotation using bcftools
 #'
@@ -641,18 +671,18 @@ call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcft
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
-vcf_format=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=FALSE,output_dir=""){
+vcf_format=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
   }
   sample_name=ULPwgs::get_sample_name(vcf)
-  out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATTED")
+  out_file_dir=paste0(output_dir,sep,sample_name,"_FORMATED")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
 
-  out_file=paste0(out_file_dir,"/",sample_name,".FORMATTED.vcf")
+  out_file=paste0(out_file_dir,"/",sample_name,".FORMATED.vcf")
 
   if(verbose){
     print(paste(bin_path,"query -f ",expr, vcf,">",out_file))
@@ -861,7 +891,7 @@ format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=
 
 
 
-call_ASEQ=function(bin_path="tools/ASEQ/binaries/linux64/ASEQ",vcf="",bam="",mqr="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
+call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mqr="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
 
   sample_name=ULPwgs::get_sample_name(bam)
 
