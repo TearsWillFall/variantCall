@@ -955,7 +955,7 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
     }
   }
   if (mrq!=""){
-    mrq=paste0(" mqr=",mrq)
+    mrq=paste0(" mrq=",mrq)
   }
   if (mbq!=""){
     mbq=paste0(" mbq=",mbq)
