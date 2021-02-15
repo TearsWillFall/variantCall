@@ -590,7 +590,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
   files=dplyr::left_join(files2,files3,by="Sample")
   print(files)
-  pbapply::pblapply(X=1:nrow(files), FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mqr=40,mbq=30,mdc=20,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
+  pbapply::pblapply(X=1:nrow(files), FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mqr=mq,mbq=qual,mdc=20,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
   files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
   pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
   on.exit(parallel::stopCluster(cl))
@@ -907,7 +907,7 @@ format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=
 #' @param bin_path [REQUIRED] Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ
 #' @param vcf [REQUIRED] Path to vcf file.
 #' @param bam [REQUIRED] Path to bam file.
-#' @param mqr [OPTIONAL] Filter by read mapping quality >=. Default value 1. See ASEQ doc.
+#' @param mrq [OPTIONAL] Filter by read mapping quality >=. Default value 1. See ASEQ doc.
 #' @param mbq [OPTIONAL] Filter by base quality >=. Default value 1. See ASEQ doc.
 #' @param mdc [OPTIONAL] Filter by coverage per base >=. Default value 1. See ASEQ doc.
 #' @param htperc [OPTIONAL] Heterozigosity test based on percentage. Default value 0.2. Only in GENOTYPE mode. See ASEQ doc.
@@ -920,7 +920,7 @@ format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=
 
 
 
-call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mqr="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
+call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq="",mbq="",mdc="",htperc="",pht="",mode="",output_dir="",threads=3,verbose=FALSE){
 
   sample_name=ULPwgs::get_sample_name(bam)
 
@@ -953,8 +953,8 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mqr
       }
     }
   }
-  if (mqr!=""){
-    mqr=paste0(" mqr=",mqr)
+  if (mrq!=""){
+    mrq=paste0(" mqr=",mrq)
   }
   if (mbq!=""){
     mbq=paste0(" mbq=",mbq)
@@ -964,10 +964,10 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mqr
   }
 
   if(verbose){
-    print(paste0(bin_path," vcf=",vcf, " bam=",bam,mode,mqr,mbq,mdc,htperc, " threads=",threads, " out=",out_file_dir))
+    print(paste0(bin_path," vcf=",vcf, " bam=",bam,mode,mrq,mbq,mdc,htperc, " threads=",threads, " out=",out_file_dir))
 
   }
-  system(paste0(bin_path," vcf=",vcf, " bam=",bam,mode,mqr,mbq,mdc,htperc, " threads=",threads, " out=",out_file_dir))
+  system(paste0(bin_path," vcf=",vcf, " bam=",bam,mode,mrq,mbq,mdc,htperc, " threads=",threads, " out=",out_file_dir))
 
 }
 
