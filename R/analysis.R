@@ -581,13 +581,13 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   files2=files2[grepl("vcf$",files2)]
   files2=as.data.frame(files2)
   names(files2)="VCF_path"
-  files2$Sample=apply(files2$VCF_path,1,FUN=ULPwgs::get_sample_name)
+  files2$Sample=apply(files2,1,FUN=ULPwgs::get_sample_name)
 
   files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
   files3=files3[grepl("bam$",files3)]
   files3=as.data.frame(files3)
   names(files3)="BAM_path"
-  files3$Sample=apply(files3$BAM_path,1,FUN=ULPwgs::get_sample_name)
+  files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
   files=left_join(files2,files3,by="Sample")
   pbapply::pbapply(FUN=function(x){
     call_ASEQ(vcf=files[x,]$VCF_path,bin_path=bin_path,bam=files[x,]$BAM_path,output_dir=output_dir,threads=1,verbose=verbose)},cl=cl)
