@@ -587,6 +587,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   files3=files3[grepl("bam$",files3)]
   files3=as.data.frame(files3)
   names(files3)="BAM_path"
+  print(files3)
   files3$Sample=lapply(files3$BAM_path,FUN=ULPwgs::get_sample_name)
   files=left_join(files2,files3,by="Sample")
   pbapply::pbapply(FUN=function(x){
