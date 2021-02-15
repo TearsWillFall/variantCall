@@ -574,11 +574,11 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   cl=parallel::makeCluster(threads)
   pbapply::pbapply(X=as.data.frame(files0),1,FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,cl=cl)
   files1=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
-  files1=files[grepl("vcf$",files1)]
+  files1=files1[grepl("vcf$",files1)]
 
   pbapply::pbapply(X=as.data.frame(files1),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
   files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FORMATED")
-  files2=files[grepl("vcf$",files2)]
+  files2=files2[grepl("vcf$",files2)]
   files2=as.data.frame(files2)
   names(files2)="VCF_path"
   files2$Sample=lapply(files2$VCF_path,FUN=ULPwgs::get_sample_name)
