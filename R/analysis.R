@@ -552,6 +552,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
 #' @param unfil_vcf_dir Path to unfiltered VCF file directory.
 #' @param qual Quality filter. Default 30.
 #' @param mq Mapping quality filter. Default 40.
+#' @param min_cov Minimum coverage to filter. Default 20.
 #' @param bam_dir Path to BAM file directory.
 #' @param patient_id Patient identifier.
 #' @param output_dir Path to the output directory.
@@ -559,7 +560,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
 #' @param threads Number of threads to use. Default 3
 #' @export
 
-format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,patient_id="",verbose=FALSE,output_dir="",threads=3){
+format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",threads=3){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -590,7 +591,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
   files=dplyr::left_join(files2,files3,by="Sample")
   print(files)
-  pbapply::pblapply(X=1:nrow(files), FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mqr=mq,mbq=qual,mdc=20,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
+  pbapply::pblapply(X=1:nrow(files), FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mrq=mq,mbq=qual,mdc=mdc,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
   files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
   pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
   on.exit(parallel::stopCluster(cl))
