@@ -577,8 +577,8 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   files1=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
   files1=files1[grepl("vcf$",files1)]
 
-  pbapply::pbapply(X=as.data.frame(files1),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
-  files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FORMATED")
+  ##pbapply::pbapply(X=as.data.frame(files1),1,FUN=vcf_format,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=verbose,output_dir=out_file_dir,cl=cl)
+  files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FILTERED")
   files2=files2[grepl("vcf$",files2)]
   files2=as.data.frame(files2)
   names(files2)="VCF_path"
@@ -988,9 +988,6 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 
 
 format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern="",vcf="",output_dir="",output_name="",verbose=FALSE){
-
-
-
 
   if(vcf!="" & vcf_dir!=""){
 
