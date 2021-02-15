@@ -332,13 +332,13 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   dat=read.table(region_bed)
   ## Dont include unplaced contigs, a.k.a autosomal+sexual+M +MT chromosomes
   if(chr_filter=="canonical"){
-    dat=dat[grepl(paste0(paste0(paste0("^",c(1:22,"X","Y","M","MT",dat$V1)),"$"),collapse="|"),dat$V1),]
+    dat=dat[grepl(paste0(paste0(paste0("^",c(1:22,"X","Y","M","MT")),"$"),collapse="|"),dat$V1),]
   ## Include autosomal chromosomal and nothing else
   }else if(chr_filter=="autosomal"){
-    dat=dat[grepl(paste0(paste0(paste0("^",c(1:22,dat$V1)),"$"),collapse="|"),dat$V1),]
+    dat=dat[grepl(paste0(paste0(paste0("^",c(1:22)),"$"),collapse="|"),dat$V1),]
   ## Include only specific chromosomes
   }else if(chr_filter!="all"){
-    dat=dat[grepl(paste0(dat[grepl(paste0(paste0(paste0("^",chr_filter),"$"),collapse="|"),dat$V1),],collapse="|"),dat$V1),]
+    dat=dat[grepl(paste0(paste0(paste0("^",chr_filter),"$"),collapse="|"),dat$V1),]
   }
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
@@ -557,7 +557,6 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FORMATED")
   files=files[grepl("vcf$",files)]
   on.exit(parallel::stopCluster(cl))
-
 }
 
 
