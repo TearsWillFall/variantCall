@@ -361,7 +361,6 @@ format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=
   }
 
 
-
   data=lapply(files,FUN=function(x) {dat=read.table(file=x,header=TRUE);
   dat$sample=ULPwgs::get_sample_name(x);
   return (dat)
@@ -441,20 +440,20 @@ format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern=""
 
 
 
-  #' VCF formating using bcftools
-  #'
-  #' This function formats VCF file using bcftools
-  #'
-  #' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
-  #' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
-  #' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
-  #' @param vcf Path to vcf file.
-  #' @param expr Expresion by which to format VCF. Default %CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n
-  #' @param output_dir Path to the output directory.
-  #' @param verbose Enables progress messages. Default False.
-  #' @export
+#' VCF formating using bcftools
+#'
+#' This function formats VCF file using bcftools
+#'
+#' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param vcf Path to vcf file.
+#' @param expr Expresion by which to format VCF. Default %CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
 
-  vcf_format=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=FALSE,output_dir=""){
+vcf_format=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",expr="'%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO\\n'",verbose=FALSE,output_dir=""){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -479,23 +478,23 @@ format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern=""
   }
 
 
-  #' VCF filtering using GATK
-  #'
-  #' This function filters VCF calls using GATK statistics
-  #'
-  #' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
-  #' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
-  #' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
-  #' @param unfil_vcf Path to unfiltered vcf file.
-  #' @param unfil_vcf_stats Path to unfiltered vcf file stats.
-  #' @param ref_genome Path to reference genome fasta file.
-  #' @param output_dir Path to the output directory.
-  #' @param verbose Enables progress messages. Default False.
-  #' @export
+#' VCF filtering using GATK
+#'
+#' This function filters VCF calls using GATK statistics
+#'
+#' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param unfil_vcf Path to unfiltered vcf file.
+#' @param unfil_vcf_stats Path to unfiltered vcf file stats.
+#' @param ref_genome Path to reference genome fasta file.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
 
 
 
-  vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
+vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -520,27 +519,27 @@ format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern=""
   }
 
 
-  #' This function filter and formats heterozygous SNP data for downstream analysis using clonet
-  #'
-  #' This function takes a path of a directory of unfiltered VCFs files generated using Platypus and
-  #' the a path of the directory of BAMs from which those VCFs were generated.
-  #'
-  #' @param bin_path Path to gatk binary. Default tools/bcftools/bcftools.
-  #' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
-  #' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
-  #' @param bin_path4 Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ
-  #' @param unfil_vcf_dir Path to unfiltered VCF file directory.
-  #' @param qual Quality filter. Default 30.
-  #' @param mq Mapping quality filter. Default 40.
-  #' @param min_cov Minimum coverage to filter. Default 20.
-  #' @param bam_dir Path to BAM file directory.
-  #' @param patient_id Patient identifier.
-  #' @param output_dir Path to the output directory.
-  #' @param verbose Enables progress messages. Default False.
-  #' @param threads Number of threads to use. Default 3
-  #' @export
+#' This function filter and formats heterozygous SNP data for downstream analysis using clonet
+#'
+#' This function takes a path of a directory of unfiltered VCFs files generated using Platypus and
+#' the a path of the directory of BAMs from which those VCFs were generated.
+#'
+#' @param bin_path Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param bin_path4 Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ
+#' @param unfil_vcf_dir Path to unfiltered VCF file directory.
+#' @param qual Quality filter. Default 30.
+#' @param mq Mapping quality filter. Default 40.
+#' @param min_cov Minimum coverage to filter. Default 20.
+#' @param bam_dir Path to BAM file directory.
+#' @param patient_id Patient identifier.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @param threads Number of threads to use. Default 3
+#' @export
 
-  format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",threads=3){
+format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",threads=3){
     sep="/"
     if(output_dir==""){
       sep=""
