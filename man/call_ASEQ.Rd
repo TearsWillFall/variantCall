@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{call_ASEQ}
 \alias{call_ASEQ}
-\title{Format segmentation data for downstream analysis using CLONETv2}
+\title{Wrapper around ASEQ tool for pileup data.}
 \usage{
 call_ASEQ(
   vcf = "",
@@ -43,20 +43,11 @@ call_ASEQ(
 \item{threads}{\link{OPTIONAL} Number of threads to use. Default value 3.}
 
 \item{verbose}{\link{OPTIONAL}  Enables progress messages. Default False.}
-
-\item{seg_file}{\link{REQUIRED} Path/s to segmentation file/s. dir_segment and seg_file are mutually excluding.}
-
-\item{dir_segment}{\link{REQUIRED} Path to directory with segmentation files.}
-
-\item{pattern}{\link{FALSE} Pattern to use if directory for segmentation files is given.}
-
-\item{cols_to_keep}{\link{DEFAULT==c(1,2,3,5)} Columns to keep from original segmentation bed files}
-
-\item{output_name}{Name of the file to output.}
 }
 \description{
-This function takes the segmentation data of multiple samples produced by any segment caller (mainly CNVkit) and generates
-a single BED file with all the segment information (chr/start/end/log2) with an additional column for sample ID.
-The default columns to select from original segmentation files are 1,2,3,5, which correspond to chr/start/end/log2 in CNVkit.
-Use argument cols_to_keep to select other columns if needed or if order is different from different segment callers.
+This function takes a VCF and BAM files and generates a pileup for all the variants in the vcf file. See https://demichelislab.unitn.it/lib/exe/fetch.php?media=manual.pdf for ASEQ manual.
+Two modes:
+-PILEUP: Default use. Generates a pileup from the BAM file
+-GENOTYPE: Generates genotype at VCF marked positions
+The output is a ASEQ pileup format that can be used for downstream analysis. In addition, genotype mode generates a VCF file with all heterozygous calls.
 }

@@ -237,13 +237,14 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   vcf_stats_merge(bin_path=bin_path,vcf_stats_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_filtering(bin_path=bin_path,bin_path2=bin_path3,bin_path3=bin_path4,ref_genome=ref_genome,unfil_vcf=paste0(out_file_dir,"/",sample_name,"_SORTED","/",sample_name,".SORTED.CONCATENATED.vcf"),
   unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir,verbose=verbose)
-  ##system(paste0("rm -rf ",out_file_dir,"/*:*"))
-  ##system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
-  ##system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
-  ##system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED.CONCATENATED.VCF.GZ"))
-
-
+  system(paste0("rm -rf ",out_file_dir,"/*:*"))
+  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
+  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
+  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED.CONCATENATED"))
 }
+
+
+
 
 #' Variant calling using bcftools on parallel per genomic region
 #'
@@ -442,7 +443,6 @@ call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",norm
 }
 
 
-
 #' Wrapper around ASEQ tool for pileup data.
 #'
 #'
@@ -520,6 +520,55 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 
 }
 
+#' Structural variant calling using svaba
+#'
+#' This function calls structural variants in a pair of tumor-normal matched samples,
+#' using svaba
+#'
+#'
+#' @param tumor_bam Path to tumor bam file.
+#' @param normal_bam Path to germline bam file.
+#' @param bin_path Path to svaba binary executable. Default path tools/svaba/svaba.
+#' @param ref_genome Path to reference genome fasta file.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @param threads Number of threads to use. Default 3.
+#' @param targets BED file with capture target regions.
+#' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
+#' @export
+
+call_sv=function(bin_path="tools/svaba/bin/svaba",tumor_bam="",normal_bam="",ref_genome="",threads=3,output_name="",targets="",verbose=FALSE){
+
+  sep="/"
+
+  if(output_dir==""){
+    sep=""
+  }
+
+  if (output_name==""){
+    sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+  }else{
+    sample_name=output_name
+  }
+
+  out_file=paste0(output_dir,sep,sample_name,"_SVABA_VARIANTS_VCF")
+  if (!dir.exists(out_file)){
+      dir.create(out_file)
+  }
+  tgs=""
+  if (!targets==""){
+    tgs=paste0(" -k ",targets)
+  }
+  norm=""
+  if (!normal_bam==""){
+    norm=paste0(" -n ",normal_bam)
+  }
+
+  if(verbose){
+      print(paste0(bin_path," run -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome," -D ",dbsnp_indels))
+  }
+  system(paste0(bin_path," run -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome," -D ",dbsnp_indels))
+}
 
 #' Variant calling using Platypus
 #'
@@ -536,9 +585,8 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @param threads Number of threads to use. Default 3.
-#' @param output_name [OPTIONAL] Name for the output. If not given the name of one of the samples will be used.
+#' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
 #' @export
-
 
 call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3,output_name=""){
 
