@@ -125,12 +125,14 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
     type=paste0(" & TYPE=\"",type,"\" ")
   }
 
-
-
   if (qual!=""){
     qual=paste0("\'%QUAL>",qual)
+    if (filter!=""){
+      filter=paste0(" & FILTER=\"",filter,"\" ")
+    }
+
   }else{
-      filter=paste0(" FILTER=\"",filter,"\" ")
+      filter=paste0("\'%FILTER=\"",filter,"\" ")
   }
 
   if (mq!=""){
