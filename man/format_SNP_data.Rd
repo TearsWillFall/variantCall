@@ -21,7 +21,7 @@ format_SNP_data(
 )
 }
 \arguments{
-\item{bin_path}{Path to gatk binary. Default tools/bcftools/bcftools.}
+\item{bin_path}{Path to bcftools binary. Default tools/bcftools/bcftools.}
 
 \item{bin_path2}{Path to bgzip binary. Default tools/htslib/bgzip.}
 

@@ -125,7 +125,9 @@ vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #'
 #' This function predicts the effect of variant found in a VCF file
 #'
-#' @param bin_path Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path Path to bcftools binary. Default tools/ensembl-vep/vep.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to bgzip binary. Default tools/htslib/tabix.
 #' @param vcf Path to vcf file.
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
@@ -134,7 +136,7 @@ vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",bam="",ref_ge
 
 
 
-call_vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_dir="",threads=3){
+call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",verbose=FALSE,output_dir="",threads=3){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -147,14 +149,18 @@ call_vep=function(bin_path="tools/ensembl-vep/vep",vcf="",verbose=FALSE,output_d
       dir.create(out_file_dir)
   }
 
-  out_file=paste0(out_file_dir,"/",sample_name,".VEP.",file_ext)
+  out_file=paste0(out_file_dir,"/",sample_name,".VEP.vcf")
 
   if(verbose){
     print(paste(bin_path,"-i",,vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
   }
   system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
+  system(paste("cp", out_file, paste0(out_file,".tmp")))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", paste0(out_file,".tmp"), out_file))
+  system(paste("rm -rf", paste0(out_file,".tmp")))
 }
-
 
 
 
@@ -240,7 +246,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   system(paste0("rm -rf ",out_file_dir,"/*:*"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
-  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED.CONCATENATED"))
+  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED"))
 }
 
 

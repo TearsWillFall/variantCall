@@ -125,15 +125,27 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
     type=paste0(" & TYPE=\"",type,"\" ")
   }
 
+  if (qual!=""){
+    qual=paste0("\'%QUAL>",qual)
+  }else{
+    if (filter!=""){
+      filter=paste0(" FILTER=\"",filter,"\" ")
+    }
+  }
   if (filter!=""){
     filter=paste0(" & FILTER=\"",filter,"\" ")
   }
 
+  if (mq!=""){
+    mq=paste0("& MQ>",mq,"\'")
+  }
+
+
 
   if(verbose){
-    print(paste(bin_path,"view  -i \'%QUAL>",qual,state,type,,filter,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+    print(paste(bin_path,"view  -i ",qual,filter,state,type,ref,mq,unfil_vcf,">",out_file))
   }
-  system(paste(bin_path,"view  -i \'%QUAL>",qual,state,type,filter,ref,"& MQ>",mq,"\'",unfil_vcf,">",out_file))
+  system(paste(bin_path,"view  -i ",qual,filter,state,type,ref,mq,unfil_vcf,">",out_file))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))

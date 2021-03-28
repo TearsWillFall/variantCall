@@ -6,6 +6,8 @@
 \usage{
 call_vep(
   bin_path = "tools/ensembl-vep/vep",
+  bin_path2 = "tools/htslib/bgzip",
+  bin_path3 = "tools/htslib/tabix",
   vcf = "",
   verbose = FALSE,
   output_dir = "",
@@ -13,7 +15,11 @@ call_vep(
 )
 }
 \arguments{
-\item{bin_path}{Path to bcftools binary. Default tools/bcftools/bcftools.}
+\item{bin_path}{Path to bcftools binary. Default tools/ensembl-vep/vep.}
+
+\item{bin_path2}{Path to bgzip binary. Default tools/htslib/bgzip.}
+
+\item{bin_path3}{Path to bgzip binary. Default tools/htslib/tabix.}
 
 \item{vcf}{Path to vcf file.}
 
