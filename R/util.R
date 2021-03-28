@@ -446,12 +446,13 @@ format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=
 #' @param pattern [OPTIONAL] Pattern to filter vcfs by.
 #' @param vcf [OPTIONAL] Path to vcf file. Only if vcf directory not provided.
 #' @param output_dir [OPTIONAL]  Path to the output directory.
+#' @param worst [OPTIONAL]  Only keep the variants with the worst outcome.
 #' @param output_name [OPTIONAL]  Name of output file.
 #' @param verbose [OPTIONAL]  Enables progress messages. Default False.
 #' @export
 
 
-format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern="",vcf="",output_dir="",output_name="",verbose=FALSE){
+format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern="",vcf="",worst=FALSE,output_dir="",output_name="",verbose=FALSE){
 
   if(vcf!="" & vcf_dir!=""){
 
@@ -466,6 +467,10 @@ format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern=""
 
   if(output_name==""){
     output_name="PMreadsCount"
+  }
+  wrst=""
+  if(worst){
+    wrst= "-s worst"
   }
 
   sep="/"
@@ -482,10 +487,19 @@ format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern=""
 
   if(verbose){
     print(paste("printf","\'Gene.id\tchr\tstart\tend\tsample\tref.count\talt.count\n\'",">",out_file))
-    lapply(files,FUN=function(x){print(paste0(bin_path," +", system(paste0("echo ",sub("bcftools$", "plugins\\1",bin_path),"/split-vep.so"),intern=TRUE)," -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\" & AD[0:1-]>1\' -s worst ",x," | awk -F \'[\t,]\' \'{ print  $1,$2,$3,$3, \"",ULPwgs::get_sample_name(x),"\", $5, $6 }\' OFS=\'\\t\' >> ",out_file))})
+    lapply(files,FUN=function(x){print(paste0(bin_path," +", system(paste0("echo ",sub("bcftools$", "plugins\\1",bin_path),"/split-vep.so"),intern=TRUE)," -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\" & AD[0:1]>0\'",wrst, ",x," | awk -F \'[\t,]\' \'{ print  $1,$2,$3,$3, \"",ULPwgs::get_sample_name(x),"\", $5, $6 }\' OFS=\'\\t\' >> ",out_file))})
+    print(paste("printf","\'Gene.id\tchr\tpos\tAD\tAllele\tConsequence\tIMPACT\tSYMBOL\tGene\tFeature_type\tFeature\tBIOTYPE\tEXON\tINTRON\tHGVSc\tHGVSp\tcDNA_position\tCDS_position\tProtein_position\tAmino_acids\tCodons\tExisting_variation\tDISTANCE\tSTRAND\tFLAGS\tVARIANT_CLASS\tSYMBOL_SOURCE\tHGNC_ID\tCANONICAL\tMANE\tTSL\tAPPRIS\tCCDS\tENSP\tSWISSPROT
+    \tTREMBL\tUNIPARC\tUNIPROT_ISOFORM\tGENE_PHENO\tSIFT\tPolyPhen\tDOMAINS\tmiRNA\tHGVS_OFFSET\tAF\tAFR_AF\tAMR_AF\tEAS_AF\tEUR_AF\tSAS_AF\tAA_AF\tEA_AF\tgnomAD_AF\tgnomAD_AFR_AF\tgnomAD_AMR_AF\tgnomAD_ASJ_AF\tgnomAD_EAS_AF\tgnomAD_FIN_AF\tgnomAD_NFE_AF\tgnomAD_OTH_AF\tgnomAD_SAS_AF\tMAX_AF\tMAX_AF_POPS\tCLIN_SIG\tSOMATIC\tPHENO\tPUBMED\tMOTIF_NAME\tMOTIF_POS\tHIGH_INF_POS\tMOTIF_SCORE_CHANGE
+    \tTRANSCRIPTION_FACTORS\tsample\n\'",">",paste0(out_file,".ALL")))
+    lapply(files,FUN=function(x){print(paste0(bin_path," +",system(paste0("echo ",sub("bcftools$", "plugins\\1",bin_path),"/split-vep.so"),intern=TRUE), " -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\t%CSQ\\n\' -i \'TYPE=\"snp\" & AD[0:1]>0\'",wrst," -d -A tab",x,"|sed \'s/$/\\t",x,"/\'",paste0(out_file,".ALL")))})
   }
     system(paste("printf","\'Gene.id\tchr\tstart\tend\tsample\tref.count\talt.count\n\'",">",out_file))
-    lapply(files,FUN=function(x){system(paste0(bin_path," +",system(paste0("echo ",sub("bcftools$", "plugins\\1",bin_path),"/split-vep.so"),intern=TRUE), " -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\" & AD[0:1-]>1\' -s worst ",x," | awk -F \'[\t,]\' \'{ print  $1,$2,$3,$3, \"",ULPwgs::get_sample_name(x),"\", $5, $6 }\' OFS=\'\\t\' >> ",out_file))})
+    lapply(files,FUN=function(x){system(paste0(bin_path," +",system(paste0("echo ",sub("bcftools$", "plugins\\1",bin_path),"/split-vep.so"),intern=TRUE), " -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\n\' -i \'TYPE=\"snp\" & AD[0:1]>0\'",wrst ",x," | awk -F \'[\t,]\' \'{ print  $1,$2,$3,$3, \"",ULPwgs::get_sample_name(x),"\", $5, $6 }\' OFS=\'\\t\' >> ",out_file))})
+
+    system(paste("printf","\'Gene.id\tchr\tpos\tAD\tAllele\tConsequence\tIMPACT\tSYMBOL\tGene\tFeature_type\tFeature\tBIOTYPE\tEXON\tINTRON\tHGVSc\tHGVSp\tcDNA_position\tCDS_position\tProtein_position\tAmino_acids\tCodons\tExisting_variation\tDISTANCE\tSTRAND\tFLAGS\tVARIANT_CLASS\tSYMBOL_SOURCE\tHGNC_ID\tCANONICAL\tMANE\tTSL\tAPPRIS\tCCDS\tENSP\tSWISSPROT
+    \tTREMBL\tUNIPARC\tUNIPROT_ISOFORM\tGENE_PHENO\tSIFT\tPolyPhen\tDOMAINS\tmiRNA\tHGVS_OFFSET\tAF\tAFR_AF\tAMR_AF\tEAS_AF\tEUR_AF\tSAS_AF\tAA_AF\tEA_AF\tgnomAD_AF\tgnomAD_AFR_AF\tgnomAD_AMR_AF\tgnomAD_ASJ_AF\tgnomAD_EAS_AF\tgnomAD_FIN_AF\tgnomAD_NFE_AF\tgnomAD_OTH_AF\tgnomAD_SAS_AF\tMAX_AF\tMAX_AF_POPS\tCLIN_SIG\tSOMATIC\tPHENO\tPUBMED\tMOTIF_NAME\tMOTIF_POS\tHIGH_INF_POS\tMOTIF_SCORE_CHANGE
+    \tTRANSCRIPTION_FACTORS\tsample\n\'",">",paste0(out_file,".ALL")))
+    lapply(files,FUN=function(x){system(paste0(bin_path," +",system(paste0("echo ",sub("bcftools$", "plugins\\1",bin_path),"/split-vep.so"),intern=TRUE), " -f \'%SYMBOL\\t%CHROM\\t%POS\\t[\\t%AD]\\t%CSQ\\n\' -i \'TYPE=\"snp\" & AD[0:1]>0\'",wrst," -d -A tab",x,"|sed \'s/$/\\t",x,"/\'",paste0(out_file,".ALL")))})
   }
 
 
