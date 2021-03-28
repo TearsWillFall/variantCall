@@ -322,7 +322,7 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
-filter_VEP=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir=""){
+filter_VEP=function(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
