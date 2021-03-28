@@ -9,6 +9,7 @@ format_PM_data(
   vcf_dir = "",
   pattern = "",
   vcf = "",
+  worst = FALSE,
   output_dir = "",
   output_name = "",
   verbose = FALSE
@@ -22,6 +23,8 @@ format_PM_data(
 \item{pattern}{\link{OPTIONAL} Pattern to filter vcfs by.}
 
 \item{vcf}{\link{OPTIONAL} Path to vcf file. Only if vcf directory not provided.}
+
+\item{worst}{\link{OPTIONAL}  Only keep the variants with the worst outcome.}
 
 \item{output_dir}{\link{OPTIONAL}  Path to the output directory.}
 

@@ -5,7 +5,7 @@
 \title{Filter VEP results}
 \usage{
 filter_VEP(
-  bin_path = "tools/bcftools/bcftools",
+  bin_path = "tools/ensembl-vep/filter_vep",
   bin_path2 = "tools/htslib/bgzip",
   bin_path3 = "tools/htslib/tabix",
   unf_vcf = "",
