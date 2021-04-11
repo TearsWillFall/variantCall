@@ -137,25 +137,23 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
     }
 
 
-
-    if (state!=""&grepl("%",state)){
+    if (state!=""&!grepl("%",state)){
       state=paste0(" & GT[0]=\"",state,"\" ")
     }
 
-    if (ref!=""&grepl("%",ref)){
+    if (ref!=""&!grepl("%",ref)){
       ref=paste0(" & ID!=\"",ref,"\" ")
     }
 
-    if (type!=""&grepl("%",type)){
+    if (type!=""&!grepl("%",type)){
       type=paste0(" & TYPE=\"",type,"\" ")
     }
-    if (filter!=""&grepl("%",filter)){
+    if (filter!=""&!grepl("%",filter)){
       filter=paste0(" & FILTER=\"",filter,"\" ")
     }
-    if (mq!=""&grepl("%",mq)){
+    if (mq!=""&!grepl("%",mq)){
       mq=paste0("\'%MQ>",mq)
     }
-
 
   if(verbose){
     print(paste(bin_path,"view  -i ",qual,filter,state,type,ref,mq,unfil_vcf,">",out_file))
