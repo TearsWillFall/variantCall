@@ -379,7 +379,10 @@ call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcft
 #' Afterwards, it calls FiNGS to calculates metrics based on BAM files, providing filtering of FP.
 #'
 #'
-#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path [REQUIRED] Path to FiNGS binary. Default tools/FiNGS/fings/FiNGS.py.
+#' @param bin_path2 [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path3 [REQUIRED] Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path4 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
 #' @param bam_dir [REQUIRED] Path to directory with BAM files.
 #' @param vcf_dir [REQUIRED] Path to directory with VCF files.
 #' @param patient_id [REQUIRED] Patient ID to analyze. Has to be in file names to subselect samples.
@@ -394,7 +397,7 @@ call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcft
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
 #' @export
 
-call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir="",patient_id="",germ_pattern="GL",ref_genome="",max_depth=1000,pass_in=TRUE,pass_out=FALSE,param="tools/fings/icgc_filter_parameters.txt",threads=3,output_dir="",verbose=FALSE){
+call_fings_parallel=function(bin_path="tools/FiNGS/fings/FiNGS.py",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bam_dir="",vcf_dir="",patient_id="",germ_pattern="GL",ref_genome="",max_depth=1000,pass_in=TRUE,pass_out=FALSE,param="tools/fings/icgc_filter_parameters.txt",threads=3,output_dir="",verbose=FALSE){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -430,7 +433,10 @@ call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir=
 #' for FP variants called by the variant caller.
 #'
 #'
-#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path [REQUIRED] Path to FiNGS binary. Default tools/FiNGS/fings/FiNGS.py.
+#' @param bin_path2 [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path3 [REQUIRED] Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path4 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
 #' @param bam_dir [REQUIRED] Path to directory with BAM files.
 #' @param vcf_dir [REQUIRED] Path to directory with VCF files.
 #' @param patient_id [REQUIRED] Patient ID to analyze. Has to be in file names to subselect samples.
@@ -446,7 +452,7 @@ call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir=
 #' @export
 
 
-call_fings=function(bin_path="tools/fings/FiNGS.py",tumor_bam="",normal_bam="",tumor_vcf="",ref_genome="",output_dir="",max_depth=1000,pass_in=TRUE,pass_out=FALSE,verbose=FALSE,param="tools/fings/icgc_filter_parameters.txt"){
+call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",tumor_vcf="",ref_genome="",output_dir="",max_depth=1000,pass_in=TRUE,pass_out=FALSE,verbose=FALSE,param="tools/fings/icgc_filter_parameters.txt"){
 
   sep="/"
   if(output_dir==""){
@@ -472,6 +478,7 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",tumor_bam="",normal_bam="",t
     print(paste(bin_path," -n ",normal_bam," -t ", tumor_bam," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o, " -d ", out_file_dir))
   }
   system(paste(bin_path," -n ",normal_bam," -t ", tumor_bam," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o," -d ",  out_file_dir))
+  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",ULPwgs::get_sample_name(tumor_bam),".filtered.vcf"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",state="",ref="",type="",filter="PASS",verbose=verbose,output_dir=out_file_dir)
 }
 
 
