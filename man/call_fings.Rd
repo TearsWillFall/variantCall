@@ -6,6 +6,9 @@
 \usage{
 call_fings(
   bin_path = "tools/fings/FiNGS.py",
+  bin_path2 = "tools/bcftools/bcftools",
+  bin_path3 = "tools/htslib/bgzip",
+  bin_path4 = "tools/htslib/tabix",
   tumor_bam = "",
   normal_bam = "",
   tumor_vcf = "",
@@ -19,7 +22,13 @@ call_fings(
 )
 }
 \arguments{
-\item{bin_path}{\link{REQUIRED} Path to gatk binary. Default tools/gatk/gatk.}
+\item{bin_path}{\link{REQUIRED} Path to FiNGS binary. Default tools/FiNGS/fings/FiNGS.py.}
+
+\item{bin_path2}{\link{REQUIRED} Path to bcftools binary. Default tools/bcftools/bcftools.}
+
+\item{bin_path3}{\link{REQUIRED} Path to bgzip binary. Default tools/htslib/bgzip.}
+
+\item{bin_path4}{\link{REQUIRED} Path to tabix binary. Default tools/htslib/tabix.}
 
 \item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
 
