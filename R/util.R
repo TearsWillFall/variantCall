@@ -68,7 +68,6 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
     apply(names,1,function(x){print(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(x,".vcf.gz"),vcf))
     })
   }
-
   name=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
   sapply(name,function(x){system(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(out_file,"/",x,".vcf.gz"),vcf))
   })
@@ -637,7 +636,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
     names(files3)="BAM_path"
     files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
     files=dplyr::left_join(files2,files3,by="Sample")
-    print(files)
+
     pbapply::pblapply(X=1:nrow(files), FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
     files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
     pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)

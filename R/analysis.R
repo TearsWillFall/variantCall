@@ -371,6 +371,104 @@ call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcft
 }
 
 
+#' Filters SNVs from any variant caller to remove false positives (FP) using FiNGS on parallel
+#'
+#' This function takes a path to a directory with BAM files and a patient ID. Then it subsets all BAM
+#' files specific to the patient, identifying between cancer and normal samples using the germline identifier.
+#' It also takes a directory with vcf files and subsets them based on the sample ID.
+#' Afterwards, it calls FiNGS to calculates metrics based on BAM files, providing filtering of FP.
+#'
+#'
+#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param bam_dir [REQUIRED] Path to directory with BAM files.
+#' @param vcf_dir [REQUIRED] Path to directory with VCF files.
+#' @param patient_id [REQUIRED] Patient ID to analyze. Has to be in file names to subselect samples.
+#' @param germ_pattern [REQUIRED] Pattern used to identify germline samples. Ex GL
+#' @param ref_genome [REQUIRED] Path to reference genome fasta file.
+#' @param max_depth [OPTIONAL] Maximum number of reads.Reads beyond this depth will be ignored
+#' @param param [REQUIRED] Path to file with filter params.
+#' @param threads [OPTIONAL] Number of threads. Default 3
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @export
+
+call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir="",patient_id="",germ_pattern="GL",ref_genome="",max_depth=1000,param="tools/fings/icgc_filter_parameters.txt",threads=3,output_dir="",verbose=FALSE){
+    sep="/"
+    if(output_dir==""){
+      sep=""
+    }
+    out_file_dir=paste0(output_dir,sep,patient_id,"_FiNGS")
+    if (!dir.exists(out_file_dir)){
+        dir.create(out_file_dir)
+    }
+    files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    files=files[grepl("bam$",files)]
+    tumor_bams=files[!grepl(germ_pattern,files)]
+    normal_bam=files[grepl(germ_pattern,files)]
+
+    files=list.files(vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    tumor_vcfs=files[grepl(!germ_pattern,files)]
+    tumor_bams=data.frame(bam=tumor_bams,sample_id=sapply(tumor_bams,FUN=ULPwgs::get_sample_name))
+    tumor_vcfs=data.frame(vcf=tumor_vcfs,sample_id=sapply(tumor_vcfs,FUN=ULPwgs::get_sample_name))
+    files=dplyr::left_join(tumor_bams,tumor_vcfs,by="sample_id")
+    if (any(is.na(files))){
+      stop("Could not match BAM and VCF file IDs.")
+    }
+    cl=parallel::makeCluster(threads)
+    pbapply::pbapply(X=1:nrow(files),1,FUN=function(x){call_fings(tumor_bam=files[x,]$bam,normal_bam=normal_bam,tumor_vcf=files[x,]$vcf,ref_genome=ref_genome,output_dir=out_file_dir,max_depth=max_depth,verbose=verbose,param=param)},cl=cl)
+    on.exit(parallel::stopCluster(cl))
+  }
+
+
+#' Filters SNVs from any variant caller to remove false positives (FP) using FiNGS
+#'
+#' This function takes a paths of a pair of matched tumor/normal BAMs and the tumors' VCF.
+#' Then it calls FiNGS to calculate metrics based on the BAM files, as well as providing filtering
+#' for FP variants called by the variant caller.
+#'
+#'
+#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param bam_dir [REQUIRED] Path to directory with BAM files.
+#' @param vcf_dir [REQUIRED] Path to directory with VCF files.
+#' @param patient_id [REQUIRED] Patient ID to analyze. Has to be in file names to subselect samples.
+#' @param germ_pattern [REQUIRED] Pattern used to identify germline samples. Ex GL
+#' @param ref_genome [REQUIRED] Path to reference genome fasta file.
+#' @param max_depth [OPTIONAL] Maximum number of reads.Reads beyond this depth will be ignored
+#' @param param [REQUIRED] Path to file with filter params.
+#' @param threads [OPTIONAL] Number of threads. Default 3
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @export
+
+
+call_fings=function(bin_path="tools/fings/FiNGS.py",tumor_bam="",normal_bam="",tumor_vcf="",ref_genome="",output_dir="",max_depth=1000,verbose=FALSE,param="tools/fings/icgc_filter_parameters.txt"){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  sample_name=ULPwgs::get_sample_name(tumor_bam)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_FiNGS_FILTERED")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  pass_i=""
+  if (pass_in){
+    pass_i=" --PASSonlyin "
+  }
+  pass_o=""
+  if (pass_out){
+    pass_o=" --PASSonlyout "
+  }
+
+  if(verbose){
+    print(paste(bin_path," -n ",normal_sample," -t ", tumor_sample," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o, " -d ", out_file_dir))
+  }
+  system(paste(bin_path," -n ",normal_sample," -t ", tumor_sample," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o," -d ",  out_file_dir))
+}
+
 
 
 #' Call segments for panel, exome and WGS data using CNVkit
