@@ -107,7 +107,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
   sample_name=ULPwgs::get_sample_name(unfil_vcf)
   out_file_dir=paste0(output_dir,sep,sample_name,"_FILTERED")
   if (!dir.exists(out_file_dir)){
-      dir.create(out_file_dir)
+      dir.create(out_file_dir,recursive=TRUE)
   }
 
   out_file=paste0(out_file_dir,"/",sample_name,".FILTERED.vcf")
