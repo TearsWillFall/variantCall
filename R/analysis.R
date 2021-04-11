@@ -409,8 +409,8 @@ call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir=
     files=list.files(vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
     files=files[grepl("vcf$",files)]
     tumor_vcfs=files[!grepl(germ_pattern,files)]
-    tumor_bams=data.frame(bam=tumor_bams,sample_id=sapply(tumor_bams,FUN=ULPwgs::get_sample_name))
-    tumor_vcfs=data.frame(vcf=tumor_vcfs,sample_id=sapply(tumor_vcfs,FUN=ULPwgs::get_sample_name))
+    tumor_bams=data.frame(bam=tumor_bams,sample_id=sapply(tumor_bams,FUN=ULPwgs::get_sample_name),stringsAsFactors =FALSE)
+    tumor_vcfs=data.frame(vcf=tumor_vcfs,sample_id=sapply(tumor_vcfs,FUN=ULPwgs::get_sample_name),stringsAsFactors =FALSE)
     files=dplyr::left_join(tumor_bams,tumor_vcfs,by="sample_id")
     if (any(is.na(files))){
       stop("Could not match BAM and VCF file IDs.")
