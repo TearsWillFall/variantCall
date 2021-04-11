@@ -469,9 +469,9 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",tumor_bam="",normal_bam="",t
   }
 
   if(verbose){
-    print(paste(bin_path," -n ",normal_sample," -t ", tumor_sample," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o, " -d ", out_file_dir))
+    print(paste(bin_path," -n ",normal_bam," -t ", tumor_bam," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o, " -d ", out_file_dir))
   }
-  system(paste(bin_path," -n ",normal_sample," -t ", tumor_sample," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o," -d ",  out_file_dir))
+  system(paste(bin_path," -n ",normal_bam," -t ", tumor_bam," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o," -d ",  out_file_dir))
 }
 
 
