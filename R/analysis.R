@@ -407,7 +407,7 @@ call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir=
     normal_bam=files[grepl(germ_pattern,files)]
 
     files=list.files(vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
-    tumor_vcfs=files[grepl(!germ_pattern,files)]
+    tumor_vcfs=files[!grepl(germ_pattern,files)]
     tumor_bams=data.frame(bam=tumor_bams,sample_id=sapply(tumor_bams,FUN=ULPwgs::get_sample_name))
     tumor_vcfs=data.frame(vcf=tumor_vcfs,sample_id=sapply(tumor_vcfs,FUN=ULPwgs::get_sample_name))
     files=dplyr::left_join(tumor_bams,tumor_vcfs,by="sample_id")
