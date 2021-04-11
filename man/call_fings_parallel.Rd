@@ -12,6 +12,8 @@ call_fings_parallel(
   germ_pattern = "GL",
   ref_genome = "",
   max_depth = 1000,
+  pass_in = TRUE,
+  pass_out = FALSE,
   param = "tools/fings/icgc_filter_parameters.txt",
   threads = 3,
   output_dir = "",
@@ -32,6 +34,10 @@ call_fings_parallel(
 \item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
 
 \item{max_depth}{\link{OPTIONAL} Maximum number of reads.Reads beyond this depth will be ignored}
+
+\item{pass_in}{\link{OPTIONAL} Only input variants with a PASS. Default TRUE.}
+
+\item{pass_out}{\link{OPTIONAL} Only output variants with a PASS. Default FALSE.}
 
 \item{param}{\link{REQUIRED} Path to file with filter params.}
 

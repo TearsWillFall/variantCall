@@ -12,6 +12,8 @@ call_fings(
   ref_genome = "",
   output_dir = "",
   max_depth = 1000,
+  pass_in = TRUE,
+  pass_out = FALSE,
   verbose = FALSE,
   param = "tools/fings/icgc_filter_parameters.txt"
 )
@@ -24,6 +26,10 @@ call_fings(
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 
 \item{max_depth}{\link{OPTIONAL} Maximum number of reads.Reads beyond this depth will be ignored}
+
+\item{pass_in}{\link{OPTIONAL} Only input variants with a PASS. Default TRUE.}
+
+\item{pass_out}{\link{OPTIONAL} Only output variants with a PASS. Default FALSE.}
 
 \item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
 

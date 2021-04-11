@@ -386,13 +386,15 @@ call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcft
 #' @param germ_pattern [REQUIRED] Pattern used to identify germline samples. Ex GL
 #' @param ref_genome [REQUIRED] Path to reference genome fasta file.
 #' @param max_depth [OPTIONAL] Maximum number of reads.Reads beyond this depth will be ignored
+#' @param pass_in [OPTIONAL] Only input variants with a PASS. Default TRUE.
+#' @param pass_out [OPTIONAL] Only output variants with a PASS. Default FALSE.
 #' @param param [REQUIRED] Path to file with filter params.
 #' @param threads [OPTIONAL] Number of threads. Default 3
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
 #' @export
 
-call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir="",patient_id="",germ_pattern="GL",ref_genome="",max_depth=1000,param="tools/fings/icgc_filter_parameters.txt",threads=3,output_dir="",verbose=FALSE){
+call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir="",patient_id="",germ_pattern="GL",ref_genome="",max_depth=1000,pass_in=TRUE,pass_out=FALSE,param="tools/fings/icgc_filter_parameters.txt",threads=3,output_dir="",verbose=FALSE){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -435,6 +437,8 @@ call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir=
 #' @param germ_pattern [REQUIRED] Pattern used to identify germline samples. Ex GL
 #' @param ref_genome [REQUIRED] Path to reference genome fasta file.
 #' @param max_depth [OPTIONAL] Maximum number of reads.Reads beyond this depth will be ignored
+#' @param pass_in [OPTIONAL] Only input variants with a PASS. Default TRUE.
+#' @param pass_out [OPTIONAL] Only output variants with a PASS. Default FALSE.
 #' @param param [REQUIRED] Path to file with filter params.
 #' @param threads [OPTIONAL] Number of threads. Default 3
 #' @param output_dir [OPTIONAL] Path to the output directory.
@@ -442,7 +446,7 @@ call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir=
 #' @export
 
 
-call_fings=function(bin_path="tools/fings/FiNGS.py",tumor_bam="",normal_bam="",tumor_vcf="",ref_genome="",output_dir="",max_depth=1000,verbose=FALSE,param="tools/fings/icgc_filter_parameters.txt"){
+call_fings=function(bin_path="tools/fings/FiNGS.py",tumor_bam="",normal_bam="",tumor_vcf="",ref_genome="",output_dir="",max_depth=1000,pass_in=TRUE,pass_out=FALSE,verbose=FALSE,param="tools/fings/icgc_filter_parameters.txt"){
 
   sep="/"
   if(output_dir==""){
