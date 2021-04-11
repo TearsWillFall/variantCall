@@ -114,9 +114,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
 
   if (qual!=""){
     qual=paste0("\'%QUAL>",qual)
-
   }else{
-
     if (mq!=""){
       mq=paste0("\'%MQ>",mq)
     }else{
