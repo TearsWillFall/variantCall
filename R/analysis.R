@@ -407,6 +407,7 @@ call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir=
     normal_bam=files[grepl(germ_pattern,files)]
 
     files=list.files(vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    files=files[grepl("vcf$",files)]
     tumor_vcfs=files[!grepl(germ_pattern,files)]
     tumor_bams=data.frame(bam=tumor_bams,sample_id=sapply(tumor_bams,FUN=ULPwgs::get_sample_name))
     tumor_vcfs=data.frame(vcf=tumor_vcfs,sample_id=sapply(tumor_vcfs,FUN=ULPwgs::get_sample_name))
@@ -415,7 +416,7 @@ call_fings_parallel=function(bin_path="tools/fings/FiNGS.py",bam_dir="",vcf_dir=
       stop("Could not match BAM and VCF file IDs.")
     }
     cl=parallel::makeCluster(threads)
-    pbapply::pbapply(X=1:nrow(files),1,FUN=function(x){call_fings(tumor_bam=files[x,]$bam,normal_bam=normal_bam,tumor_vcf=files[x,]$vcf,ref_genome=ref_genome,output_dir=out_file_dir,max_depth=max_depth,verbose=verbose,param=param)},cl=cl)
+    pbapply::pblapply(X=1:nrow(files),FUN=function(x){call_fings(tumor_bam=files[x,]$bam,normal_bam=normal_bam,tumor_vcf=files[x,]$vcf,ref_genome=ref_genome,output_dir=out_file_dir,max_depth=max_depth,verbose=verbose,param=param)},cl=cl)
     on.exit(parallel::stopCluster(cl))
   }
 
