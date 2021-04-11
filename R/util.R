@@ -112,35 +112,51 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
 
   out_file=paste0(out_file_dir,"/",sample_name,".FILTERED.vcf")
 
-
-  if (state!=""){
-    state=paste0(" & GT[0]=\"",state,"\" ")
-  }
-
-  if (ref!=""){
-    ref=paste0(" & ID!=\"",ref,"\" ")
-  }
-
-  if (type!=""){
-    type=paste0(" & TYPE=\"",type,"\" ")
-  }
-
   if (qual!=""){
     qual=paste0("\'%QUAL>",qual)
-    if (filter!=""){
-      filter=paste0(" & FILTER=\"",filter,"\" ")
+
+  }else{
+
+    if (mq!=""){
+      mq=paste0("\'%MQ>",mq)
+    }else{
+        if (filter!=""){
+          filter=paste0("\'%FILTER=\"",filter,"\" ")
+        }else{
+          if (type!=""){
+            type=paste0("\'%TYPE=\"",type,"\" ")
+          }else{
+            if (ref!=""){
+              ref=paste0("\'%ID!=\"",ref,"\" ")
+            }else{
+              if (state!=""){
+                state=paste0("\'%GT[0]=\"",state,"\" ")
+              }
+            }
+          }
+        }
+      }
     }
 
-  }else{
-      filter=paste0("\'%FILTER=\"",filter,"\" ")
-  }
 
-  if (mq!=""){
-    mq=paste0("& MQ>",mq,"\'")
-  }else{
-    mq=paste0("\'")
-  }
 
+    if (state!=""|grepl("%",state)){
+      state=paste0(" & GT[0]=\"",state,"\" ")
+    }
+
+    if (ref!=""|grepl("%",ref)){
+      ref=paste0(" & ID!=\"",ref,"\" ")
+    }
+
+    if (type!=""|grepl("%",type)){
+      type=paste0(" & TYPE=\"",type,"\" ")
+    }
+    if (filter!=""|grepl("%",filter)){
+      filter=paste0(" & FILTER=\"",filter,"\" ")
+    }
+    if (mq!=""|grepl("%",mq)){
+      mq=paste0("\'%MQ>",mq)
+    }
 
 
   if(verbose){
