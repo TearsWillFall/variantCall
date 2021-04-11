@@ -421,7 +421,7 @@ call_fings_parallel=function(bin_path="tools/FiNGS/fings/FiNGS.py",bin_path2="to
       stop("Could not match BAM and VCF file IDs.")
     }
     cl=parallel::makeCluster(threads)
-    pbapply::pblapply(X=1:nrow(files),FUN=function(x){call_fings(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,tumor_vcf=files[x,]$vcf,ref_genome=ref_genome,output_dir=out_file_dir,max_depth=max_depth,verbose=verbose,param=param)},cl=cl)
+    pbapply::pblapply(X=1:nrow(files),FUN=function(x){call_fings(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=files[x,]$bam,normal_bam=normal_bam,tumor_vcf=files[x,]$vcf,ref_genome=ref_genome,output_dir=out_file_dir,max_depth=max_depth,verbose=verbose,param=param)},cl=cl)
     on.exit(parallel::stopCluster(cl))
   }
 
