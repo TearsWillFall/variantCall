@@ -423,8 +423,22 @@ call_fings_parallel=function(bin_path="tools/FiNGS/fings/FiNGS.py",bin_path2="to
     cl=parallel::makeCluster(threads)
     pbapply::pblapply(X=1:nrow(files),FUN=function(x){call_fings(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=files[x,]$bam,normal_bam=normal_bam,tumor_vcf=files[x,]$vcf,ref_genome=ref_genome,output_dir=out_file_dir,max_depth=max_depth,verbose=verbose,param=param)},cl=cl)
     on.exit(parallel::stopCluster(cl))
-  }
 
+    files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="tumor.combined.txt")
+    cl=parallel::makeCluster(threads)
+    dat=pbapply::pbsapply(X=files,FUN=function(x){dat=read.table(x,header=TRUE);dat$sample=ULPwgs::get_sample_name(sub("_FiNGS_FILTERED/tumor.combined.txt","",x))},cl=cl)
+    on.exit(parallel::stopCluster(cl))
+    dat=dat %>% dplyr::bind_rows()
+    write.table(paste0(out_file_dir,"/",patient_id,".tumor.stats.txt"),quote=FALSE,col.names=TRUE,row.names=FALSE)
+    files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="tumor.combined.txt")
+
+    files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="normal.combined.txt")
+    cl=parallel::makeCluster(threads)
+    dat=pbapply::pbsapply(X=files,FUN=function(x){dat=read.table(x,header=TRUE);dat$sample=ULPwgs::get_sample_name(sub("_FiNGS_FILTERED/normal.combined.txt","",x))},cl=cl)
+    on.exit(parallel::stopCluster(cl))
+    dat=dat %>% dplyr::bind_rows()
+    write.table(paste0(out_file_dir,"/",patient_id,".normal.stats.txt"),quote=FALSE,col.names=TRUE,row.names=FALSE)
+  }
 
 #' Filters SNVs from any variant caller to remove false positives (FP) using FiNGS
 #'
@@ -479,6 +493,7 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
   }
   system(paste(bin_path," -n ",normal_bam," -t ", tumor_bam," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o," -d ",  out_file_dir))
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",ULPwgs::get_sample_name(tumor_bam),".filtered.vcf"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",state="",ref="",type="",filter="PASS",verbose=verbose,output_dir=out_file_dir)
+  system(paste0("gunzip ",out_file_dir,"/*.vcf"))
 }
 
 
