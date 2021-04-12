@@ -493,7 +493,7 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
   }
   system(paste(bin_path," -n ",normal_bam," -t ", tumor_bam," -v ", tumor_vcf, " -m ",max_depth, " -r ",ref_genome, " -p ",param,pass_i,pass_o," -d ",  out_file_dir))
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",ULPwgs::get_sample_name(tumor_bam),".filtered.vcf"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",state="",ref="",type="",filter="PASS",verbose=verbose,output_dir=out_file_dir)
-  system(paste0("gunzip ",out_file_dir,"/*.vcf"))
+  system(paste0("gunzip ",out_file_dir,"/*.gz"))
 }
 
 
