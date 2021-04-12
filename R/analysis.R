@@ -429,7 +429,7 @@ call_fings_parallel=function(bin_path="tools/FiNGS/fings/FiNGS.py",bin_path2="to
     dat=pbapply::pblapply(X=files,FUN=function(x){dat=read.table(x,header=TRUE);dat$sample=ULPwgs::get_sample_name(sub("_FiNGS_FILTERED/tumor.combined.txt","",x));return(dat)},cl=cl)
     on.exit(parallel::stopCluster(cl))
     dat=dat %>% dplyr::bind_rows()
-    write.table(paste0(out_file_dir,"/",patient_id,".tumor.stats.txt"),quote=FALSE,col.names=TRUE,row.names=FALSE)
+    write.table(dat,paste0(out_file_dir,"/",patient_id,".tumor.stats.txt"),quote=FALSE,col.names=TRUE,row.names=FALSE)
     files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="tumor.combined.txt")
 
     files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="normal.combined.txt")
@@ -437,7 +437,7 @@ call_fings_parallel=function(bin_path="tools/FiNGS/fings/FiNGS.py",bin_path2="to
     dat=pbapply::pblapply(X=files,FUN=function(x){dat=read.table(x,header=TRUE);dat$sample=ULPwgs::get_sample_name(sub("_FiNGS_FILTERED/normal.combined.txt","",x));return(dat)},cl=cl)
     on.exit(parallel::stopCluster(cl))
     dat=dat %>% dplyr::bind_rows()
-    write.table(paste0(out_file_dir,"/",patient_id,".normal.stats.txt"),quote=FALSE,col.names=TRUE,row.names=FALSE)
+    write.table(dat,paste0(out_file_dir,"/",patient_id,".normal.stats.txt"),quote=FALSE,col.names=TRUE,row.names=FALSE)
   }
 
 #' Filters SNVs from any variant caller to remove false positives (FP) using FiNGS
