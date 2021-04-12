@@ -471,7 +471,7 @@ format_PM_data=function(bin_path="tools/bcftools/bcftools",vcf_dir="",pattern=""
   }
 
   if (vcf_dir!=""){
-    files=list.files(path=vcf_dir,pattern=pattern,full.names=TRUE)
+    files=list.files(path=vcf_dir,pattern=pattern,full.names=TRUE,recursive=TRUE)
   }else {
     files=vcf
   }
