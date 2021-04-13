@@ -590,6 +590,125 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
     system(paste("rm -rf", paste0(out_file,".tmp")))
   }
 
+#' VCF contamination estimation using GATK
+#'
+#' This function estimates sample contamination for further variant filtering
+#'
+#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param pileup_table_tumor [REQUIRED] Path to pileup_table for tumor sample generated using pileup_summary
+#' @param pileup_table_normal [OPTIONAL] Path to pileup_table for matched normal sample generated using pileup_summary
+#' @param output_dir [OPTIONAL]  Path to the output directory.
+#' @param verbose [OPTIONAL]  Enables progress messages. Default False.
+#' @export
+
+
+estimate_contamination=function(pileup_table_tumor="",bin_path="tools/gatk/gatk",pileup_table_normal="",verbose=FALSE,output_dir=""){
+
+      sep="/"
+      if(output_dir==""){
+        sep=""
+      }
+      sample_name=ULPwgs::get_sample_name(pileup_table_tumor)
+      if (!dir.exists(output_dir)){
+          dir.create(output_dir)
+      }
+
+      out_file=paste0(output_dir,"/",sample_name,".contamination.table")
+      out_file2=paste0(output_dir,"/",sample_name,".segments.table")
+      if (pileup_table_normal!=""){
+        pileup_table_normal=paste0("-matched ",pileup_table_normal)
+      }
+
+      if(verbose){
+        print(paste(bin_path,"CalculateContamination -O ",out_file," -tumor-segmentation ",out_file2," -V ",db," -L ",interval,"-I ",pileup_table_tumor,pileup_table_normal))
+      }
+      system(paste(bin_path,"CalculateContamination -O ",out_file," -tumor-segmentation ",out_file2," -V ",db," -L ",interval,"-I ",pileup_table_tumor,pileup_table_normal))
+  }
+
+#' VCF contamination estimation using GATK
+#'
+#' This function estimates sample contamination for further variant filtering
+#'
+#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param bam_dir [REQUIRED] Path to directory with BAM files
+#' @param germ_pattern [REQUIRED] Pattern to match normal samples.
+#' @param patient_id [REQUIRED] Pattern to match patient specific samples.
+#' @param db [REQUIRED] Path to vcf with known variants.
+#' @param interval [REQUIRED] Path to vcf with intervals to analyze.
+#' @param output_dir [OPTIONAL]  Path to the output directory.
+#' @param verbose [OPTIONAL]  Enables progress messages. Default False.
+#' @param threads [OPTIONAL]  Number of threads to use. Default 3.
+#' @export
+
+
+estimate_contamination_parallel=function(bin_path="tools/gatk/gatk",bam_dir="",germ_pattern="GL",patient_id="",db="",interval="",verbose=FALSE,output_dir="",threads=3){
+
+      sep="/"
+      if(output_dir==""){
+        sep=""
+      }
+      sample_name=ULPwgs::get_sample_name(patient_id)
+      out_file_dir=paste0(output_dir,sep,sample_name,"_CONTAMINATION")
+      if (!dir.exists(out_file_dir)){
+          dir.create(out_file_dir)
+      }
+
+      files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+      files=files[grepl("bam$",files)]
+      tumor_bams=files[!grepl(germ_pattern,files)]
+      normal_bam=files[grepl(germ_pattern,files)]
+
+      cl=parallel::makeCluster(threads)
+      pbapply::pblapply(X=files,FUN=get_pileup_summary,db=db,interval=interval,verbose=verbose,output_dir=out_file_dir,cl=cl)
+      on.exit(parallel::stopCluster(cl))
+
+      files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+      files=files[grepl(".pileup.table$",files)]
+      tumor_pileups=files[!grepl(germ_pattern,files)]
+      normal_pileup=files[grepl(germ_pattern,files)]
+
+      cl=parallel::makeCluster(threads)
+      pbapply::pblapply(X=tumor_pileups,FUN=estimate_contamination,pileup_table_normal=normal_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
+      on.exit(parallel::stopCluster(cl))
+}
+
+
+
+
+#' BAM pileup summary for known sites using GATK
+#'
+#' This function generates a pileup summary that is further used in estimating contamination
+#'
+#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param bam [REQUIRED] Path to BAM file.
+#' @param db [REQUIRED] Path to vcf with known variants.
+#' @param interval [REQUIRED] Path to vcf with intervals to analyze.
+#' @param output_dir [OPTIONAL]  Path to the output directory.
+#' @param verbose [OPTIONAL]  Enables progress messages. Default False.
+#' @export
+
+get_pileup_summary=function(bam="",bin_path="tools/gatk/gatk",db="",interval="",verbose=FALSE,output_dir=""){
+      sep="/"
+      if(output_dir==""){
+        sep=""
+      }
+      sample_name=ULPwgs::get_sample_name(bam)
+      if (!dir.exists(output_dir)){
+          dir.create(output_dir)
+      }
+
+      out_file=paste0(output_dir,"/",sample_name,".pileup.table")
+
+      if(verbose){
+        print(paste(bin_path,"GetPileupSummaries  -O",out_file," -V ",db," -L ",interval, " -I ",bam))
+      }
+      system(paste(bin_path,"GetPileupSummaries  -O",out_file," -V ",db," -L ",interval, " -I ",bam))
+
+  }
+
+
+
+
 
 #' This function filter and formats heterozygous SNP data for downstream analysis using clonet
 #'
