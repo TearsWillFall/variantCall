@@ -659,7 +659,7 @@ estimate_contamination_parallel=function(bin_path="tools/gatk/gatk",bam_dir="",g
       normal_bam=files[grepl(germ_pattern,files)]
 
       cl=parallel::makeCluster(threads)
-      pbapply::pblapply(X=files,FUN=get_pileup_summary,db=db,interval=interval,verbose=verbose,output_dir=out_file_dir,cl=cl)
+      pbapply::pblapply(X=files,FUN=get_pileup_summary,bin_path=bin_path,db=db,interval=interval,verbose=verbose,output_dir=out_file_dir,cl=cl)
       on.exit(parallel::stopCluster(cl))
 
       files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
@@ -668,7 +668,7 @@ estimate_contamination_parallel=function(bin_path="tools/gatk/gatk",bam_dir="",g
       normal_pileup=files[grepl(germ_pattern,files)]
 
       cl=parallel::makeCluster(threads)
-      pbapply::pblapply(X=tumor_pileups,FUN=estimate_contamination,pileup_table_normal=normal_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
+      pbapply::pblapply(X=tumor_pileups,FUN=estimate_contamination,bin_path=bin_path,pileup_table_normal=normal_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
       on.exit(parallel::stopCluster(cl))
 }
 
