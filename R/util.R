@@ -620,9 +620,9 @@ estimate_contamination=function(pileup_table_tumor="",bin_path="tools/gatk/gatk"
       }
 
       if(verbose){
-        print(paste(bin_path,"CalculateContamination -O ",out_file," -tumor-segmentation ",out_file2," -V ",db," -L ",interval,"-I ",pileup_table_tumor,pileup_table_normal))
+        print(paste(bin_path,"CalculateContamination -O ",out_file," -tumor-segmentation ",out_file2," -I ",pileup_table_tumor,pileup_table_normal))
       }
-      system(paste(bin_path,"CalculateContamination -O ",out_file," -tumor-segmentation ",out_file2," -V ",db," -L ",interval,"-I ",pileup_table_tumor,pileup_table_normal))
+      system(paste(bin_path,"CalculateContamination -O ",out_file," -tumor-segmentation ",out_file2," -I ",pileup_table_tumor,pileup_table_normal))
   }
 
 #' VCF contamination estimation using GATK
