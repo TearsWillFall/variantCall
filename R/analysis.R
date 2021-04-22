@@ -731,12 +731,11 @@ call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref
 #' @param jobs [OPTIONAL] Number of paired jobs to run. Only when par_type is Paired. Default 3.
 #' @param threads [OPTIONAL] Number of threads to use per job. Default 1.
 #' @param targets [OPTIONAL] BED file with capture target regions.
-#' @param output_name [OPTIONAL] Name for the output.
 #' @param par_type [OPTIONAL] Parallelization type. Joint: Runs a single job with multiple samples jointly | Paired: Runs a pair of tumor-normal through multiple jobs.
 #' @export
 
 
-call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",jobs=3,threads=1,par_type="Joint",verbose=FALSE){
+call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",jobs=3,threads=1,par_type="Joint",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -752,10 +751,10 @@ call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir=""
   normal_bam=files[grepl(germ_pattern,files)]
 
   if(par_type=="Joint"){
-    call_sv(tumor_bam=tumor_bams,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,vebose=verbose)
+    call_sv(tumor_bam=tumor_bams,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,vebose=verbose,output_dir=out_file_dir)
   }else if(par_type=="Paired"){
     cl=parallel::makeCluster(jobs)
-    dat=pbapply::pblapply(X=tumor_bams,FUN=call_sv,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,vebose=verbose)
+    dat=pbapply::pblapply(X=tumor_bams,FUN=call_sv,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,vebose=verbose,output_dir=out_file_dir)
     on.exit(parallel::stopCluster(cl))
   }
 }
