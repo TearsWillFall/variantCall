@@ -690,13 +690,13 @@ call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref
     tgs=paste0(" -k ",targets)
   }
   if(length(tumor_bam)>1){
-    tumor_bam=paste0(tumor_bam,collapse="-t")
+    tumor_bam=paste0(tumor_bam,collapse=" -t ")
   }
 
   norm=""
   if (!normal_bam==""){
     if (length(normal_bam)>1){
-        norm=paste0(" -n ",paste(normal_bam,collapse="-n"))
+        norm=paste0(" -n ",paste(normal_bam,collapse=" -n "))
     }else{
         norm=paste0(" -n ",normal_bam)
     }
