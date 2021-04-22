@@ -668,7 +668,7 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 #' @param output_name [OPTIONAL] Name for the output.
 #' @export
 
-call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref_genome="",threads=3,output_name="",targets="",dbsnp_indels="",verbose=FALSE){
+call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref_genome="",threads=3,output_name="",targets="",dbsnp_indels="",verbose=FALSE,output_dir=""){
   sep="/"
 
   if(output_dir==""){
@@ -740,7 +740,7 @@ call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir=""
   if(output_dir==""){
     sep=""
   }
-  out_file_dir=paste0(output_dir,sep,patient_id,"_SV")
+  out_file_dir=paste0(output_dir,sep,patient_id,"_svaba_SV")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
@@ -751,10 +751,10 @@ call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir=""
   normal_bam=files[grepl(germ_pattern,files)]
 
   if(par_type=="Joint"){
-    call_sv(tumor_bam=tumor_bams,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,vebose=verbose,output_dir=out_file_dir)
+    call_sv(tumor_bam=tumor_bams,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,verbose=verbose,output_dir=out_file_dir)
   }else if(par_type=="Paired"){
     cl=parallel::makeCluster(jobs)
-    dat=pbapply::pblapply(X=tumor_bams,FUN=call_sv,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,vebose=verbose,output_dir=out_file_dir)
+    dat=pbapply::pblapply(X=tumor_bams,FUN=call_sv,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,verbose=verbose,output_dir=out_file_dir)
     on.exit(parallel::stopCluster(cl))
   }
 }
