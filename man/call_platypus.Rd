@@ -19,29 +19,29 @@ call_platypus(
 )
 }
 \arguments{
-\item{bin_path}{Path to fastQC executable. Default path tools/platypus/Platypus.py.}
+\item{bin_path}{\link{REQUIRED} Path to fastQC executable. Default path tools/platypus/Platypus.py}
 
-\item{bin_path2}{Path to bgzip binary. Default tools/htslib/bgzip.}
+\item{bin_path2}{\link{REQUIRED} Path to bgzip binary. Default tools/htslib/bgzip.}
 
-\item{bin_path3}{Path to tabix binary. Default tools/htslib/tabix.}
+\item{bin_path3}{\link{REQUIRED} Path to tabix binary. Default tools/htslib/tabix.}
 
-\item{tumor_bam}{Path to tumor bam file.}
+\item{tumor_bam}{\link{REQUIRED} Path to tumor bam file.}
 
-\item{normal_bam}{Path to germline bam file.}
+\item{normal_bam}{\link{REQUIRED} Path to germline bam file.}
 
-\item{ref_genome}{Path to reference genome fasta file.}
+\item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
 
-\item{vcf_overlay}{Path to vcf overlay to use as source.}
+\item{vcf_overlay}{\link{REQUIRED} Path to vcf overlay to use as source.}
 
-\item{output_dir}{Path to the output directory.}
+\item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 
-\item{verbose}{Enables progress messages. Default False.}
+\item{verbose}{\link{OPTIONAL}  Enables progress messages. Default False.}
 
-\item{threads}{Number of threads to use. Default 3.}
+\item{threads}{\link{OPTIONAL}  Number of threads to use. Default 3.}
 
 \item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of the first sample in alphanumerical order will be used.}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or
-just in a tumor sample if no matched sample is not available.
+just in a tumor sample if no matched sample is available.
 }

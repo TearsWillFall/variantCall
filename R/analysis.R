@@ -521,7 +521,6 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 
 call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",normal_samples="",targets="",fasta="",access="",ref_output="",output_dir="",diagram=TRUE,scatter=TRUE,threads=3,verbose=FALSE,male=TRUE){
 
-
   if (is.vector(tumor_samples) & length(tumor_samples)>1){
     tumor_samples=paste(tumor_samples,collapse=" ")
   }else{
@@ -653,23 +652,23 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 
 #' Structural variant calling using svaba
 #'
-#' This function calls structural variants in a pair of tumor-normal matched samples,
+#' This function calls structural variants in a pair of tumor-normal matched samples
 #' using svaba
 #'
 #'
-#' @param tumor_bam Path to tumor bam file.
-#' @param normal_bam Path to germline bam file.
-#' @param bin_path Path to svaba binary executable. Default path tools/svaba/svaba.
-#' @param ref_genome Path to reference genome fasta file.
-#' @param output_dir Path to the output directory.
-#' @param verbose Enables progress messages. Default False.
-#' @param threads Number of threads to use. Default 3.
-#' @param targets BED file with capture target regions.
-#' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
+#' @param tumor_bam [REQUIRED]  Path to tumor bam file.
+#' @param normal_bam [OPTIONAL] Path to germline bam file.
+#' @param bin_path [REQUIRED] Path to svaba binary executable. Default path tools/svaba/svaba.
+#' @param ref_genome [REQUIRED] Path to reference genome fasta file.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @param threads [OPTIONAL] Number of threads to use. Default 3.
+#' @param targets [OPTIONAL] BED file with capture target regions.
+#' @param dbsnp_indels [OPTIONAL] Database with indel annotations.
+#' @param output_name [OPTIONAL] Name for the output.
 #' @export
 
-call_sv=function(bin_path="tools/svaba/bin/svaba",tumor_bam="",normal_bam="",ref_genome="",threads=3,output_name="",targets="",verbose=FALSE){
-
+call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref_genome="",threads=3,output_name="",targets="",dbsnp_indels="",verbose=FALSE){
   sep="/"
 
   if(output_dir==""){
@@ -690,32 +689,103 @@ call_sv=function(bin_path="tools/svaba/bin/svaba",tumor_bam="",normal_bam="",ref
   if (!targets==""){
     tgs=paste0(" -k ",targets)
   }
+  if(length(tumor_bam)>1){
+    tumor_bam=paste0(tumor_bam,collapse="-t")
+  }
+
   norm=""
   if (!normal_bam==""){
-    norm=paste0(" -n ",normal_bam)
+    if (length(normal_bam)>1){
+        norm=paste0(" -n ",paste(normal_bam,collapse="-n"))
+    }else{
+        norm=paste0(" -n ",normal_bam)
+    }
+
+  }
+
+  dbsnp=""
+  if (!dbsnp_indels==""){
+    dbsnp=paste0(" -D ",dbsnp_indels)
   }
 
   if(verbose){
-      print(paste0(bin_path," run -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome," -D ",dbsnp_indels))
+      print(paste0(bin_path," run -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
   }
-  system(paste0(bin_path," run -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome," -D ",dbsnp_indels))
+    system(paste0(bin_path," run -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
 }
+
+
+#' Structural variant calling using svaba in parallel
+#'
+#' This function calls structural variants in a pair of tumor-normal matched samples pairs
+#' using svaba in parallel
+#'
+#'
+#' @param bam_dir [REQUIRED]  Path to bam files.
+#' @param bin_path [REQUIRED] Path to svaba binary executable. Default path tools/svaba/svaba.
+#' @param patient_id [REQUIRED] Patient ID patter to filter samples with.
+#' @param germ_pattern [OPTIONAL] Patient ID pattern to filter samples with.
+#' @param ref_genome [REQUIRED] Germline pattern to filter samples with
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @param jobs [OPTIONAL] Number of paired jobs to run. Only when par_type is Paired. Default 3.
+#' @param threads [OPTIONAL] Number of threads to use per job. Default 1.
+#' @param targets [OPTIONAL] BED file with capture target regions.
+#' @param output_name [OPTIONAL] Name for the output.
+#' @param par_type [OPTIONAL] Parallelization type. Joint: Runs a single job with multiple samples jointly | Paired: Runs a pair of tumor-normal through multiple jobs.
+#' @export
+
+
+call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",jobs=3,threads=1,par_type="Joint",verbose=FALSE){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  out_file_dir=paste0(output_dir,sep,patient_id,"_SV")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+  files=files[grepl("bam$",files)]
+  tumor_bams=files[!grepl(germ_pattern,files)]
+  normal_bam=files[grepl(germ_pattern,files)]
+
+  if(par_type=="Joint"){
+    call_sv(tumor_bam=tumor_bams,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,vebose=verbose)
+  }else if(par_type=="Paired"){
+    cl=parallel::makeCluster(jobs)
+    dat=pbapply::pblapply(X=tumor_bams,FUN=call_sv,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,vebose=verbose)
+    on.exit(parallel::stopCluster(cl))
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
 
 #' Variant calling using Platypus
 #'
 #' This function calls somatic variants in a pair of tumor-normal matched samples, or
-#' just in a tumor sample if no matched sample is not available.
+#' just in a tumor sample if no matched sample is available.
 #'
-#' @param tumor_bam Path to tumor bam file.
-#' @param normal_bam Path to germline bam file.
-#' @param bin_path Path to fastQC executable. Default path tools/platypus/Platypus.py.
-#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
-#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
-#' @param ref_genome Path to reference genome fasta file.
-#' @param vcf_overlay Path to vcf overlay to use as source.
-#' @param output_dir Path to the output directory.
-#' @param verbose Enables progress messages. Default False.
-#' @param threads Number of threads to use. Default 3.
+#' @param tumor_bam [REQUIRED] Path to tumor bam file.
+#' @param normal_bam [REQUIRED] Path to germline bam file.
+#' @param bin_path [REQUIRED] Path to fastQC executable. Default path tools/platypus/Platypus.py
+#' @param bin_path2 [REQUIRED] Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
+#' @param ref_genome [REQUIRED] Path to reference genome fasta file.
+#' @param vcf_overlay [REQUIRED] Path to vcf overlay to use as source.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL]  Enables progress messages. Default False.
+#' @param threads [OPTIONAL]  Number of threads to use. Default 3.
 #' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
 #' @export
 

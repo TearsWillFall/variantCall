@@ -5,36 +5,39 @@
 \title{Structural variant calling using svaba}
 \usage{
 call_sv(
-  bin_path = "tools/svaba/bin/svaba",
   tumor_bam = "",
+  bin_path = "tools/svaba/bin/svaba",
   normal_bam = "",
   ref_genome = "",
   threads = 3,
   output_name = "",
   targets = "",
+  dbsnp_indels = "",
   verbose = FALSE
 )
 }
 \arguments{
-\item{bin_path}{Path to svaba binary executable. Default path tools/svaba/svaba.}
+\item{tumor_bam}{\link{REQUIRED}  Path to tumor bam file.}
 
-\item{tumor_bam}{Path to tumor bam file.}
+\item{bin_path}{\link{REQUIRED} Path to svaba binary executable. Default path tools/svaba/svaba.}
 
-\item{normal_bam}{Path to germline bam file.}
+\item{normal_bam}{\link{OPTIONAL} Path to germline bam file.}
 
-\item{ref_genome}{Path to reference genome fasta file.}
+\item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
 
-\item{threads}{Number of threads to use. Default 3.}
+\item{threads}{\link{OPTIONAL} Number of threads to use. Default 3.}
 
-\item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of the first sample in alphanumerical order will be used.}
+\item{output_name}{\link{OPTIONAL} Name for the output.}
 
-\item{targets}{BED file with capture target regions.}
+\item{targets}{\link{OPTIONAL} BED file with capture target regions.}
 
-\item{verbose}{Enables progress messages. Default False.}
+\item{dbsnp_indels}{\link{OPTIONAL} Database with indel annotations.}
 
-\item{output_dir}{Path to the output directory.}
+\item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
+
+\item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 }
 \description{
-This function calls structural variants in a pair of tumor-normal matched samples,
+This function calls structural variants in a pair of tumor-normal matched samples
 using svaba
 }
