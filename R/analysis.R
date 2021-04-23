@@ -682,7 +682,7 @@ call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref
   }
 
   out_file_dir=paste0(output_dir,sep,sample_name,"_SVABA_VARIANTS_VCF")
-  if (!dir.exists(out_file_dir))){
+  if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
 

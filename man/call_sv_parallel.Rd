@@ -14,7 +14,8 @@ call_sv_parallel(
   jobs = 3,
   threads = 1,
   par_type = "Joint",
-  verbose = FALSE
+  verbose = FALSE,
+  output_dir = ""
 )
 }
 \arguments{
@@ -39,8 +40,6 @@ call_sv_parallel(
 \item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
 
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
-
-\item{output_name}{\link{OPTIONAL} Name for the output.}
 }
 \description{
 This function calls structural variants in a pair of tumor-normal matched samples pairs

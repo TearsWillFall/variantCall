@@ -13,7 +13,8 @@ call_sv(
   output_name = "",
   targets = "",
   dbsnp_indels = "",
-  verbose = FALSE
+  verbose = FALSE,
+  output_dir = ""
 )
 }
 \arguments{
