@@ -754,7 +754,7 @@ call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir=""
   normal_bam=files[grepl(germ_pattern,files)]
 
   if(par_type=="Joint"){
-    call_sv(tumor_bam=tumor_bams,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,verbose=verbose,output_dir=out_file_dir,output_name=sample_id)
+    call_sv(tumor_bam=tumor_bams,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,verbose=verbose,output_dir=out_file_dir,output_name=patient_id)
   }else if(par_type=="Paired"){
     cl=parallel::makeCluster(jobs)
     dat=pbapply::pblapply(X=tumor_bams,FUN=call_sv,bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,cl=cl,verbose=verbose,output_dir=out_file_dir)
