@@ -153,9 +153,9 @@ CNNScoreVariants=function(bin_path="tools/gatk/gatk",vcf="",ref_genome="",bam=""
   }
 
   if(verbose){
-    print(paste0(bin_path," CNNScoreVariants -V ",vfc," -R ",ref_genome, " -O ", out_file_dir,bam,opt))
+    print(paste0(bin_path," CNNScoreVariants -V ",vfc," -R ",ref_genome, " -O ", out_file,bam,opt))
   }
-  system(paste0(bin_path," CNNScoreVariants -V ",vfc," -R ",ref_genome, " -O ", out_file_dir,bam,opt))
+  system(paste0(bin_path," CNNScoreVariants -V ",vfc," -R ",ref_genome, " -O ", out_file,bam,opt))
 
 }
 
