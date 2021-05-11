@@ -143,7 +143,7 @@ CNNScoreVariants=function(bin_path="tools/gatk/gatk",vcf="",ref_genome="",bam=""
       dir.create(out_file_dir)
   }
 
-
+  opt=""
   if (bam!=""){
     bam=paste0(" -I ",bam)
     opt=" -tensor-type read_tensor "
