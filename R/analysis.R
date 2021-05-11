@@ -306,6 +306,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 #' @param normal_bam [REQUIRED] Path to BAM file
 #' @param ref_genome [REQUIRED] Path to reference genome
 #' @param resources [OPTIONAL] Path to resources for variant filtering
+#' @param region [OPTIONAL] Genomic region/regions to analyze. In samtools format.
 #' @param output_name [OPTIONAL] Name of the sample to output
 #' @param info_key [OPTIONAL] Annotation column to select. Default CNN_D1
 #' @param snp_tranche [OPTIONAL] SNP tranche filter value. Default 99.95
@@ -317,7 +318,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 #' @export
 
 
-call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genome="",output_dir="",resources="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,output_name="",verbose=FALSE,threads=3){
+call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genome="",region="",output_dir="",resources="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,output_name="",verbose=FALSE,threads=3){
 
   sep="/"
   if(output_dir==""){
@@ -341,9 +342,9 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genom
   }
 
   if(verbose){
-    print(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
+    print(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads,region))
   }
-  system(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
+  system(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads,region))
 
   if (info_key=="CNN_1D"){
       CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,output_dir=out_file_dir,output_name=sample_name)
