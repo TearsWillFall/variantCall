@@ -333,9 +333,9 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genom
   out_file_dir=paste0(output_dir,sep,sample_name,"_GERMLINE_VARIANTS")
 
   if(verbose){
-    print(paste(bin_path," -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
+    print(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
   }
-  system(paste(bin_path," -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
+  system(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
 
   if (info_key=="CNN_1D"){
       CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,output_dir=out_file_dir,output_name=sample_name)
