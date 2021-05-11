@@ -330,11 +330,12 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genom
     sample_name=output_name
   }
 
+  out_file_dir=paste0(output_dir,sep,sample_name,"_GERMLINE_VARIANTS")
+
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
 
-  out_file_dir=paste0(output_dir,sep,sample_name,"_GERMLINE_VARIANTS")
 
   if(verbose){
     print(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
