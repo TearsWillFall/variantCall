@@ -146,7 +146,7 @@ CNNScoreVariants=function(bin_path="tools/gatk/gatk",vcf="",ref_genome="",bam=""
 
   if (bam!=""){
     bam=paste0(" -I ",bam)
-    opt=" -tensor-type read-tensor "
+    opt=" -tensor-type read_tensor "
     out_file=paste0(out_file_dir,"/",sample_name,".CNNscored.2D.vcf")
   }else{
     out_file=paste0(out_file_dir,"/",sample_name,".CNNscored.1D.vcf")
