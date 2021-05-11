@@ -16,7 +16,8 @@
 #' @export
 
 
-vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",verbose=FALSE){
+call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",verbose=FALSE,orientation=TRUE){
+
   sep="/"
 
   if(output_dir==""){
@@ -59,17 +60,24 @@ vcf_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_ba
       norm=paste0(" -I ",normal_bam," -normal ",ULPwgs::get_sample_name(normal_bam))
       }
   }
-  pn=" "
+
   if (pon!=""){
-    pn=paste0(" --panel-of-normals ",pon)
+    pon=paste0(" --panel-of-normals ",pon)
   }
+
+
+  if (orientation){
+      f1r2=paste0(" --f1r2-tar-gz ",out_file,"/",sample_name,".",region,".f1r2.tar.gz")
+  }
+
   if(verbose){
-      print(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm," --germline-resource ",germ_resource,pn," -O ",out_file,reg))
+      print(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm," --germline-resource ",germ_resource, pon," -O ",out_file, reg,f1r2))
 
   }
-  system(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm, " --germline-resource ",germ_resource, pn, " -O ",out_file,reg))
-
+  system(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm, " --germline-resource ",germ_resource, pon, " -O ",out_file, reg,f1r2))
 }
+
+
 
 #' Variant calling using bcftools
 #'
@@ -190,35 +198,51 @@ call_clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_
 #' This function calls somatic variants in a pair of tumor-normal matched samples, or
 #' just in a tumor sample if no matched sample is not available.
 #'
-#' @param tumor_bam [REQUIRED] Path to tumor bam file/s.
+#' @param tumor_bam [OPTIONAL] Path to tumor bam file/s.
 #' @param normal_bam [OPTIONAL] Path to germline bam file/s.
+#' @param bam_dir [OPTIONAL] Path to bam_dir. Only if tumor_bam and/or normal_bam not given.
 #' @param bin_path [REQUIRED] Path to gatk binary. Default path tools/gatk/gatk.
 #' @param bin_path2 [REQUIRED] Path to bcftools binary. Default path tools/bcftools/bcftools.
 #' @param bin_path3 [REQUIRED] Path to tabix binary. Default path tools/htslib/tabix.
 #' @param bin_path4 [REQUIRED] Path to bgzip binary. Default path tools/htslib/bgzip.
 #' @param ref_genome [REQUIRED] Path to reference genome fasta file.
 #' @param germ_resource [REQUIRED] Path to germline resources vcf file.
-#' @param output_name [OPTIONAL] Name for the output. If not given the name of one of the samples will be used.
+#' @param region_bed [REQUIRED] Path to bed file with regions to analyze.
+#' @param patient_id [OPTIONAL] Patients ID to identify project with. Otherwise name of tumor sample will be used.
+#' @param germ_pattern [OPTIONAL] Identifier for normal samples. Default GL. Only used when bam_dir is given.
 #' @param pon [OPTIONAL] Path to panel of normal.
 #' @param threads [OPTIONAL] Number of threads. Default 3
+#' @param db [OPTIONAL] Path to vcf with known variants for contamination estimation.
+#' @param interval [OPTIONAL] Path to vcf with intervals to analyze contamination.
 #' @param chr_filter [OPTIONAL] Chromosomes to analyze. canonical/autosomal/all or a list of chromosomes
-#' @param region_bed [REQUIRED] Path to bed file with regions to analyze.
+#' @param orientation [OPTIONAL] Generate a read orientation model to filter variants. Default False
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
 #' @export
 #' @import pbapply
 
 
-call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",region_bed="",threads=3,verbose=FALSE,chr_filter="canonical"){
+call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",db="",interval="",threads=3,verbose=FALSE,chr_filter="canonical",orientation=FALSE){
 
-  if (output_name==""){
+  if (patient_id==""){
     sample_name=ULPwgs::get_sample_name(tumor_bam[1])
   }else{
-    sample_name=output_name
+    sample_name=patient_id
   }
   dat=read.table(region_bed)
 
+
+  ## If a path to bam_dir is supplied and no individual bams are given identify bams in dir based on patient_id and germ_pattern
+
+  if (tumor_bam=="" & normal_bam=="" & bam_dir!="" & patient_id!=""){
+    files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    files=files[grepl("bam$",files)]
+    tumor_bam=files[!grepl(germ_pattern,files)]
+    normal_bam=files[grepl(germ_pattern,files)]
+  }
+
   ## Dont include unplaced contigs, a.k.a only autosomal+sexual+MT chromosomes
+
   if(chr_filter=="canonical"){
     dat=dat[grepl(paste0(paste0(paste0("^",c(1:22,"X","Y","M","MT")),"$"),collapse="|"),dat$V1),]
   ## Include autosomal chromosomal and nothing else
@@ -231,25 +255,99 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
   cl=parallel::makeCluster(round(threads/4), digits = 0)
-  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=vcf_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=output_dir,output_name=output_name,verbose=verbose,cl=cl)
+  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=call_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=output_dir,output_name=output_name,verbose=verbose,orientation=orientation,cl=cl)
   on.exit(parallel::stopCluster(cl))
   sep="/"
+
   if(output_dir==""){
     sep=""
   }
+
   out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf"),output_dir=out_file_dir,verbose=verbose)
   vcf_stats_merge(bin_path=bin_path,vcf_stats_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
-  vcf_filtering(bin_path=bin_path,bin_path2=bin_path3,bin_path3=bin_path4,ref_genome=ref_genome,unfil_vcf=paste0(out_file_dir,"/",sample_name,"_SORTED","/",sample_name,".SORTED.CONCATENATED.vcf"),
-  unfil_vcf_stats=paste0(out_file_dir,"/",sample_name,"_MERGED_VCF_STATS","/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir,verbose=verbose)
-  system(paste0("rm -rf ",out_file_dir,"/*:*"))
+
+  contamination_tables=""
+  contamination_segments=""
+
+  ## If common variant db and interval is given, then contamination will be estimated and included in the vcf filtering.
+
+  if (db!="" & interval!=""){
+    estimate_contamination_parallel(bin_path=bin_path,bam_dir=bam_dir,germ_pattern=germ_pattern,patient_id=patient_id,db=db,interval=interval,verbose=verbose,output_dir=out_file_dir,threads=threads)
+    contamination_files=list.files(paste0(out_file_dir,"/",patient_id,"_CONTAMINATION"))
+    contamination_tables=contamination_files[grepl("contamination.table$")]
+    contamination_segments=contamination_files[grepl("segments.table$")]
+  }
+
+  ## If orientation variable is established orientation_model will generated and used in vcf filtering
+
+  if (orientation){
+    learn_orientation(bin_path=bin_path,f1r2_dir=out_file_dir,output_name=sample_name,output_dir=out_file_dir,verbose=verbose)
+  }
+
+  vcf_filtering(bin_path=bin_path,bin_path2=bin_path3,bin_path3=bin_path4,ref_genome=ref_genome,unfil_vcf=paste0(out_file_dir,"/",patient_id,"_SORTED/",patient_id,".SORTED.CONCATENATED.vcf"),
+  unfil_vcf_stats=paste0(out_file_dir,"/",patient_id,"_MERGED_VCF_STATS/",sample_name,".MERGED.vcf.stats"),output_dir=out_file_dir,verbose=verbose,contamination=contamination_tables,segmentation=contamination_segments,
+  orientation_model=paste0(out_file_dir,"/",patient_id,"_ORIENTATION_MODEL/",sample_name,".read-orientation-model.tar.gz"))
+
+  ## Remove intermediary files
+  system(paste0("rm ",out_file_dir,"/*"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED"))
 }
 
+#' Wrapper for GATK HaplotypeCaller for Germline Variant calling
+#'
+#' This function takes an annotated VCF with CNN_D1 or CNN_D2 scores and filter the
+#' variants based on set threshold.
+#'
+#' @param bin_path [REQUIRED] Path to GATK binary. Default tools/gatk/gatk
+#' @param normal_bam [REQUIRED] Path to BAM file
+#' @param ref_genome [REQUIRED] Path to reference genome
+#' @param resources [OPTIONAL] Path to resources for variant filtering
+#' @param output_name [OPTIONAL] Name of the sample to output
+#' @param info_key [OPTIONAL] Annotation column to select. Default CNN_D1
+#' @param snp_tranche [OPTIONAL] SNP tranche filter value. Default 99.95
+#' @param indel_tranche [OPTIONAL] Indel tranche filter value. Default 99.4
+#' @param keep_previous_filters [OPTIONAL] Keep previous filters in VCF. Default False
+#' @param output_dir [OPTIONAL] Path to output dir
+#' @param threads [OPTIONAL] Number of threads per job. Default 3
+#' @param verbose [Optional] Enables progress messages. Default False
+#' @export
 
+
+call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genome="",output_dir="",resources="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,output_name="",verbose=FALSE,threads=3){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  if (output_name==""){
+    sample_name=ULPwgs::get_sample_name(normal_bam[1])
+  }else{
+    sample_name=output_name
+  }
+
+  out_file_dir=paste0(output_dir,sep,sample_name,"_GERMLINE_VARIANTS")
+
+  if(verbose){
+    print(paste(bin_path," -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
+  }
+  system(paste(bin_path," -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads))
+
+  if (info_key=="CNN_1D"){
+      CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,output_dir=out_file_dir,output_name=sample_name)
+      scored_vcf=paste0(out_file_dir,"/",sample_name,"_CNNscored","/",sample_name,".CNNscored.1D.vcf")
+  }else if(info_key=="CNN_2D"){
+      CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,bam=normal_bam,output_dir=out_file_dir,output_name=sample_name)
+            scored_vcf=paste0(out_file_dir,"/",sample_name,"_CNNscored","/",sample_name,".CNNscored.2D.vcf")
+  }
+
+  FilterVariantTranches(bin_path=bin_path,vcf=scored_vcf,resources=resources,output_name=sample_name,info_key=info_key,
+  snp_tranche=snp_tranche,indel_tranche=indel_tranche,output_dir=out_file_dir,keep_previous_filters=keep_previous_filters,verbose=verbose)
+}
 
 
 #' Variant calling using bcftools on parallel per genomic region
@@ -322,7 +420,11 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 }
 
 
-#' Variant calling of Somatic and Germline (MuTECT2 and Platypus) mutations and their subsequent annotation (VEP)
+
+
+
+
+#' Variant calling of Somatic and Germline (MuTECT2 and Platypus) mutations and produces their subsequent annotation (VEP)
 #'
 #' This function calls somatic and germline mutations, in previously pre-processed sequencing data.
 #' This function takes a path to a directory with BAM files and a patients ID. Then it subsets all BAM
@@ -346,12 +448,14 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @param pon [OPTIONAL] Path to panel of normal.
 #' @param threads [OPTIONAL] Number of threads. Default 3
 #' @param region_bed [REQUIRED] Path to bed file with regions to analyze.
+#' @param db [OPTIONAL] Path to vcf with common variants. Used for contamination estimation.
+#' @param interval [OPTIONAL] Path to interval for common variants to analyze. Used for contamination estimation.
 #' @param chr_filter [OPTIONAL] Chromosomes to analyze. canonical/autosomal/all or a list of chromosomes
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
 #' @export
 
-call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bin_path5="tools/platypus/Platypus.py",bin_path6="tools/ensembl-vep/vep",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",threads=3,verbose=FALSE){
+call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bin_path5="tools/platypus/Platypus.py",bin_path6="tools/ensembl-vep/vep",bin_path7="",bin_path8="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db="",interval="",threads=3,verbose=FALSE){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -495,6 +599,215 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",ULPwgs::get_sample_name(tumor_bam),".filtered.vcf"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",state="",ref="",type="",filter="PASS",verbose=verbose,output_dir=out_file_dir)
   system(paste0("gunzip ",out_file_dir,"/*.gz"))
 }
+
+
+
+
+
+
+
+#' Call Somatic/Germline single nucleotide variants using Strelka
+
+#' This function takes a pair of matched samples or single | multiple germline variants
+#' and calls variants on them. To specify the variant calling mode supply the right strelka binary.
+#' It is recommended to supply a vcf with indel candidates. This can be generated using MANTA workflow
+#'
+#' @param bin_path [REQUIRED] Path to strelka binary. Somatic or Germline.
+#' @param tumor_bam [REQUIRED] Path to tumor  bam file.
+#' @param normal_bam [OPTIONAL] Path to normal samples bam files.
+#' @param ref_genome [REQUIRED] Path to reference genome.
+#' @param indel_candidates [OPTIONAL] Path to indel candidates produced by MANTA.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param targeted [OPTIONAL] If exome/capture method. Default FALSE
+#' @param threads [OPTIONAL] Number of threads per job. Default 3
+#' @param exec_options [OPTIONAL] Type of execution. local (Single node) / sge (multiple nodes). Default local.
+#' @param verbose [DEFAULT==FALSE] Enables progress messages.
+#' @export
+
+call_variants_strelka=function(bin_path="~/tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",tumor_bam="",normal_bam="",ref_genome="",indel_candidates="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  if (tumor_bam!=""){
+    sample_name=ULPwgs::get_sample_name(tumor_bam)
+    out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_SOMATIC")
+    tumor_bam=paste(" --tumorBAM ",tumor_bam)
+    normal_bam=paste(" --normalBAM ",normal_bam)
+  }else{
+    sample_name=ULPwgs::get_sample_name(normal_bam)
+    out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_GERMLINE")
+    normal_bam=paste0(" --bam ", normal_bam,collapse=" --bam ")
+  }
+
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  if (indel_candidates!=""){
+    indel_candidates=paste(" --indelCandidates ",indel_candidates)
+  }
+
+  exome=""
+  if (targeted){
+    exome=" --exome "
+  }
+
+  if(verbose){
+    print(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome,indel_candidates," -- runDir ",output_dir, exome))
+  }
+  system(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome,indel_candidates," -- runDir ",output_dir, exome))
+
+
+  if(verbose){
+    print(paste0("python2.7 ",out_file_dir,"/runWorkflow.py -m ",exec_options," -j ",threads))
+  }
+  system(paste0("python2.7 ",out_file_dir,"/runWorkflow.py -m ",exec_options," -j ",threads))
+}
+
+
+
+#' Call Somatic/Germline structural variants using Manta
+
+#' This function takes a pair of matched samples or single | multiple germline variants
+#' and calls variants on them. Variant calling mode is established based on wether tumor_bam is provided or not.
+#'
+#' @param bin_path [REQUIRED] Path to strelka binary. Somatic or Germline.
+#' @param tumor_bam [REQUIRED] Path to tumor  bam file.
+#' @param normal_bam [OPTIONAL] Path to normal samples bam files.
+#' @param ref_genome [REQUIRED] Path to reference genome.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param targeted [OPTIONAL] If exome/capture method. Default FALSE
+#' @param threads [OPTIONAL] Number of threads per job. Default 3
+#' @param verbose [DEFAULT==FALSE] Enables progress messages.
+#' @export
+
+
+call_sv_manta=function(bin_path="~/home/regmova/tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  if (tumor_bam!=""){
+    sample_name=ULPwgs::get_sample_name(tumor_bam)
+    tumor_bam=paste(" --tumorBAM ",tumor_bam)
+    normal_bam=paste(" --normalBAM ",normal_bam)
+    out_file_dir=paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC")
+  }else{
+    sample_name=ULPwgs::get_sample_name(normal_bam)
+    normal_bam=paste0(" --bam ", normal_bam,collapse=" --bam ")
+    out_file_dir=paste0(output_dir,sep,sample_name,"_MANTA_SV_GERMLINE")
+  }
+
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  exome=""
+  if (targeted){
+    exome=" --exome "
+  }
+
+  if(verbose){
+    print(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome," -- runDir ",output_dir, exome))
+  }
+  system(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome," -- runDir ",output_dir, exome))
+
+
+  if(verbose){
+    print(paste0("python2.7 ",out_file_dir,"/runWorkflow.py -j ",threads))
+  }
+  system(paste0("python2.7 ",out_file_dir,"/runWorkflow.py  -j ",threads))
+}
+
+
+
+#' Call Somatic/Germline variants using Strelka in parallel
+
+#' This function takes a pair of matched samples or single | multiple germline variants
+#' and calls variants on them. To specify the variant calling mode supply the right strelka binary.
+#' It is recommended to supply a vcf with indel candidates. This can be generated using MANTA workflow.
+#' This function parallelizes the number of jobs that can be run.
+#'
+#' @param bin_path [REQUIRED] Path to strelka binary. Somatic or Germline.
+#' @param bam_dir [REQUIRED] Path to directory with BAM files.
+#' @param ref_genome [REQUIRED] Path to reference genome.
+#' @param indel_candidates [OPTIONAL] Path to indel candidates produced by MANTA.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param targeted [OPTIONAL] If exome/capture method. Default FALSE
+#' @param threads [OPTIONAL] Number of threads per job. Default 3
+#' @param jobs [OPTIONAL] Number of jobs. Default 1
+#' @param exec_options [OPTIONAL] Type of execution. local (Single node) / sge (multiple nodes). Default local.
+#' @param verbose [DEFAULT==FALSE] Enables progress messages.
+#' @export
+
+
+call_variants_strelka_parallel=function(bin_path="~/tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bam_dir="",ref_genome="",indel_candidates="",output_dir="",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  out_file_dir=paste0(output_dir,sep,patient_id,"_STRELKA_VARIANTS")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+  files=files[grepl("bam$",files)]
+  tumor_bams=files[!grepl(germ_pattern,files)]
+  normal_bam=files[grepl(germ_pattern,files)]
+
+  cl=parallel::makeCluster(jobs)
+  pbapply::pblapply(X=1:nrow(files),FUN=function(x){call_variants_strelka(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,indel_candidates=indel_candidates,targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
+  on.exit(parallel::stopCluster(cl))
+}
+
+
+#' Call Somatic/Germline variants using MANTA in parallel
+
+#' This function takes a pair of matched samples or single | multiple germline variants
+#' and calls variants on them.
+#' This function parallelizes the number of jobs that can be run at single time.
+#'
+#' @param bin_path [REQUIRED] Path to strelka binary. Somatic or Germline.
+#' @param bam_dir [REQUIRED] Path to directory with BAM files.
+#' @param ref_genome [REQUIRED] Path to reference genome.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param targeted [OPTIONAL] If exome/capture method. Default FALSE
+#' @param threads [OPTIONAL] Number of threads per job. Default 3
+#' @param jobs [OPTIONAL] Number of jobs. Default 1
+#' @param verbose [DEFAULT==FALSE] Enables progress messages.
+#' @export
+
+
+call_sv_manta_parallel=function(bin_path="~/home/regmova/tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,jobs=1,threads=3){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  out_file_dir=paste0(output_dir,sep,patient_id,"_MANTA_VARIANTS_VCF")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+  files=files[grepl("bam$",files)]
+  tumor_bams=files[!grepl(germ_pattern,files)]
+  normal_bam=files[grepl(germ_pattern,files)]
+
+  cl=parallel::makeCluster(jobs)
+  pbapply::pblapply(X=1:nrow(files),FUN=function(x){call_sv_manta(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads)},cl=cl)
+  on.exit(parallel::stopCluster(cl))
+}
+
 
 
 
@@ -668,7 +981,7 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 #' @param output_name [OPTIONAL] Name for the output.
 #' @export
 
-call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref_genome="",threads=3,output_name="",targets="",dbsnp_indels="",verbose=FALSE,output_dir=""){
+call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref_genome="",threads=3,output_name="",targets="",dbsnp_indels="",verbose=FALSE,output_dir=""){
   sep="/"
 
   if(output_dir==""){
@@ -681,7 +994,7 @@ call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref
     sample_name=output_name
   }
 
-  out_file_dir=paste0(output_dir,sep,sample_name,"_SVABA_VARIANTS_VCF")
+  out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
@@ -738,12 +1051,12 @@ call_sv=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref
 #' @export
 
 
-call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",jobs=3,threads=1,par_type="Joint",verbose=FALSE,output_dir=""){
+call_sv_svaba_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",jobs=3,threads=1,par_type="Joint",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
   }
-  out_file_dir=paste0(output_dir,sep,patient_id,"_svaba_SV")
+  out_file_dir=paste0(output_dir,sep,patient_id,"_SVABA_VARIANTS_VCF")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
@@ -761,16 +1074,6 @@ call_sv_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_dir=""
     on.exit(parallel::stopCluster(cl))
   }
 }
-
-
-
-
-
-
-
-
-
-
 
 
 #' Variant calling using Platypus
@@ -823,13 +1126,17 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/ht
   }
   out_file=paste0(out_file,"/",sample_name,".PLATYPUS.vcf")
 
+
+  if (targeted){
+    opt=paste0(" --filterDuplicates=0 ")
+  }
 # TO DO FIX THIS MESS
 
   if(verbose){
-      print(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm)," --source=",vcf_overlay," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")," --nCPU=",threads))
+      print(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm)," --source=",vcf_overlay," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1  --logFileName=",paste0(out_file,".log"),opt," --nCPU=",threads))
 
   }
-  system(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm), " --source=",vcf_overlay," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log")," --nCPU=",threads))
+  system(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm), " --source=",vcf_overlay," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log"),opt," --nCPU=",threads))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))

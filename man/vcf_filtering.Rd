@@ -11,26 +11,35 @@ vcf_filtering(
   unfil_vcf = "",
   ref_genome = "",
   unfil_vcf_stats = "",
+  contamination = "",
+  segmentation = "",
+  orientation_model = "",
   verbose = FALSE,
   output_dir = ""
 )
 }
 \arguments{
-\item{bin_path}{Path to gatk binary. Default tools/gatk/gatk.}
+\item{bin_path}{\link{REQUIRED} Path to gatk binary. Default tools/gatk/gatk.}
 
-\item{bin_path2}{Path to bgzip binary. Default tools/htslib/bgzip.}
+\item{bin_path2}{\link{REQUIRED} Path to bgzip binary. Default tools/htslib/bgzip.}
 
-\item{bin_path3}{Path to tabix binary. Default tools/htslib/tabix.}
+\item{bin_path3}{\link{REQUIRED} Path to tabix binary. Default tools/htslib/tabix.}
 
-\item{unfil_vcf}{Path to unfiltered vcf file.}
+\item{unfil_vcf}{\link{REQUIRED} Path to unfiltered vcf file.}
 
-\item{ref_genome}{Path to reference genome fasta file.}
+\item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
 
-\item{unfil_vcf_stats}{Path to unfiltered vcf file stats.}
+\item{unfil_vcf_stats}{\link{REQUIRED} Path to unfiltered vcf file stats.}
 
-\item{verbose}{Enables progress messages. Default False.}
+\item{contamination}{\link{OPTIONAL} Path to contamination table. Also requires segmentation.}
 
-\item{output_dir}{Path to the output directory.}
+\item{segmentation}{\link{OPTIONAL} Path to segments table. Also requires contamination.}
+
+\item{orientation_model}{\link{OPTIONAL} Path to orientation model generated using learn_orientation.}
+
+\item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
+
+\item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 }
 \description{
 This function filters VCF calls using GATK statistics

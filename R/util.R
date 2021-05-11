@@ -18,6 +18,147 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 }
 
 
+#' Learn Read Orientation Model (Mutect2)
+#'
+#' This function takes a f1r2 read information and generates an orientation model
+#' to be used for further filtering steps.
+#'
+#' @param bin_path [REQUIRED] Path to GATK binary. Default tools/htslib/tabix.
+#' @param f1r2 [OPTIONAL] Path to f1r2 file. Only if f1r2_dir is not given.
+#' @param f1r2_dir [OPTIONAL] Path to f1r2 file dir. Only if f1r2 is not given.
+#' @param verbose [Optional] Enables progress messages. Default False.
+#' @export
+
+learn_orientation=function(bin_path="tools/gatk/gatk",f1r2="",f1r2_dir="",output_name="",output_dir="",verbose=FALSE){
+
+  if (f1r2!=""){
+    f1r2=paste0(" -I ",f1r2,collapse=" -I ")
+  }else{
+    files=list.files(f1r2_dir,full.names=TRUE)
+    files=files[grepl(".f1r2.tar.gz$",files)]
+    f1r2=paste0(" -I ",files,collapse=" -I ")
+  }
+
+  if (output_name==""){
+    sample_name=ULPwgs::get_sample_name(f1r2[1])
+  }else{
+    sample_name=output_name
+  }
+
+  sep="/"
+
+  if(output_dir==""){
+    sep=""
+  }
+  out_file_dir=paste0(output_dir,sep,sample_name,"_ORIENTATION_MODEL")
+
+  if (verbose){
+
+    print(paste0(bin_path," LearnReadOrientationModel ",f1r2, " -O ", paste0(out_file_dir,"/",sample_name,".read-orientation-model.tar.gz")))
+  }
+  system(paste0(bin_path," LearnReadOrientationModel ",f1r2, " -O ", paste0(out_file_dir,"/",sample_name,".read-orientation-model.tar.gz")))
+}
+
+
+
+#' Filter Variant Tranches (Mutect2)
+#'
+#' This function takes an annotated VCF with CNN_D1 or CNN_D2 scores and filter the
+#' variants based on set threshold.
+#'
+#' @param bin_path [REQUIRED] Path to GATK binary. Default tools/gatk/gatk
+#' @param vcf [REQUIRED] Path to annotated VCF with CNN_D1/CNN_D2 scores
+#' @param resources [OPTIONAL] Path to resources for variant filtering
+#' @param output_name [OPTIONAL] Name of the sample to output
+#' @param info_key [OPTIONAL] Annotation column to select. Default CNN_D1
+#' @param snp_tranche [OPTIONAL] SNP tranche filter value. Default 99.95
+#' @param indel_tranche [OPTIONAL] Indel tranche filter value. Default 99.4
+#' @param keep_previous_filters [OPTIONAL] Keep previous filters in VCF. Default False
+#' @param output_dir [OPTIONAL] Path to output dir
+#' @param verbose [Optional] Enables progress messages. Default False
+#' @export
+
+FilterVariantTranches=function(bin_path="tools/gatk/gatk",vcf="",resources="",output_name="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,output_dir="",keep_previous_filters=FALSE,verbose=FALSE){
+
+  prev_filters=" --invalidate-previous-filters "
+  if (keep_previous_filters){
+    prev_filters=" "
+  }
+
+  if (output_name==""){
+    sample_name=ULPwgs::get_sample_name(vcf[1])
+  }else{
+    sample_name=output_name
+  }
+
+  if(resources!=""){
+    resources=paste0(" --resource ",resources,collapse=" --resource ")
+  }
+
+  sep="/"
+
+  if(output_dir==""){
+    sep=""
+  }
+  out_file_dir=paste0(output_dir,sep,sample_name,"_FILTERED_TRENCHES")
+
+  if (verbose){
+    print(paste0(bin_path," FilterVariantTranches -V",vcf," --info-key ",info_key, " -O ", paste0(out_file_dir,"/",sample_name,".filtered.vcf")," --snp-tranche ",snp_tranche," --indel-tranche ",indel_tranche,resources,prev_filters))
+  }
+  system(paste0(bin_path," FilterVariantTranches -V",vcf, " --info-key ",info_key, " -O ", paste0(out_file_dir,"/",sample_name,".filtered.vcf")," --snp-tranche ",snp_tranche," --indel-tranche ",indel_tranche,resources,prev_filters))
+}
+
+
+
+#' Annotate a VCF with scores from a Convolutional Neural Network (CNN) {Mutect2}
+#'
+#' This function takes a vcf and then annotates it with CNN scores.
+#' If a BAM files is supplied a 2D model will be applied, otherwise a 1D model will be applied.
+#'
+#' @param bin_path [REQUIRED] Path to GATK binary. Default tools/gatk/gatk
+#' @param vcf [REQUIRED] Path to VCF file to annotate.
+#' @param ref_genome [REQUIRED] Path to reference genome.
+#' @param bam [OPTIONAL] Path to BAM file.
+#' @param output_dir [OPTIONAL] Path to BAM file.
+#' @param output_name [OPTIONAL] Default output name. If not supplied it will use the vcf file name.
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @export
+
+
+CNNScoreVariants=function(bin_path="tools/gatk/gatk",vcf="",ref_genome="",bam="",output_dir="",output_name=""){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  sample_name=ULPwgs::get_sample_name(vcf)
+
+  if(output_name!=""){
+    sample_name=output_name
+  }
+
+  out_file_dir=paste0(output_dir,sep,sample_name,"_CNNscored")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+
+  if (bam!=""){
+    bam=paste0(" -I ",bam)
+    opt=" -tensor-type read-tensor "
+    out_file=paste0(out_file_dir,"/",sample_name,".CNNscored.2D.vcf")
+  }else{
+    out_file=paste0(out_file_dir,"/",sample_name,".CNNscored.1D.vcf")
+  }
+
+  if(verbose){
+    print(paste0(bin_path," CNNScoreVariants -V ",vfc," -R ",ref_genome, " -O ", out_file_dir,bam,opt))
+  }
+  system(paste0(bin_path," CNNScoreVariants -V ",vfc," -R ",ref_genome, " -O ", out_file_dir,bam,opt))
+
+}
+
 
 #' Bzips a VCF file
 #'
@@ -73,8 +214,6 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
   })
 
 }
-
-
 
 
 #' VCF filtering using bcftools
@@ -550,23 +689,31 @@ vcf_format=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/h
   }
 
 
+
+
+
+
+
 #' VCF filtering using GATK
 #'
 #' This function filters VCF calls using GATK statistics
 #'
-#' @param bin_path Path to gatk binary. Default tools/gatk/gatk.
-#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
-#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
-#' @param unfil_vcf Path to unfiltered vcf file.
-#' @param unfil_vcf_stats Path to unfiltered vcf file stats.
-#' @param ref_genome Path to reference genome fasta file.
-#' @param output_dir Path to the output directory.
-#' @param verbose Enables progress messages. Default False.
+#' @param bin_path [REQUIRED] Path to gatk binary. Default tools/gatk/gatk.
+#' @param bin_path2 [REQUIRED] Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
+#' @param ref_genome [REQUIRED] Path to reference genome fasta file.
+#' @param unfil_vcf [REQUIRED] Path to unfiltered vcf file.
+#' @param unfil_vcf_stats [REQUIRED] Path to unfiltered vcf file stats.
+#' @param contamination [OPTIONAL] Path to contamination table. Also requires segmentation.
+#' @param segmentation [OPTIONAL] Path to segments table. Also requires contamination.
+#' @param orientation_model [OPTIONAL] Path to orientation model generated using learn_orientation.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
 #' @export
 
 
+vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",ref_genome="",unfil_vcf_stats="",contamination="",segmentation="",orientation_model="",verbose=FALSE,output_dir=""){
 
-vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unfil_vcf="",ref_genome="",unfil_vcf_stats="",verbose=FALSE,output_dir=""){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -577,12 +724,22 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
         dir.create(out_file_dir)
     }
 
+
     out_file=paste0(out_file_dir,"/",sample_name,".FILTERED.vcf")
 
-    if(verbose){
-      print(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats))
+    if (contamination!="" & segmentation !=""){
+      contamination=paste0(" --contamination-table ",contamination,collapse=" --contamination-table ")
+      segmentation=paste0(" --tumor-segmentation ",segmentation,collapse=" --tumor-segmentation ")
     }
-    system(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats))
+
+    if (orientation_model!=""){
+      orientation_model=paste0(" --ob-priors ",orientation_model)
+    }
+
+    if(verbose){
+      print(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats, contamination,segmentation,orientation_model))
+    }
+    system(paste(bin_path,"FilterMutectCalls -O",out_file," -R ",ref_genome," -V ",unfil_vcf," -stats ",unfil_vcf_stats, contamination,segmentation,orientation_model))
     system(paste("cp", out_file, paste0(out_file,".tmp")))
     bgzip(bin_path=bin_path2,file=out_file)
     tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))

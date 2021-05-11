@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{call_variants}
 \alias{call_variants}
-\title{Variant calling of Somatic and Germline (MuTECT2 and Platypus) mutations and their subsequent annotation (VEP)}
+\title{Variant calling of Somatic and Germline (MuTECT2 and Platypus) mutations and produces their subsequent annotation (VEP)}
 \usage{
 call_variants(
   bin_path = "tools/gatk/gatk",
@@ -11,6 +11,8 @@ call_variants(
   bin_path4 = "tools/htslib/tabix",
   bin_path5 = "tools/platypus/Platypus.py",
   bin_path6 = "tools/ensembl-vep/vep",
+  bin_path7 = "",
+  bin_path8 = "",
   bam_dir = "",
   patient_id = "",
   germ_pattern = "GL",
@@ -20,6 +22,8 @@ call_variants(
   output_dir = "",
   region_bed = "",
   chr_filter = "canonical",
+  db = "",
+  interval = "",
   threads = 3,
   verbose = FALSE
 )
@@ -54,6 +58,10 @@ call_variants(
 \item{region_bed}{\link{REQUIRED} Path to bed file with regions to analyze.}
 
 \item{chr_filter}{\link{OPTIONAL} Chromosomes to analyze. canonical/autosomal/all or a list of chromosomes}
+
+\item{db}{\link{OPTIONAL} Path to vcf with common variants. Used for contamination estimation.}
+
+\item{interval}{\link{OPTIONAL} Path to interval for common variants to analyze. Used for contamination estimation.}
 
 \item{threads}{\link{OPTIONAL} Number of threads. Default 3}
 

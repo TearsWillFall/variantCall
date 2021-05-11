@@ -11,15 +11,20 @@ call_mutect2_parallel(
   bin_path4 = "tools/htslib/tabix",
   tumor_bam = "",
   normal_bam = "",
+  bam_dir = "",
+  patient_id = "",
+  germ_pattern = "GL",
   ref_genome = "",
   germ_resource = "",
   pon = "",
   output_dir = "",
-  output_name = "",
   region_bed = "",
+  db = "",
+  interval = "",
   threads = 3,
   verbose = FALSE,
-  chr_filter = "canonical"
+  chr_filter = "canonical",
+  orientation = FALSE
 )
 }
 \arguments{
@@ -31,9 +36,15 @@ call_mutect2_parallel(
 
 \item{bin_path4}{\link{REQUIRED} Path to bgzip binary. Default path tools/htslib/bgzip.}
 
-\item{tumor_bam}{\link{REQUIRED} Path to tumor bam file/s.}
+\item{tumor_bam}{\link{OPTIONAL} Path to tumor bam file/s.}
 
 \item{normal_bam}{\link{OPTIONAL} Path to germline bam file/s.}
+
+\item{bam_dir}{\link{OPTIONAL} Path to bam_dir. Only if tumor_bam and/or normal_bam not given.}
+
+\item{patient_id}{\link{OPTIONAL} Patients ID to identify project with. Otherwise name of tumor sample will be used.}
+
+\item{germ_pattern}{\link{OPTIONAL} Identifier for normal samples. Default GL. Only used when bam_dir is given.}
 
 \item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
 
@@ -43,15 +54,19 @@ call_mutect2_parallel(
 
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 
-\item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of one of the samples will be used.}
-
 \item{region_bed}{\link{REQUIRED} Path to bed file with regions to analyze.}
+
+\item{db}{\link{OPTIONAL} Path to vcf with known variants for contamination estimation.}
+
+\item{interval}{\link{OPTIONAL} Path to vcf with intervals to analyze contamination.}
 
 \item{threads}{\link{OPTIONAL} Number of threads. Default 3}
 
 \item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
 
 \item{chr_filter}{\link{OPTIONAL} Chromosomes to analyze. canonical/autosomal/all or a list of chromosomes}
+
+\item{orientation}{\link{OPTIONAL} Generate a read orientation model to filter variants. Default False}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or
