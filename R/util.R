@@ -125,7 +125,7 @@ FilterVariantTranches=function(bin_path="tools/gatk/gatk",vcf="",resources="",ou
 #' @export
 
 
-CNNScoreVariants=function(bin_path="tools/gatk/gatk",vcf="",ref_genome="",bam="",output_dir="",output_name=""){
+CNNScoreVariants=function(bin_path="tools/gatk/gatk",vcf="",ref_genome="",bam="",output_dir="",output_name="",verbose=FALSE){
 
   sep="/"
   if(output_dir==""){

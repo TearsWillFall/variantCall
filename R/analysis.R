@@ -347,10 +347,10 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genom
   system(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads,region))
 
   if (info_key=="CNN_1D"){
-      CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,output_dir=out_file_dir,output_name=sample_name)
+      CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,output_dir=out_file_dir,output_name=sample_name,verbose=verbose)
       scored_vcf=paste0(out_file_dir,"/",sample_name,"_CNNscored","/",sample_name,".CNNscored.1D.vcf")
   }else if(info_key=="CNN_2D"){
-      CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,bam=normal_bam,output_dir=out_file_dir,output_name=sample_name)
+      CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,bam=normal_bam,output_dir=out_file_dir,output_name=sample_name,verbose=verbose)
       scored_vcf=paste0(out_file_dir,"/",sample_name,"_CNNscored","/",sample_name,".CNNscored.2D.vcf")
   }
 
