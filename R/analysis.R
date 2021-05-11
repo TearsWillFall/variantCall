@@ -330,6 +330,10 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genom
     sample_name=output_name
   }
 
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
   out_file_dir=paste0(output_dir,sep,sample_name,"_GERMLINE_VARIANTS")
 
   if(verbose){
