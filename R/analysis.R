@@ -483,7 +483,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     tumor_bam=files[!grepl(germ_pattern,files)]
     normal_bam=files[grepl(germ_pattern,files)]
     ## Call Somatic SNVs+INDELs Using Mutect2
-    call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,output_name=patient_id,chr_filter=chr_filter)
+    call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter)
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,output_name=sample_id,verbose=verbose,threads=threads)
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
