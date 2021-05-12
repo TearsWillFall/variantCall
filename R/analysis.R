@@ -30,17 +30,17 @@ call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_b
     sample_name=output_name
   }
 
-  out_file=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
-  if (!dir.exists(out_file)){
-      dir.create(out_file)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
   }
 
   reg=""
   if (region==""){
-      out_file=paste0(out_file,"/",sample_name,".UNFILTERED_MUTECT2.vcf")
+      out_file=paste0(out_file_dir,"/",sample_name,".UNFILTERED_MUTECT2.vcf")
   }else{
       reg=paste0(" -L ",region)
-      out_file=paste0(out_file,"/",sample_name,".",region,".UNFILTERED_MUTECT2.vcf")
+      out_file=paste0(out_file_dir,"/",sample_name,".",region,".UNFILTERED_MUTECT2.vcf")
   }
 
 
@@ -67,7 +67,7 @@ call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_b
 
   f1r2=""
   if (orientation){
-      f1r2=paste0(" --f1r2-tar-gz ",out_file,"/",sample_name,".",region,".f1r2.tar.gz")
+      f1r2=paste0(" --f1r2-tar-gz ",out_file_dir,"/",sample_name,".",region,".f1r2.tar.gz")
   }
 
   if(verbose){
