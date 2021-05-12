@@ -65,7 +65,7 @@ call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_b
     pon=paste0(" --panel-of-normals ",pon)
   }
 
-
+  f1r2=""
   if (orientation){
       f1r2=paste0(" --f1r2-tar-gz ",out_file,"/",sample_name,".",region,".f1r2.tar.gz")
   }
@@ -222,7 +222,7 @@ call_clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_
 #' @import pbapply
 
 
-call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",db="",interval="",threads=3,verbose=FALSE,chr_filter="canonical",orientation=FALSE){
+call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",db="",interval="",threads=3,verbose=FALSE,chr_filter="canonical",orientation=TRUE){
 
   if (patient_id==""){
     sample_name=ULPwgs::get_sample_name(tumor_bam[1])
@@ -458,6 +458,7 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @param region_bed [REQUIRED] Path to bed file with regions to analyze.
 #' @param db [OPTIONAL] Path to vcf with common variants. Used for contamination estimation.
 #' @param interval [OPTIONAL] Path to interval for common variants to analyze. Used for contamination estimation.
+#' @param orientation [OPTIONAL] Generate a read orientation model to filter variants. Default TRUE
 #' @param info_key [OPTIONAL] Annotation column to select. Default CNN_D2
 #' @param snp_tranche [OPTIONAL] SNP tranche filter value. Default 99.95
 #' @param indel_tranche [OPTIONAL] Indel tranche filter value. Default 99.4
@@ -467,7 +468,7 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @export
 
 call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bin_path5="tools/platypus/Platypus.py",bin_path6="tools/ensembl-vep/vep",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",
-germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db="",interval="",resources="",info_key="CNN_2D",snp_tranche=99.95,indel_tranche=99.4,threads=3,verbose=FALSE){
+germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db="",interval="",orientation=TRUE,resources="",info_key="CNN_2D",snp_tranche=99.95,indel_tranche=99.4,threads=3,verbose=FALSE){
 
     sep="/"
     if(output_dir==""){
@@ -483,7 +484,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     tumor_bam=files[!grepl(germ_pattern,files)]
     normal_bam=files[grepl(germ_pattern,files)]
     ## Call Somatic SNVs+INDELs Using Mutect2
-    call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter)
+    call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter,orientation=orientation,interval=interval,db=db)
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,output_name=sample_id,verbose=verbose,threads=threads)
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
