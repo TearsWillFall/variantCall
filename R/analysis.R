@@ -255,7 +255,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   dat$V2=dat$V2+1
   dat=dat %>% dplyr::mutate(Region=paste0(sub("chr","",V1),":",V2,"-",V3))
   cl=parallel::makeCluster(round(threads/4), digits = 0)
-  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=call_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=output_dir,output_name=output_name,verbose=verbose,orientation=orientation,cl=cl)
+  pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=call_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=output_dir,output_name=sample_id,verbose=verbose,orientation=orientation,cl=cl)
   on.exit(parallel::stopCluster(cl))
   sep="/"
 
