@@ -92,7 +92,7 @@ FilterVariantTranches=function(bin_path="tools/gatk/gatk",vcf="",resources="",ou
   }
 
   if(resources!=""){
-    resources=paste0(" --resource ",resources,collapse=" --resource ")
+    resources=paste0(" --resource ",paste0(resources,collapse=" --resource "))
   }
 
   sep="/"
