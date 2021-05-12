@@ -11,8 +11,6 @@ call_variants(
   bin_path4 = "tools/htslib/tabix",
   bin_path5 = "tools/platypus/Platypus.py",
   bin_path6 = "tools/ensembl-vep/vep",
-  bin_path7 = "",
-  bin_path8 = "",
   bam_dir = "",
   patient_id = "",
   germ_pattern = "GL",
@@ -24,6 +22,10 @@ call_variants(
   chr_filter = "canonical",
   db = "",
   interval = "",
+  resources = "",
+  info_key = "CNN_2D",
+  snp_tranche = 99.95,
+  indel_tranche = 99.4,
   threads = 3,
   verbose = FALSE
 )
@@ -62,6 +64,12 @@ call_variants(
 \item{db}{\link{OPTIONAL} Path to vcf with common variants. Used for contamination estimation.}
 
 \item{interval}{\link{OPTIONAL} Path to interval for common variants to analyze. Used for contamination estimation.}
+
+\item{info_key}{\link{OPTIONAL} Annotation column to select. Default CNN_D2}
+
+\item{snp_tranche}{\link{OPTIONAL} SNP tranche filter value. Default 99.95}
+
+\item{indel_tranche}{\link{OPTIONAL} Indel tranche filter value. Default 99.4}
 
 \item{threads}{\link{OPTIONAL} Number of threads. Default 3}
 

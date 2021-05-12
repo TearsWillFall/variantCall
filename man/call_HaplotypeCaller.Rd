@@ -8,6 +8,7 @@ call_HaplotypeCaller(
   bin_path = "tools/gatk/gatk",
   normal_bam = "",
   ref_genome = "",
+  region = "",
   output_dir = "",
   resources = "",
   info_key = "CNN_1D",
@@ -25,6 +26,8 @@ call_HaplotypeCaller(
 \item{normal_bam}{\link{REQUIRED} Path to BAM file}
 
 \item{ref_genome}{\link{REQUIRED} Path to reference genome}
+
+\item{region}{\link{OPTIONAL} Genomic region/regions to analyze. In samtools format.}
 
 \item{output_dir}{\link{OPTIONAL} Path to output dir}
 

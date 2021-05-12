@@ -10,7 +10,8 @@ CNNScoreVariants(
   ref_genome = "",
   bam = "",
   output_dir = "",
-  output_name = ""
+  output_name = "",
+  verbose = FALSE
 )
 }
 \arguments{

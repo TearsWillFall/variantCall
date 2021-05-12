@@ -112,9 +112,9 @@ FilterVariantTranches=function(bin_path="tools/gatk/gatk",vcf="",resources="",ou
 
 
   if (verbose){
-    print(paste0(bin_path," FilterVariantTranches -V ",vcf," --info-key ",info_key, " -O ", paste0(out_file_dir,"/",sample_name,".filtered.vcf")," --snp-tranche ",snp_tranche," --indel-tranche ",indel_tranche,resources,prev_filters))
+    print(paste0(bin_path," FilterVariantTranches -V ",vcf," --info-key ",info_key, " -O ", paste0(out_file_dir,"/",sample_name,".FILTERED.vcf.gz")," --snp-tranche ",snp_tranche," --indel-tranche ",indel_tranche,resources,prev_filters))
   }
-  system(paste0(bin_path," FilterVariantTranches -V ",vcf, " --info-key ",info_key, " -O ", paste0(out_file_dir,"/",sample_name,".filtered.vcf")," --snp-tranche ",snp_tranche," --indel-tranche ",indel_tranche,resources,prev_filters))
+  system(paste0(bin_path," FilterVariantTranches -V ",vcf, " --info-key ",info_key, " -O ", paste0(out_file_dir,"/",sample_name,".FILTERED.vcf.gz")," --snp-tranche ",snp_tranche," --indel-tranche ",indel_tranche,resources,prev_filters))
 }
 
 
