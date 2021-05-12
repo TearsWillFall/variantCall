@@ -52,6 +52,10 @@ learn_orientation=function(bin_path="tools/gatk/gatk",f1r2="",f1r2_dir="",output
   }
   out_file_dir=paste0(output_dir,sep,sample_name,"_ORIENTATION_MODEL")
 
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
   if (verbose){
 
     print(paste0(bin_path," LearnReadOrientationModel ",f1r2, " -O ", paste0(out_file_dir,"/",sample_name,".read-orientation-model.tar.gz")))
@@ -101,6 +105,11 @@ FilterVariantTranches=function(bin_path="tools/gatk/gatk",vcf="",resources="",ou
     sep=""
   }
   out_file_dir=paste0(output_dir,sep,sample_name,"_FILTERED_TRENCHES")
+
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
 
   if (verbose){
     print(paste0(bin_path," FilterVariantTranches -V ",vcf," --info-key ",info_key, " -O ", paste0(out_file_dir,"/",sample_name,".filtered.vcf")," --snp-tranche ",snp_tranche," --indel-tranche ",indel_tranche,resources,prev_filters))
