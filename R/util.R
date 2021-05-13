@@ -737,8 +737,8 @@ vcf_filtering=function(bin_path="tools/gatk/gatk",bin_path2="tools/htslib/bgzip"
     out_file=paste0(out_file_dir,"/",sample_name,".FILTERED.vcf")
 
     if (contamination!="" & segmentation !=""){
-      contamination=paste0(" --contamination-table ",contamination,collapse=" --contamination-table ")
-      segmentation=paste0(" --tumor-segmentation ",segmentation,collapse=" --tumor-segmentation ")
+      contamination=paste0(" --contamination-table ", paste0(contamination,collapse=" --contamination-table "))
+      segmentation=paste0(" --tumor-segmentation ",paste0(segmentation,collapse=" --tumor-segmentation "))
     }
 
     if (orientation_model!=""){
