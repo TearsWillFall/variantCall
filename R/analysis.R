@@ -665,7 +665,7 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-call_variants_strelka=function(bin_path="~/tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",tumor_bam="",normal_bam="",ref_genome="",indel_candidates="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
+call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",tumor_bam="",normal_bam="",ref_genome="",indel_candidates="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
 
   sep="/"
   if(output_dir==""){
@@ -695,6 +695,8 @@ call_variants_strelka=function(bin_path="~/tools/strelka-2.9.10/build/bin/config
   if (targeted){
     exome=" --exome "
   }
+
+
 
   if(verbose){
     print(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome,indel_candidates," -- runDir ",output_dir, exome))
@@ -726,7 +728,7 @@ call_variants_strelka=function(bin_path="~/tools/strelka-2.9.10/build/bin/config
 #' @export
 
 
-call_sv_manta=function(bin_path="~/home/regmova/tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3){
+call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3){
 
   sep="/"
   if(output_dir==""){
@@ -787,7 +789,7 @@ call_sv_manta=function(bin_path="~/home/regmova/tools/manta-1.6.0/build/bin/conf
 #' @export
 
 
-call_variants_strelka_parallel=function(bin_path="~/tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bam_dir="",ref_genome="",indel_candidates="",output_dir="",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
+call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="~/tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",indel_candidates="",output_dir="",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
 
   sep="/"
   if(output_dir==""){
@@ -805,7 +807,9 @@ call_variants_strelka_parallel=function(bin_path="~/tools/strelka-2.9.10/build/b
   normal_bam=files[grepl(germ_pattern,files)]
 
   cl=parallel::makeCluster(jobs)
-  pbapply::pblapply(X=1:nrow(files),FUN=function(x){call_variants_strelka(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,indel_candidates=indel_candidates,targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
+  pbapply::pblapply(X=1:nrow(files),FUN=function(x){
+    call_sv_manta(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads);
+    call_variants_strelka(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,indel_candidates=paste0(out_file_dir,"/",ULPwgs::get_sample_name(x),"_MANTA_SV_SOMATIC/candidateSmallIndels"),targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
   on.exit(parallel::stopCluster(cl))
 }
 
@@ -827,7 +831,7 @@ call_variants_strelka_parallel=function(bin_path="~/tools/strelka-2.9.10/build/b
 #' @export
 
 
-call_sv_manta_parallel=function(bin_path="~/home/regmova/tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,jobs=1,threads=3){
+call_sv_manta_parallel=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,jobs=1,threads=3){
 
   sep="/"
   if(output_dir==""){
