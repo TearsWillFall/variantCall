@@ -300,7 +300,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 #' Wrapper for GATK HaplotypeCaller for Germline Variant calling
 #'
 #' This function takes an annotated VCF with CNN_D1 or CNN_D2 scores and filter the
-#' variants based on set threshold.
+#' variants based on set threshold.Cuttently only single sample implementation
 #'
 #' @param bin_path [REQUIRED] Path to GATK binary. Default tools/gatk/gatk
 #' @param normal_bam [REQUIRED] Path to BAM file
@@ -318,17 +318,17 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 #' @param verbose [Optional] Enables progress messages. Default False
 #' @export
 
-call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genome="",region="",output_dir="",resources="",patient_id="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,output_name="",verbose=FALSE,threads=3){
+call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genome="",region="",output_dir="",resources="",patient_id="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,verbose=FALSE,threads=3){
 
   sep="/"
   if(output_dir==""){
     sep=""
   }
 
-  if (output_name==""){
+  if (patient_id==""){
     sample_name=ULPwgs::get_sample_name(normal_bam[1])
   }else{
-    sample_name=output_name
+    sample_name=patient_id
   }
 
   out_file_dir=paste0(output_dir,sep,sample_name,"_HAPLOTYPECALLER_VARIANTS_VCF")
@@ -499,7 +499,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     ## Call Somatic SNVs+INDELs Using Mutect2
     call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter,orientation=orientation,interval=interval,db=db)
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
-    call_HaplotypeCaller(bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_name=patient_id,verbose=verbose,threads=threads,region=chr_pass)
+    call_HaplotypeCaller(bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
     call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id)
     ## Anotate Variants using VEP
