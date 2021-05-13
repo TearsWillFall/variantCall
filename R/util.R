@@ -32,11 +32,11 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 learn_orientation=function(bin_path="tools/gatk/gatk",f1r2="",f1r2_dir="",output_name="",output_dir="",verbose=FALSE){
 
   if (f1r2!=""){
-    f1r2=paste0(" -I ",f1r2,collapse=" -I ")
+    f1r2=paste0(" -I ",paste0(f1r2,collapse=" -I "))
   }else{
     files=list.files(f1r2_dir,full.names=TRUE)
     files=files[grepl(".f1r2.tar.gz$",files)]
-    f1r2=paste0(" -I ",files,collapse=" -I ")
+    f1r2=paste0(" -I ",paste0(files,collapse=" -I "))
   }
 
   if (output_name==""){
