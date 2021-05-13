@@ -675,8 +675,8 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
   if (tumor_bam!=""){
     sample_name=ULPwgs::get_sample_name(tumor_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_SOMATIC")
-    tumor_bam=paste(" --tumorBAM ",tumor_bam)
-    normal_bam=paste(" --normalBAM ",normal_bam)
+    tumor_bam=paste(" --tumorBam ",tumor_bam)
+    normal_bam=paste(" --normalBam ",normal_bam)
   }else{
     sample_name=ULPwgs::get_sample_name(normal_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_GERMLINE")
@@ -737,8 +737,8 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 
   if (tumor_bam!=""){
     sample_name=ULPwgs::get_sample_name(tumor_bam)
-    tumor_bam=paste(" --tumorBAM ",tumor_bam)
-    normal_bam=paste(" --normalBAM ",normal_bam)
+    tumor_bam=paste(" --tumorBam ",tumor_bam)
+    normal_bam=paste(" --normalBam ",normal_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC")
   }else{
     sample_name=ULPwgs::get_sample_name(normal_bam)
