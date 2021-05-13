@@ -779,7 +779,8 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 #' @param bin_path [REQUIRED] Path to strelka binary. Somatic or Germline.
 #' @param bam_dir [REQUIRED] Path to directory with BAM files.
 #' @param ref_genome [REQUIRED] Path to reference genome.
-#' @param indel_candidates [OPTIONAL] Path to indel candidates produced by MANTA.
+#' @param patient_id [REQUIRED] Patient ID to analyze. Has to be in file names to subselect samples.
+#' @param germ_pattern [REQUIRED] Pattern used to identify germline samples. Ex GL
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param targeted [OPTIONAL] If exome/capture method. Default FALSE
 #' @param threads [OPTIONAL] Number of threads per job. Default 3
@@ -789,14 +790,14 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 #' @export
 
 
-call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="~/tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",indel_candidates="",output_dir="",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
+call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="~/tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",patient_id="",germ_pattern="GL",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
 
   sep="/"
   if(output_dir==""){
     sep=""
   }
 
-  out_file_dir=paste0(output_dir,sep,patient_id,"_STRELKA_VARIANTS")
+  out_file_dir=paste0(output_dir,sep,patient_id,"_STRELKA_VARIANTS_VCF")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }

@@ -22,12 +22,14 @@ call_variants(
   chr_filter = "canonical",
   db = "",
   interval = "",
+  orientation = TRUE,
   resources = "",
   info_key = "CNN_2D",
   snp_tranche = 99.95,
   indel_tranche = 99.4,
   threads = 3,
-  verbose = FALSE
+  verbose = FALSE,
+  targeted = TRUE
 )
 }
 \arguments{
@@ -65,15 +67,19 @@ call_variants(
 
 \item{interval}{\link{OPTIONAL} Path to interval for common variants to analyze. Used for contamination estimation.}
 
+\item{orientation}{\link{OPTIONAL} Generate a read orientation model to filter variants. Default TRUE}
+
 \item{info_key}{\link{OPTIONAL} Annotation column to select. Default CNN_D2}
 
 \item{snp_tranche}{\link{OPTIONAL} SNP tranche filter value. Default 99.95}
 
-\item{indel_tranche}{\link{OPTIONAL} Indel tranche filter value. Default 99.4}
+\item{indel_tranche}{\link{OPTIONAL} Indel tranche filter value. Default 99.44}
 
 \item{threads}{\link{OPTIONAL} Number of threads. Default 3}
 
 \item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
+
+\item{targeted}{\link{OPTIONAL} Sequencing method Exome/Targeted. Default TRUE}
 
 \item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of one of the samples will be used.}
 }

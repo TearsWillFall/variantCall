@@ -9,11 +9,13 @@ It is recommended to supply a vcf with indel candidates. This can be generated u
 This function parallelizes the number of jobs that can be run.}
 \usage{
 call_variants_strelka_parallel(
-  bin_path = "~/tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",
+  bin_path = "tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",
+  bin_path2 = "~/tools/manta-1.6.0/build/bin/configManta.py",
   bam_dir = "",
   ref_genome = "",
-  indel_candidates = "",
   output_dir = "",
+  patient_id = "",
+  germ_pattern = "GL",
   verbose = FALSE,
   targeted = FALSE,
   jobs = 1,
@@ -28,9 +30,11 @@ call_variants_strelka_parallel(
 
 \item{ref_genome}{\link{REQUIRED} Path to reference genome.}
 
-\item{indel_candidates}{\link{OPTIONAL} Path to indel candidates produced by MANTA.}
-
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
+
+\item{patient_id}{\link{REQUIRED} Patient ID to analyze. Has to be in file names to subselect samples.}
+
+\item{germ_pattern}{\link{REQUIRED} Pattern used to identify germline samples. Ex GL}
 
 \item{verbose}{\link{DEFAULT==FALSE} Enables progress messages.}
 

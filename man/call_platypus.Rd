@@ -15,7 +15,8 @@ call_platypus(
   output_dir = "",
   verbose = FALSE,
   threads = 3,
-  output_name = ""
+  output_name = "",
+  targeted = FALSE
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ call_platypus(
 \item{threads}{\link{OPTIONAL}  Number of threads to use. Default 3.}
 
 \item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of the first sample in alphanumerical order will be used.}
+
+\item{targeted}{\link{OPTIONAL}  Sequencing data is exome/targeted. Default FALSE}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or

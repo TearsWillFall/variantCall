@@ -7,7 +7,7 @@ This function takes a pair of matched samples or single | multiple germline vari
 and calls variants on them. Variant calling mode is established based on wether tumor_bam is provided or not.}
 \usage{
 call_sv_manta(
-  bin_path = "~/home/regmova/tools/manta-1.6.0/build/bin/configManta.py",
+  bin_path = "tools/manta-1.6.0/build/bin/configManta.py",
   tumor_bam = "",
   normal_bam = "",
   ref_genome = "",

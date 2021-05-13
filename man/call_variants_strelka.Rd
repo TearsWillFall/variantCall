@@ -8,7 +8,7 @@ and calls variants on them. To specify the variant calling mode supply the right
 It is recommended to supply a vcf with indel candidates. This can be generated using MANTA workflow}
 \usage{
 call_variants_strelka(
-  bin_path = "~/tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",
+  bin_path = "tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",
   tumor_bam = "",
   normal_bam = "",
   ref_genome = "",

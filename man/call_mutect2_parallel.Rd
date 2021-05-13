@@ -24,7 +24,7 @@ call_mutect2_parallel(
   threads = 3,
   verbose = FALSE,
   chr_filter = "canonical",
-  orientation = FALSE
+  orientation = TRUE
 )
 }
 \arguments{

@@ -8,7 +8,7 @@ and calls variants on them.
 This function parallelizes the number of jobs that can be run at single time.}
 \usage{
 call_sv_manta_parallel(
-  bin_path = "~/home/regmova/tools/manta-1.6.0/build/bin/configManta.py",
+  bin_path = "tools/manta-1.6.0/build/bin/configManta.py",
   bam_dir = "",
   ref_genome = "",
   output_dir = "",

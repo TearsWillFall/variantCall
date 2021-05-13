@@ -11,11 +11,11 @@ call_HaplotypeCaller(
   region = "",
   output_dir = "",
   resources = "",
+  patient_id = "",
   info_key = "CNN_1D",
   snp_tranche = 99.95,
   indel_tranche = 99.4,
   keep_previous_filters = FALSE,
-  output_name = "",
   verbose = FALSE,
   threads = 3
 )
@@ -33,6 +33,8 @@ call_HaplotypeCaller(
 
 \item{resources}{\link{OPTIONAL} Path to resources for variant filtering}
 
+\item{patient_id}{\link{OPTIONAL} Patient ID after which to name the output. If not given bam file name will be used.}
+
 \item{info_key}{\link{OPTIONAL} Annotation column to select. Default CNN_D1}
 
 \item{snp_tranche}{\link{OPTIONAL} SNP tranche filter value. Default 99.95}
@@ -41,13 +43,13 @@ call_HaplotypeCaller(
 
 \item{keep_previous_filters}{\link{OPTIONAL} Keep previous filters in VCF. Default False}
 
-\item{output_name}{\link{OPTIONAL} Name of the sample to output}
-
 \item{verbose}{\link{Optional} Enables progress messages. Default False}
 
 \item{threads}{\link{OPTIONAL} Number of threads per job. Default 3}
+
+\item{output_name}{\link{OPTIONAL} Name of the sample to output}
 }
 \description{
 This function takes an annotated VCF with CNN_D1 or CNN_D2 scores and filter the
-variants based on set threshold.
+variants based on set threshold.Cuttently only single sample implementation
 }
