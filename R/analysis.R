@@ -808,9 +808,9 @@ call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin
   normal_bam=files[grepl(germ_pattern,files)]
 
   cl=parallel::makeCluster(jobs)
-  pbapply::pblapply(X=1:nrow(files),FUN=function(x){
-    call_sv_manta(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads);
-    call_variants_strelka(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,indel_candidates=paste0(out_file_dir,"/",ULPwgs::get_sample_name(x),"_MANTA_SV_SOMATIC/candidateSmallIndels"),targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
+  pbapply::pblapply(X=1:nrow(tumor_bams),FUN=function(x){
+    call_sv_manta(bin_path=bin_path,tumor_bam=tumor_bams[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads);
+    call_variants_strelka(bin_path=bin_path,tumor_bam=tumor_bams[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,indel_candidates=paste0(out_file_dir,"/",ULPwgs::get_sample_name(x),"_MANTA_SV_SOMATIC/candidateSmallIndels"),targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
   on.exit(parallel::stopCluster(cl))
 }
 
@@ -850,7 +850,7 @@ call_sv_manta_parallel=function(bin_path="tools/manta-1.6.0/build/bin/configMant
   normal_bam=files[grepl(germ_pattern,files)]
 
   cl=parallel::makeCluster(jobs)
-  pbapply::pblapply(X=1:nrow(files),FUN=function(x){call_sv_manta(bin_path=bin_path,tumor_bam=files[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads)},cl=cl)
+  pbapply::pblapply(X=1:nrow(tumor_bams),FUN=function(x){call_sv_manta(bin_path=bin_path,tumor_bam=tumor_bams[x,]$bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads)},cl=cl)
   on.exit(parallel::stopCluster(cl))
 }
 
