@@ -313,11 +313,12 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 #' @param indel_tranche [OPTIONAL] Indel tranche filter value. Default 99.4
 #' @param keep_previous_filters [OPTIONAL] Keep previous filters in VCF. Default False
 #' @param output_dir [OPTIONAL] Path to output dir
+#' @param patient_id [OPTIONAL] Patient ID after which to name the output. If not given bam file name will be used.
 #' @param threads [OPTIONAL] Number of threads per job. Default 3
 #' @param verbose [Optional] Enables progress messages. Default False
 #' @export
 
-call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genome="",region="",output_dir="",resources="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,output_name="",verbose=FALSE,threads=3){
+call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genome="",region="",output_dir="",resources="",patient_id="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,output_name="",verbose=FALSE,threads=3){
 
   sep="/"
   if(output_dir==""){
@@ -344,6 +345,7 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genom
     print(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads,region))
   }
   system(paste(bin_path," HaplotypeCaller -R ",ref_genome," -I ",normal_bam," -O ",paste0(out_file_dir,"/",sample_name,".GL.vcf.gz ")," --native-pair-hmm-threads ",threads,region))
+
 
   if (info_key=="CNN_1D"){
       CNNScoreVariants(bin_path=bin_path,vcf=paste0(out_file_dir,"/",sample_name,".GL.vcf.gz "),ref_genome=ref_genome,output_dir=out_file_dir,output_name=sample_name,verbose=verbose)
@@ -479,6 +481,17 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
         dir.create(out_file_dir)
     }
 
+    chr_pass=""
+    if(chr_filter=="canonical"){
+      chr_pass=c(1:22,"X","Y","M","MT")
+    ## Include autosomal chromosomal and nothing else
+    }else if(chr_filter=="autosomal"){
+      chr_pass=c(1:22)
+    ## Include only specific chromosomes
+    }else if(chr_filter!="all"){
+      chr_pass=chr_filter
+    }
+
     files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
     files=files[grepl("bam$",files)]
     tumor_bam=files[!grepl(germ_pattern,files)]
@@ -486,7 +499,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     ## Call Somatic SNVs+INDELs Using Mutect2
     call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter,orientation=orientation,interval=interval,db=db)
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
-    call_HaplotypeCaller(bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,output_name=sample_id,verbose=verbose,threads=threads)
+    call_HaplotypeCaller(bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,output_name=sample_id,verbose=verbose,threads=threads,region=chr_pass)
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
     call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id)
     ## Anotate Variants using VEP
