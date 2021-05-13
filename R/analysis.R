@@ -160,7 +160,7 @@ call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip
   out_file=paste0(out_file_dir,"/",sample_name,".VEP.vcf")
 
   if(verbose){
-    print(paste(bin_path,"-i",,vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
+    print(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
   }
   system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
@@ -187,7 +187,7 @@ call_clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_
   out_file=paste0(out_file_dir,"/",sample_name,".VEP.vcf")
 
   if(verbose){
-    print(paste(bin_path,"-i",,vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
+    print(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
   }
   system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
 }
