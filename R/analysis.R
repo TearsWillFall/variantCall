@@ -229,6 +229,18 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   }else{
     sample_name=patient_id
   }
+
+  sep="/"
+
+  if(output_dir==""){
+    sep=""
+  }
+
+  out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
   dat=read.table(region_bed)
 
 
@@ -257,13 +269,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   cl=parallel::makeCluster(round(threads/4), digits = 0)
   pbapply(X=dat[,c("Region"),drop=FALSE],1,FUN=call_mutect2,bin_path=bin_path,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=output_dir,output_name=patient_id,verbose=verbose,orientation=orientation,cl=cl)
   on.exit(parallel::stopCluster(cl))
-  sep="/"
 
-  if(output_dir==""){
-    sep=""
-  }
-
-  out_file_dir=paste0(output_dir,sep,sample_name,"_MUTECT2_VARIANTS_VCF")
   vcf_concatenate(bin_path=bin_path2,vcf_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
   vcf_sort(bin_path=bin_path2,vcf=paste0(out_file_dir,"/",sample_name,"_CONCATENATED","/",sample_name,".CONCATENATED.vcf"),output_dir=out_file_dir,verbose=verbose)
   vcf_stats_merge(bin_path=bin_path,vcf_stats_dir=out_file_dir,output_dir=out_file_dir,verbose=verbose)
@@ -501,7 +507,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
-    call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id)
+    call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id,targeted=TRUE)
     ## Anotate Variants using VEP
     call_vep(bin_path=bin_path6,vcf=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF/",patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF"),threads=threads)
     call_vep(bin_path=bin_path6,vcf=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF"),threads=threads)
@@ -1125,10 +1131,11 @@ call_sv_svaba_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param verbose [OPTIONAL]  Enables progress messages. Default False.
 #' @param threads [OPTIONAL]  Number of threads to use. Default 3.
+#' @param targeted [OPTIONAL]  Sequencing data is exome/targeted. Default FALSE
 #' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
 #' @export
 
-call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3,output_name=""){
+call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3,output_name="",targeted=FALSE){
 
   sep="/"
 
