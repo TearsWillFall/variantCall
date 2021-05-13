@@ -281,7 +281,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 
   if (db!="" & interval!=""){
     estimate_contamination_parallel(bin_path=bin_path,bam_dir=bam_dir,germ_pattern=germ_pattern,patient_id=patient_id,db=db,interval=interval,verbose=verbose,output_dir=out_file_dir,threads=threads)
-    contamination_files=list.files(paste0(out_file_dir,"/",patient_id,"_CONTAMINATION"))
+    contamination_files=list.files(paste0(out_file_dir,"/",patient_id,"_CONTAMINATION"),full.names=TRUE)
     contamination_tables=contamination_files[grepl("contamination.table$",contamination_files)]
     contamination_segments=contamination_files[grepl("segments.table$",contamination_files)]
   }
