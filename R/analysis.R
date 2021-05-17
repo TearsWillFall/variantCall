@@ -706,6 +706,8 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
     sep=""
   }
 
+  call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=output_dir,verbose=verbose,targeted=targeted,threads=threads)
+
   if (tumor_bam!=""){
     sample_name=ULPwgs::get_sample_name(tumor_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_SOMATIC")
@@ -728,8 +730,6 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
     exome=" --exome "
   }
 
-
-  call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=output_dir,verbose=verbose,targeted=targeted,threads=threads)
 
   if (tumor_bam!=""){
     indel_candidates=paste0(" --indelCandidates ",paste0(out_file_dir_manta,"/results/variants/candidateSmallIndels.vcf.gz"))
@@ -780,7 +780,7 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
     out_file_dir=paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC")
   }else{
     sample_name=ULPwgs::get_sample_name(normal_bam)
-    normal_bam=paste0(" --bam ", normal_bam,collapse=" --bam ")
+    normal_bam=paste0(" --bam ", paste0(normal_bam,collapse=" --bam "))
     out_file_dir=paste0(output_dir,sep,sample_name,"_MANTA_SV_GERMLINE")
   }
 
