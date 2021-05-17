@@ -527,16 +527,20 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     files=files[grepl("bam$",files)]
     tumor_bam=files[!grepl(germ_pattern,files)]
     normal_bam=files[grepl(germ_pattern,files)]
+
     ## Call Somatic SNVs+INDELs Using Mutect2
     call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter,orientation=orientation,interval=interval,db=db)
+
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
+
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
-    call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id,targeted=targeted)
+    call_platypus(bin_path=bin_path5,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id,targeted=targeted)
+
     ## Anotate Variants using VEP
-    call_vep(bin_path=bin_path6,bin_path2=bin_path3,bin_path3=bin_path4,vcf=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF/",patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF"),threads=threads)
-    call_vep(bin_path=bin_path6,bin_path2=bin_path3,bin_path3=bin_path4,vcf=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF"),threads=threads)
-    call_vep(bin_path=bin_path6,bin_path2=bin_path3,bin_path3=bin_path4,vcf=paste0(out_file_dir,"/",patient_id,"_PLATYPUS_VARIANTS_VCF/",patient_id,".PLATYPUS.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_PLATYPUS_VARIANTS_VCF"),threads=threads)
+    ## call_vep(bin_path=bin_path6,bin_path2=bin_path3,bin_path3=bin_path4,vcf=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF/",patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF"),threads=threads)
+    ## call_vep(bin_path=bin_path6,bin_path2=bin_path3,bin_path3=bin_path4,vcf=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF"),threads=threads)
+    ## call_vep(bin_path=bin_path6,bin_path2=bin_path3,bin_path3=bin_path4,vcf=paste0(out_file_dir,"/",patient_id,"_PLATYPUS_VARIANTS_VCF/",patient_id,".PLATYPUS.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_PLATYPUS_VARIANTS_VCF"),threads=threads)
 }
 
 
@@ -1154,8 +1158,9 @@ call_sv_svaba_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_
 #' @param tumor_bam [REQUIRED] Path to tumor bam file.
 #' @param normal_bam [REQUIRED] Path to germline bam file.
 #' @param bin_path [REQUIRED] Path to fastQC executable. Default path tools/platypus/Platypus.py
-#' @param bin_path2 [REQUIRED] Path to bgzip binary. Default tools/htslib/bgzip.
-#' @param bin_path3 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
+#' @param bin_path2 [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path3 [REQUIRED] Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path4 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
 #' @param ref_genome [REQUIRED] Path to reference genome fasta file.
 #' @param vcf_overlay [REQUIRED] Path to vcf overlay to use as source.
 #' @param output_dir [OPTIONAL] Path to the output directory.
@@ -1165,7 +1170,7 @@ call_sv_svaba_parallel=function(bin_path="tools/svaba/bin/svaba",targets="",bam_
 #' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
 #' @export
 
-call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3,output_name="",targeted=FALSE){
+call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",vcf_overlay="",output_dir="",verbose=FALSE,threads=3,output_name="",targeted=FALSE){
 
   sep="/"
 
@@ -1209,8 +1214,22 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/ht
   }
   system(paste0(bin_path," callVariants --refFile=",ref_genome, paste0(" --bamFiles=",tumor,",",norm), " --source=",vcf_overlay," --output=",out_file," --filterReadPairsWithSmallInserts=0 --minPosterior=0 --getVariantsFromBAMs=1 --logFileName=",paste0(out_file,".log"),opt," --nCPU=",threads))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
-  bgzip(bin_path=bin_path2,file=out_file)
-  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  bgzip(bin_path=bin_path3,file=out_file)
+  tab_indx(bin_path=bin_path4,file=paste0(out_file,".gz"))
   system(paste("cp", paste0(out_file,".tmp"), out_file))
   system(paste("rm -rf", paste0(out_file,".tmp")))
+
+  ## Split Platypus VCF variants between SNPs/INDELs
+
+  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",sample_name,"_PLATYPUS_VARIANTS_VCF/",sample_name,".PLATYPUS.vcf.gz"),
+  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir="SNPs")
+  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",sample_name,"_PLATYPUS_VARIANTS_VCF/",sample_name,".PLATYPUS.vcf.gz"),
+  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir="INDELs")
+
+  ## Split Platypus multisample VCFs per sample
+
+  split_vcf(bin_path=bin_path2,vcf=paste0(out_file_dir,"/SNPs/",sample_name,"_FILTERED/",sample_name,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/RESULTS/SNPs"))
+  split_vcf(bin_path=bin_path2,vcf=paste0(out_file_dir,"/INDELs/",sample_name,"_FILTERED/",sample_name,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/RESULTS/INDELs"))
+  system(paste0("rm -rf ",out_file_dir,"/SNPs"))
+  system(paste0("rm -rf ",out_file_dir,"/INDELs"))
 }
