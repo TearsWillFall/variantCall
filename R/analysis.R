@@ -731,11 +731,15 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
 
   call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=output_dir,verbose=verbose,targeted=targeted,threads=threads)
 
+  if (tumor_bam!=""){
+    indel_candidates=paste0(" --indelCandidates ",paste0(out_file_dir_manta,"/results/variants/candidateSmallIndels.vcf.gz"))
+  }
+
 
   if(verbose){
-    print(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome," --indelCandidates ",paste0(out_file_dir_manta,"/results/variants/candidateSmallIndels.vcf.gz")," --runDir ",out_file_dir, exome))
+    print(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome,indel_candidates," --runDir ",out_file_dir, exome))
   }
-  system(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome," --indelCandidates ",paste0(out_file_dir_manta,"/results/variants/candidateSmallIndels.vcf.gz")," --runDir ",out_file_dir, exome))
+  system(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome,indel_candidates," --runDir ",out_file_dir, exome))
 
 
   if(verbose){
