@@ -8,7 +8,6 @@
 #' @export
 
 
-
 tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 
   if (verbose){
@@ -63,6 +62,56 @@ learn_orientation=function(bin_path="tools/gatk/gatk",f1r2="",f1r2_dir="",output
   system(paste0(bin_path," LearnReadOrientationModel ",f1r2, " -O ", paste0(out_file_dir,"/",sample_name,".read-orientation-model.tar.gz")))
 }
 
+
+#' Generate a set between a group of vcfs usign bcftools
+#'
+#' This function takes a path to either a vcf file or to a directory of vcf files
+#' and outputs an inset/outset between these two vcf files.
+#'
+#' @param bin_path [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools
+#' @param vcf [OPTIONAL] Path to a single vcf file or a vector of vcf files. Only if vcf_dir is not given.
+#' @param vcf_dir [OPTIONAL] Path to a directory with vcf files to generate a set for. Only if vcf is not given.
+#' @param inset [OPTIONAL] Generate and inset between. Default TRUE
+#' @param filter [OPTIONAL] Filter variants by. Default PASS
+#' @param output_dir [OPTIONAL] Path to output directory. Default current directory
+#' @param verbose [Optional] Enables progress messages. Default False.
+#' @export
+
+vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",inset=TRUE,filter="PASS",output_dir="",verbose=FALSE){
+
+  if(output_dir==""){
+    output_dir="dir"
+  }
+
+  if (filter!=""){
+    filter=paste0(" -f ",filter)
+  }
+
+  if (vcf_dir!=""){
+    vcfs=list.files(vcfs,full.names=TRUE)
+    vcfs=vcfs[grepl(".vcf.gz$",files)]
+    size=length(vcfs)
+    vcfs=paste0(vcfs,collapse=" ")
+  }else{
+    size=length(vcf)
+    vcfs=paste0(vcf,collapse=" ")
+  }
+
+  private=""
+  if (inset){
+    output_dir=paste0(output_dir,"_INSET")
+  }else{
+    output_dir=paste0(output_dir,"_OUTSET")
+    private=paste0(" -n-1 -c all ")
+  }
+
+  if (verbose){
+
+    print(paste0(bin_path," isec -p ", output_dir,vcfs,filter,private))
+
+  }
+  system(paste0(bin_path," isec -p ", output_dir,vcfs,filter,private))
+}
 
 
 #' Filter Variant Tranches (Mutect2)
@@ -312,9 +361,6 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
   system(paste("cp", paste0(out_file,".tmp"), out_file))
   system(paste("rm -rf", paste0(out_file,".tmp")))
 }
-
-
-
 
 
 #' VCF file concatenation

@@ -301,6 +301,20 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
   system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED"))
+
+  ## Split Mutect2 VCF variants between SNPs/INDELs
+
+  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),
+  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir="SNPs")
+  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),
+  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir="INDELs")
+
+  ## Split Mutect2 multisample VCFs per sample
+
+  split_vcf(bin_path=bin_path2,vcf=paste0(out_file_dir,"/SNPs/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/RESULTS/SNPs"))
+  split_vcf(bin_path=bin_path2,vcf=paste0(out_file_dir,"/INDELs/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/RESULTS/INDELs"))
+  system(paste0("rm -rf ",out_file_dir,"/SNPs"))
+  system(paste0("rm -rf ",out_file_dir,"/INDELs"))
 }
 
 #' Wrapper for GATK HaplotypeCaller for Germline Variant calling
@@ -309,6 +323,9 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 #' variants based on set threshold.Cuttently only single sample implementation
 #'
 #' @param bin_path [REQUIRED] Path to GATK binary. Default tools/gatk/gatk
+#' @param bin_path2 Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path3 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path4 Path to tabix binary. Default tools/htslib/tabix.
 #' @param normal_bam [REQUIRED] Path to BAM file
 #' @param ref_genome [REQUIRED] Path to reference genome
 #' @param resources [OPTIONAL] Path to resources for variant filtering
@@ -324,8 +341,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 #' @param verbose [Optional] Enables progress messages. Default False
 #' @export
 
-call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genome="",region="",output_dir="",resources="",patient_id="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,verbose=FALSE,threads=3){
-
+call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",normal_bam="",ref_genome="",region="",output_dir="",resources="",patient_id="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,verbose=FALSE,threads=3){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -363,6 +379,14 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",normal_bam="",ref_genom
 
   FilterVariantTranches(bin_path=bin_path,vcf=scored_vcf,resources=resources,output_name=sample_name,info_key=info_key,
   snp_tranche=snp_tranche,indel_tranche=indel_tranche,output_dir=out_file_dir,keep_previous_filters=keep_previous_filters,verbose=verbose)
+
+
+  ## Split HaplotypeCaller generated vcf between indels/snps
+
+  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",sample_name,"_HAPLOTYPECALLER_VARIANTS_VCF/",
+  patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir="SNPs")
+  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",sample_name,"_HAPLOTYPECALLER_VARIANTS_VCF/",
+  patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir="INDELs")
 }
 
 
@@ -506,7 +530,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     ## Call Somatic SNVs+INDELs Using Mutect2
     call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter,orientation=orientation,interval=interval,db=db)
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
-    call_HaplotypeCaller(bin_path=bin_path,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
+    call_HaplotypeCaller(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
     call_platypus(bin_path=bin_path5,bin_path2=bin_path3,bin_path3=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id,targeted=targeted)
     ## Anotate Variants using VEP
@@ -810,10 +834,10 @@ call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin
   cl=parallel::makeCluster(jobs)
   pbapply::pblapply(X=1:length(tumor_bams),FUN=function(x){
     call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bams[x],normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads);
-    call_variants_strelka(bin_path=bin_path,tumor_bam=tumor_bams[x],normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,indel_candidates=paste0(out_file_dir,"/",ULPwgs::get_sample_name(tumor_bams[x]),"_MANTA_SV_SOMATIC/results/variants/candidateSmallIndels.vcf.gz"),targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
+    call_variants_strelka(bin_path=bin_path,tumor_bam=tumor_bams[x],normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,
+    indel_candidates=paste0(out_file_dir,"/",ULPwgs::get_sample_name(tumor_bams[x]),"_MANTA_SV_SOMATIC/results/variants/candidateSmallIndels.vcf.gz"),targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
   on.exit(parallel::stopCluster(cl))
 }
-
 
 #' Call Somatic/Germline variants using MANTA in parallel
 

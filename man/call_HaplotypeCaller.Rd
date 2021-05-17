@@ -6,6 +6,9 @@
 \usage{
 call_HaplotypeCaller(
   bin_path = "tools/gatk/gatk",
+  bin_path2 = "tools/bcftools/bcftools",
+  bin_path3 = "tools/htslib/bgzip",
+  bin_path4 = "tools/htslib/tabix",
   normal_bam = "",
   ref_genome = "",
   region = "",
@@ -22,6 +25,12 @@ call_HaplotypeCaller(
 }
 \arguments{
 \item{bin_path}{\link{REQUIRED} Path to GATK binary. Default tools/gatk/gatk}
+
+\item{bin_path2}{Path to bcftools binary. Default tools/bcftools/bcftools.}
+
+\item{bin_path3}{Path to bgzip binary. Default tools/htslib/bgzip.}
+
+\item{bin_path4}{Path to tabix binary. Default tools/htslib/tabix.}
 
 \item{normal_bam}{\link{REQUIRED} Path to BAM file}
 
