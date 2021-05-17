@@ -305,9 +305,9 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   ## Split Mutect2 VCF variants between SNPs/INDELs
 
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),
-  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir="SNPs")
+  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir=paste0(out_file_dir,"SNPs"))
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),
-  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir="INDELs")
+  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir=paste0(out_file_dir,"INDELs"))
 
   ## Split Mutect2 multisample VCFs per sample
 
@@ -342,6 +342,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 #' @export
 
 call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",normal_bam="",ref_genome="",region="",output_dir="",resources="",patient_id="",info_key="CNN_1D",snp_tranche=99.95,indel_tranche=99.4,keep_previous_filters=FALSE,verbose=FALSE,threads=3){
+
   sep="/"
   if(output_dir==""){
     sep=""
@@ -384,9 +385,9 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
   ## Split HaplotypeCaller generated vcf between indels/snps
 
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",
-  patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir="SNPs")
+  patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir=paste0(out_file_dir,"SNPs"))
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",
-  patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir="INDELs")
+  patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir=paste0(out_file_dir,"INDELs"))
 }
 
 
@@ -1222,9 +1223,9 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
   ## Split Platypus VCF variants between SNPs/INDELs
 
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",sample_name,".PLATYPUS.vcf.gz"),
-  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir="SNPs")
+  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="snp",verbose=verbose,output_dir=paste0(out_file_dir,"SNPs"))
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",sample_name,".PLATYPUS.vcf.gz"),
-  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir="INDELs")
+  bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir=paste0(out_file_dir,"INDELs"))
 
   ## Split Platypus multisample VCFs per sample
 
