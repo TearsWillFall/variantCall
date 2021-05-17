@@ -259,12 +259,12 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
 
     out_file=paste0(output_dir,sep,sample_name,"_SPLIT")
     if (!dir.exists(out_file)){
-        dir.create(out_file)
+        dir.create(out_file,recursive=TRUE)
     }
 
   if (verbose){
     print(paste(bin_path," query -l ",vcf))
-    apply(names,1,function(x){print(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(x,".vcf.gz"),vcf))
+    sapply(name,function(x){print(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(x,".vcf.gz"),vcf))
     })
   }
   name=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
