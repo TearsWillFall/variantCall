@@ -298,9 +298,9 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
 
   ## Remove intermediary files
   system(paste0("rm ",out_file_dir,"/*"))
-  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
-  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
-  system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED"))
+  ## system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_CONCATENATED"))
+  ## system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_MERGED_VCF_STATS"))
+  ## system(paste0("rm -rf ",out_file_dir,"/",sample_name,"_SORTED"))
 
   ## Split Mutect2 VCF variants between SNPs/INDELs
 

@@ -263,6 +263,7 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
     }
 
   if (verbose){
+    name=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
     print(paste(bin_path," query -l ",vcf))
     sapply(name,function(x){print(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(x,".vcf.gz"),vcf))
     })
