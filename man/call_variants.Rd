@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{call_variants}
 \alias{call_variants}
-\title{Variant calling of Somatic and Germline (MuTECT2 and Platypus) mutations and produces their subsequent annotation (VEP)}
+\title{Variant calling of Somatic and Germline (MuTECT2, Platypus and Strelka) mutations and produces their subsequent annotation (VEP)}
 \usage{
 call_variants(
   bin_path = "tools/gatk/gatk",
@@ -11,6 +11,8 @@ call_variants(
   bin_path4 = "tools/htslib/tabix",
   bin_path5 = "tools/platypus/Platypus.py",
   bin_path6 = "tools/ensembl-vep/vep",
+  bin_path7 = "tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py",
+  bin_path8 = "tools/manta-1.6.0/build/bin/configManta.py",
   bam_dir = "",
   patient_id = "",
   germ_pattern = "GL",
@@ -44,6 +46,10 @@ call_variants(
 \item{bin_path5}{\link{REQUIRED} Path to platypus binary. Default tools/platypus/Platypus.py.}
 
 \item{bin_path6}{\link{REQUIRED} Path to vep binary. tools/ensembl-vep/vep}
+
+\item{bin_path7}{\link{REQUIRED} Path to Strelka Germline Workflow. tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py}
+
+\item{bin_path8}{\link{REQUIRED} Path to Manta. tools/manta-1.6.0/build/bin/configManta.py}
 
 \item{bam_dir}{\link{REQUIRED} Path to directory with BAM files.}
 

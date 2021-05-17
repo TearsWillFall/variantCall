@@ -465,7 +465,7 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 
 
 
-#' Variant calling of Somatic and Germline (MuTECT2 and Platypus) mutations and produces their subsequent annotation (VEP)
+#' Variant calling of Somatic and Germline (MuTECT2, Platypus and Strelka) mutations and produces their subsequent annotation (VEP)
 #'
 #' This function calls somatic and germline mutations, in previously pre-processed sequencing data.
 #' This function takes a path to a directory with BAM files and a patients ID. Then it subsets all BAM
@@ -480,6 +480,8 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @param bin_path4 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
 #' @param bin_path5 [REQUIRED] Path to platypus binary. Default tools/platypus/Platypus.py.
 #' @param bin_path6 [REQUIRED] Path to vep binary. tools/ensembl-vep/vep
+#' @param bin_path7 [REQUIRED] Path to Strelka Germline Workflow. tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py
+#' @param bin_path8 [REQUIRED] Path to Manta. tools/manta-1.6.0/build/bin/configManta.py
 #' @param bam_dir [REQUIRED] Path to directory with BAM files.
 #' @param patient_id [REQUIRED] Patient ID to analyze. Has to be in file names to subselect samples.
 #' @param germ_pattern [REQUIRED] Pattern used to identify germline samples. Ex GL
@@ -501,7 +503,8 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
 #' @export
 
-call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bin_path5="tools/platypus/Platypus.py",bin_path6="tools/ensembl-vep/vep",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",
+call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bin_path5="tools/platypus/Platypus.py",bin_path6="tools/ensembl-vep/vep",
+bin_path7="tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py",bin_path8="tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",
 germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db="",interval="",orientation=TRUE,resources="",info_key="CNN_2D",snp_tranche=99.95,indel_tranche=99.4,threads=3,verbose=FALSE,targeted=TRUE){
 
     sep="/"
@@ -535,9 +538,8 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
 
-
-
-
+    ## Call Germline SNVs+INDELs Using Strelka & Manta
+    call_variants_strelka(bin_path=bin_path7,bin_path2=bin_path8,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=TRUE,threads=threads)
 
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
     call_platypus(bin_path=bin_path5,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id,targeted=targeted)
@@ -687,6 +689,7 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 #' It is recommended to supply a vcf with indel candidates. This can be generated using MANTA workflow
 #'
 #' @param bin_path [REQUIRED] Path to strelka binary. Somatic or Germline.
+#' @param bin_path2 [REQUIRED] Path to manta binary. Somatic or Germline.
 #' @param tumor_bam [REQUIRED] Path to tumor  bam file.
 #' @param normal_bam [OPTIONAL] Path to normal samples bam files.
 #' @param ref_genome [REQUIRED] Path to reference genome.
@@ -697,8 +700,7 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
-
+call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -822,7 +824,7 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 #' @export
 
 
-call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="~/tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",patient_id="",germ_pattern="GL",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
+call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",patient_id="",germ_pattern="GL",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
 
   sep="/"
   if(output_dir==""){
@@ -841,7 +843,7 @@ call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin
 
   cl=parallel::makeCluster(jobs)
   pbapply::pblapply(X=1:length(tumor_bams),FUN=function(x){
-    call_variants_strelka(bin_path=bin_path,tumor_bam=tumor_bams[x],normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
+    call_variants_strelka(bin_path=bin_path,bin_path2=bin_path2,tumor_bam=tumor_bams[x],normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
   on.exit(parallel::stopCluster(cl))
 }
 

@@ -10,7 +10,7 @@ This function parallelizes the number of jobs that can be run.}
 \usage{
 call_variants_strelka_parallel(
   bin_path = "tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",
-  bin_path2 = "~/tools/manta-1.6.0/build/bin/configManta.py",
+  bin_path2 = "tools/manta-1.6.0/build/bin/configManta.py",
   bam_dir = "",
   ref_genome = "",
   output_dir = "",
