@@ -309,7 +309,7 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),
   bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir=paste0(out_file_dir,"/INDELs"))
 
-  ## Split Mutect2 multisample VCFs per sample
+  ## Split Mutect2 multisample VCFs per sample#
 
   split_vcf(bin_path=bin_path2,vcf=paste0(out_file_dir,"/SNPs/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/RESULTS/SNPs"))
   split_vcf(bin_path=bin_path2,vcf=paste0(out_file_dir,"/INDELs/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/RESULTS/INDELs"))
@@ -535,6 +535,10 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
 
+
+
+
+
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
     call_platypus(bin_path=bin_path5,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id,targeted=targeted)
 
@@ -686,7 +690,6 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 #' @param tumor_bam [REQUIRED] Path to tumor  bam file.
 #' @param normal_bam [OPTIONAL] Path to normal samples bam files.
 #' @param ref_genome [REQUIRED] Path to reference genome.
-#' @param indel_candidates [OPTIONAL] Path to indel candidates produced by MANTA.
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param targeted [OPTIONAL] If exome/capture method. Default FALSE
 #' @param threads [OPTIONAL] Number of threads per job. Default 3
@@ -694,7 +697,7 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",tumor_bam="",normal_bam="",ref_genome="",indel_candidates="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
+call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
 
   sep="/"
   if(output_dir==""){
@@ -704,20 +707,18 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
   if (tumor_bam!=""){
     sample_name=ULPwgs::get_sample_name(tumor_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_SOMATIC")
+    out_file_dir_manta=paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC")
     tumor_bam=paste(" --tumorBam ",tumor_bam)
     normal_bam=paste(" --normalBam ",normal_bam)
   }else{
     sample_name=ULPwgs::get_sample_name(normal_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_GERMLINE")
+    out_file_dir_manta=paste0(output_dir,sep,sample_name,"_MANTA_SV_GERMLINE")
     normal_bam=paste0(" --bam ", normal_bam,collapse=" --bam ")
   }
 
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
-  }
-
-  if (indel_candidates!=""){
-    indel_candidates=paste(" --indelCandidates ",indel_candidates)
   }
 
   exome=""
@@ -726,11 +727,13 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
   }
 
 
+  call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=output_dir,verbose=verbose,targeted=targeted,threads=threads)
+
 
   if(verbose){
-    print(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome,indel_candidates," --runDir ",out_file_dir, exome))
+    print(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome," --indelCandidates ",paste0(out_file_dir_manta,"/results/variants/candidateSmallIndels.vcf.gz")," --runDir ",out_file_dir, exome))
   }
-  system(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome,indel_candidates," --runDir ",out_file_dir, exome))
+  system(paste("python2.7 ",bin_path, tumor_bam, normal_bam, " --referenceFasta ", ref_genome," --indelCandidates ",paste0(out_file_dir_manta,"/results/variants/candidateSmallIndels.vcf.gz")," --runDir ",out_file_dir, exome))
 
 
   if(verbose){
@@ -838,9 +841,7 @@ call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin
 
   cl=parallel::makeCluster(jobs)
   pbapply::pblapply(X=1:length(tumor_bams),FUN=function(x){
-    call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bams[x],normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads);
-    call_variants_strelka(bin_path=bin_path,tumor_bam=tumor_bams[x],normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,
-    indel_candidates=paste0(out_file_dir,"/",ULPwgs::get_sample_name(tumor_bams[x]),"_MANTA_SV_SOMATIC/results/variants/candidateSmallIndels.vcf.gz"),targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
+    call_variants_strelka(bin_path=bin_path,tumor_bam=tumor_bams[x],normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=targeted,threads=threads,exec_options=exec_options)},cl=cl)
   on.exit(parallel::stopCluster(cl))
 }
 
@@ -1186,9 +1187,9 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
   }
 
 
-  out_file=paste0(output_dir,sep,sample_name,"_PLATYPUS_VARIANTS_VCF")
-  if (!dir.exists(out_file)){
-      dir.create(out_file)
+  out_file_dir=paste0(output_dir,sep,sample_name,"_PLATYPUS_VARIANTS_VCF")
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
   }
   if (is.vector(normal_bam)){
     norm=paste0(paste(normal_bam,collapse=","))
@@ -1201,7 +1202,7 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
   }else{
     tumor=tumor_bam
   }
-  out_file=paste0(out_file,"/",sample_name,".PLATYPUS.vcf")
+  out_file=paste0(out_file_dir,"/",sample_name,".PLATYPUS.vcf")
 
 
   if (targeted){
