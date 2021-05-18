@@ -284,12 +284,12 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
     name=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
     print(paste(bin_path," query -l ",vcf))
     sapply(name,function(x){print(paste(bin_path, "view -c1 -Oz -s",x, "-o",paste0(out_file,"/",x,".vcf.gz"),vcf));
-      system(paste(bin_path, "index" paste0(out_file,"/",x,".vcf.gz"),vcf))
+      system(paste(bin_path, "index", paste0(out_file,"/",x,".vcf.gz"),vcf))
     })
   }
   name=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
   sapply(name,function(x){system(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(out_file,"/",x,".vcf.gz"),vcf));
-        system(paste(bin_path, "index" paste0(out_file,"/",x,".vcf.gz"),vcf))
+        system(paste(bin_path, "index", paste0(out_file,"/",x,".vcf.gz"),vcf))
   })
 
 }

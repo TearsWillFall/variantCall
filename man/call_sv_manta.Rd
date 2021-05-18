@@ -12,6 +12,7 @@ call_sv_manta(
   normal_bam = "",
   ref_genome = "",
   output_dir = "",
+  patient_id = "",
   verbose = FALSE,
   targeted = FALSE,
   threads = 3
@@ -27,6 +28,8 @@ call_sv_manta(
 \item{ref_genome}{\link{REQUIRED} Path to reference genome.}
 
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
+
+\item{patient_id}{\link{OPTIONAL} Patient ID to name files after. If not given tumor_bam file name will be used, and if this is not given then normal_bam file will be used.}
 
 \item{verbose}{\link{DEFAULT==FALSE} Enables progress messages.}
 

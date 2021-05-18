@@ -6,6 +6,7 @@
 \usage{
 vcf_concatenate(
   bin_path = "tools/bcftools/bcftools",
+  vcf = "",
   vcf_dir = "",
   verbose = FALSE,
   output_dir = ""
@@ -14,7 +15,9 @@ vcf_concatenate(
 \arguments{
 \item{bin_path}{Path to bcftools binary. Default tools/bcftools/bcftools.}
 
-\item{vcf_dir}{Path to directory with vcf files to concatenate.}
+\item{vcf}{Path to vcf files to concatenate. Only if vcf_dir not given}
+
+\item{vcf_dir}{Path to directory with vcf files to concatenate. Only if vcf not given}
 
 \item{verbose}{Enables progress messages. Default False.}
 

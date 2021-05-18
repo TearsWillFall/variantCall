@@ -8,7 +8,7 @@ vcf_sets(
   bin_path = "tools/bcftools/bcftools",
   vcf = "",
   vcf_dir = "",
-  inset = TRUE,
+  n = "2",
   filter = "PASS",
   output_dir = "",
   verbose = FALSE
@@ -21,7 +21,7 @@ vcf_sets(
 
 \item{vcf_dir}{\link{OPTIONAL} Path to a directory with vcf files to generate a set for. Only if vcf is not given.}
 
-\item{inset}{\link{OPTIONAL} Generate and inset between. Default TRUE}
+\item{n}{\link{REQUIRED} Number of intersections. Default 2.}
 
 \item{filter}{\link{OPTIONAL} Filter variants by. Default PASS}
 
