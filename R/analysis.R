@@ -711,7 +711,7 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
 
   if (patient_id=="" & tumor_bam!=""){
     sample_name=ULPwgs::get_sample_name(tumor_bam)
-  }else if(patient_id=="" & tumor_bam=="" {
+  }else if(patient_id=="" & tumor_bam=="") {
     sample_name=ULPwgs::get_sample_name(normal_bam)
   }else{
     sample_name=patient_id
@@ -785,7 +785,7 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 
   if (patient_id=="" & tumor_bam!=""){
     sample_name=ULPwgs::get_sample_name(tumor_bam)
-  }else if(patient_id=="" & tumor_bam=="" {
+  }else if(patient_id=="" & tumor_bam==""){
     sample_name=ULPwgs::get_sample_name(normal_bam)
   }else{
     sample_name=patient_id
