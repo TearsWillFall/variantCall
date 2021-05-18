@@ -408,6 +408,7 @@ vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",ve
     sample_name=ULPwgs::get_sample_name(list.files(vcf_dir)[1])
   }else{
     files=vcf
+    sample_name=ULPwgs::get_sample_name(vcf[1])
   }
 
   out_file_dir=paste0(output_dir,sep,sample_name,"_CONCATENATED")
