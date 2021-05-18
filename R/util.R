@@ -104,9 +104,9 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",set_formu
 
   if(output_dir==""){
     sep=""
-    output_dir=paste0(n,"_SET")
+    output_dir="SET"
   }else{
-    output_dir=paste0(output_dir,"/",n,"_SET")
+    output_dir=paste0(output_dir,"/SET")
   }
 
   if (filter!=""){
