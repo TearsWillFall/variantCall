@@ -121,7 +121,7 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",set_formu
     vcfs=paste0(" ",vcf,collapse=" ")
   }
 
-  private=paste0(" -n",n)
+  private=paste0(" -n",set_formula)
 
   if (verbose){
 
