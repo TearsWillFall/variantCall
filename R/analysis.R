@@ -691,6 +691,9 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 #'
 #' @param bin_path [REQUIRED] Path to strelka binary. Somatic or Germline.
 #' @param bin_path2 [REQUIRED] Path to manta binary. Somatic or Germline.
+#' @param bin_path3 [REQUIRED] Path to bcftools binary.
+#' @param bin_path4 [REQUIRED] Path to bgzip binary.
+#' @param bin_path5 [REQUIRED] Path to tabix binary.
 #' @param tumor_bam [REQUIRED] Path to tumor  bam file.
 #' @param normal_bam [OPTIONAL] Path to normal samples bam files.
 #' @param ref_genome [REQUIRED] Path to reference genome.
@@ -702,7 +705,7 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",patient_id="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
+call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",tumor_bam="",normal_bam="",ref_genome="",output_dir="",patient_id="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
 
   sep="/"
   if(output_dir==""){
@@ -755,6 +758,13 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
     print(paste0("python2.7 ",out_file_dir,"/runWorkflow.py -m ",exec_options," -j ",threads))
   }
   system(paste0("python2.7 ",out_file_dir,"/runWorkflow.py -m ",exec_options," -j ",threads))
+
+  if (tumor_bam==""){
+    vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/results/variants/variants.vcf.gz"),
+    bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",type="snp",verbose=verbose,output_dir=paste0(out_file_dir,"/results/variants/SNPs"))
+    vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/results/variants/variants.vcf.gz"),
+    bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",type="indel",verbose=verbose,output_dir=paste0(out_file_dir,"/results/variants/INDELs"))
+  }
 }
 
 
