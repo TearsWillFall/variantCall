@@ -731,7 +731,7 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
     exome=" --exome "
   }
 
-
+  indel_candidates=""
   if (tumor_bam!=""){
     indel_candidates=paste0(" --indelCandidates ",paste0(out_file_dir_manta,"/results/variants/candidateSmallIndels.vcf.gz"))
   }
