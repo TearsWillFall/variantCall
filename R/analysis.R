@@ -536,7 +536,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter,orientation=orientation,interval=interval,db=db)
 
     ## Call Germline SNVs+INDELs Using Strelka & Manta
-    call_variants_strelka(bin_path=bin_path7,bin_path2=bin_path8,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=TRUE,threads=threads)
+    call_variants_strelka(bin_path=bin_path7,bin_path2=bin_path8,normal_bam=normal_bam,patient_id=patient_id,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=TRUE,threads=threads)
 
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
@@ -695,28 +695,36 @@ call_fings=function(bin_path="tools/fings/FiNGS.py",bin_path2="tools/bcftools/bc
 #' @param normal_bam [OPTIONAL] Path to normal samples bam files.
 #' @param ref_genome [REQUIRED] Path to reference genome.
 #' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param patient_id [OPTIONAL] Patient ID to name files after. If not given tumor_bam file name will be used, and if this is not given then normal_bam file will be used.
 #' @param targeted [OPTIONAL] If exome/capture method. Default FALSE
 #' @param threads [OPTIONAL] Number of threads per job. Default 3
 #' @param exec_options [OPTIONAL] Type of execution. local (Single node) / sge (multiple nodes). Default local.
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
+call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",patient_id="",verbose=FALSE,targeted=FALSE,threads=3,exec_options="local"){
+
   sep="/"
   if(output_dir==""){
     sep=""
   }
 
-  call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=output_dir,verbose=verbose,targeted=targeted,threads=threads)
+  if (patient_id=="" & tumor_bam!=""){
+    sample_name=ULPwgs::get_sample_name(tumor_bam)
+  }else if(patient_id=="" & tumor_bam=="" {
+    sample_name=ULPwgs::get_sample_name(normal_bam)
+  }else{
+    sample_name=patient_id
+  }
+
+  call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=output_dir,verbose=verbose,targeted=targeted,threads=threads,patient_id=patient_id)
 
   if (tumor_bam!=""){
-    sample_name=ULPwgs::get_sample_name(tumor_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_SOMATIC")
     out_file_dir_manta=paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC")
     tumor_bam=paste(" --tumorBam ",tumor_bam)
     normal_bam=paste(" --normalBam ",normal_bam)
   }else{
-    sample_name=ULPwgs::get_sample_name(normal_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_GERMLINE")
     out_file_dir_manta=paste0(output_dir,sep,sample_name,"_MANTA_SV_GERMLINE")
     normal_bam=paste0(" --bam ", normal_bam,collapse=" --bam ")
@@ -761,26 +769,33 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
 #' @param normal_bam [OPTIONAL] Path to normal samples bam files.
 #' @param ref_genome [REQUIRED] Path to reference genome.
 #' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param patient_id [OPTIONAL] Patient ID to name files after. If not given tumor_bam file name will be used, and if this is not given then normal_bam file will be used.
 #' @param targeted [OPTIONAL] If exome/capture method. Default FALSE
 #' @param threads [OPTIONAL] Number of threads per job. Default 3
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
 
-call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",verbose=FALSE,targeted=FALSE,threads=3){
+call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tumor_bam="",normal_bam="",ref_genome="",output_dir="",patient_id="",verbose=FALSE,targeted=FALSE,threads=3){
 
   sep="/"
   if(output_dir==""){
     sep=""
   }
 
-  if (tumor_bam!=""){
+  if (patient_id=="" & tumor_bam!=""){
     sample_name=ULPwgs::get_sample_name(tumor_bam)
+  }else if(patient_id=="" & tumor_bam=="" {
+    sample_name=ULPwgs::get_sample_name(normal_bam)
+  }else{
+    sample_name=patient_id
+  }
+
+  if (tumor_bam!=""){
     tumor_bam=paste(" --tumorBam ",tumor_bam)
     normal_bam=paste(" --normalBam ",normal_bam)
     out_file_dir=paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC")
   }else{
-    sample_name=ULPwgs::get_sample_name(normal_bam)
     normal_bam=paste0(" --bam ", paste0(normal_bam,collapse=" --bam "))
     out_file_dir=paste0(output_dir,sep,sample_name,"_MANTA_SV_GERMLINE")
   }
