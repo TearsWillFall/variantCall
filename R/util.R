@@ -90,9 +90,9 @@ learn_orientation=function(bin_path="tools/gatk/gatk",f1r2="",f1r2_dir="",output
 #' and outputs an inset/outset between these two vcf files.
 #'
 #' @param bin_path [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools
+#' @param n [REQUIRED] Number of intersections. Default 2.
 #' @param vcf [OPTIONAL] Path to a single vcf file or a vector of vcf files. Only if vcf_dir is not given.
 #' @param vcf_dir [OPTIONAL] Path to a directory with vcf files to generate a set for. Only if vcf is not given.
-#' @param inset [OPTIONAL] Generate and inset between. Default TRUE
 #' @param filter [OPTIONAL] Filter variants by. Default PASS
 #' @param output_dir [OPTIONAL] Path to output directory. Default current directory
 #' @param verbose [Optional] Enables progress messages. Default False.
@@ -106,7 +106,7 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",n="2",fil
     sep=""
     output_dir=paste0(n,"_SET")
   }else{
-    output_dir=paste0(output_dir,n,"_SET")
+    output_dir=paste0(output_dir,"_",n,"_SET")
   }
 
   if (filter!=""){
