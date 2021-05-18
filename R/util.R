@@ -17,6 +17,27 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 }
 
 
+
+generate_sets=function(){
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #' Learn Read Orientation Model (Mutect2)
 #'
 #' This function takes a f1r2 read information and generates an orientation model
@@ -77,10 +98,15 @@ learn_orientation=function(bin_path="tools/gatk/gatk",f1r2="",f1r2_dir="",output
 #' @param verbose [Optional] Enables progress messages. Default False.
 #' @export
 
-vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",inset=TRUE,filter="PASS",output_dir="",verbose=FALSE){
+vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",n="2",filter="PASS",output_dir="",verbose=FALSE){
+
+  sep="/"
 
   if(output_dir==""){
-    output_dir="dir"
+    sep=""
+    output_dir=paste0(n,"_SET")
+  }else{
+    output_dir=paste0(output_dir,n,"_SET")
   }
 
   if (filter!=""){
@@ -90,20 +116,12 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",inset=TRU
   if (vcf_dir!=""){
     vcfs=list.files(vcfs,full.names=TRUE)
     vcfs=vcfs[grepl(".vcf.gz$",files)]
-    size=length(vcfs)
     vcfs=paste0(vcfs,collapse=" ")
   }else{
-    size=length(vcf)
-    vcfs=paste0(vcf,collapse=" ")
+    vcfs=paste0(" ",vcf,collapse=" ")
   }
 
-  private=""
-  if (inset){
-    output_dir=paste0(output_dir,"_INSET")
-  }else{
-    output_dir=paste0(output_dir,"_OUTSET")
-    private=paste0(" -n-1 -c all ")
-  }
+  private=paste0(" -n=+",n)
 
   if (verbose){
 
@@ -265,11 +283,13 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
   if (verbose){
     name=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
     print(paste(bin_path," query -l ",vcf))
-    sapply(name,function(x){print(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(x,".vcf.gz"),vcf))
+    sapply(name,function(x){print(paste(bin_path, "view -c1 -Oz -s",x, "-o",paste0(out_file,"/",x,".vcf.gz"),vcf));
+      system(paste(bin_path, "index" paste0(out_file,"/",x,".vcf.gz"),vcf))
     })
   }
   name=system(paste(bin_path," query -l ",vcf), intern = TRUE, ignore.stderr = TRUE)
-  sapply(name,function(x){system(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(out_file,"/",x,".vcf.gz"),vcf))
+  sapply(name,function(x){system(paste(bin_path, "view -c1 -Oz -s",x, "-o", paste0(out_file,"/",x,".vcf.gz"),vcf));
+        system(paste(bin_path, "index" paste0(out_file,"/",x,".vcf.gz"),vcf))
   })
 
 }
@@ -369,21 +389,27 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
 #' This function concatenates VCF files found in a directory.
 #'
 #' @param bin_path Path to bcftools binary. Default tools/bcftools/bcftools.
-#' @param vcf_dir Path to directory with vcf files to concatenate.
+#' @param vcf Path to vcf files to concatenate. Only if vcf_dir not given
+#' @param vcf_dir Path to directory with vcf files to concatenate. Only if vcf not given
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
 
 
-vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf_dir="",verbose=FALSE,output_dir=""){
+vcf_concatenate=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",verbose=FALSE,output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
   }
-  files=list.files(vcf_dir,full.names=TRUE)
-  files=files[grepl(".vcf$",files)]
-  sample_name=ULPwgs::get_sample_name(list.files(vcf_dir)[1])
+  if (vcf_dir!=""){
+    files=list.files(vcf_dir,full.names=TRUE)
+    files=files[grepl(".vcf$",files)]
+    sample_name=ULPwgs::get_sample_name(list.files(vcf_dir)[1])
+  }else{
+    files=vcf
+  }
+
   out_file_dir=paste0(output_dir,sep,sample_name,"_CONCATENATED")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
