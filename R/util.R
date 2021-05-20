@@ -202,7 +202,8 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
     p1=ggvenn::ggvenn(sets)
     ggplot2::ggsave(paste0(out_file_dir,"/variantSets_VennDiagram.png"),height=10,width=10)
   }
-  write.table(tables,file=paste0(out_file_dir,"/variantSets.txt"),quote=FALSE,row.names=FALSE,col.names=TRUE)
+  write.table(tables,file=paste0(out_file_dir,"/variantData.txt"),quote=FALSE,row.names=FALSE,col.names=TRUE)
+  write.table(sets,file=paste0(out_file_dir,"/variantSets.txt"),quote=FALSE,row.names=FALSE,col.names=TRUE))
 }
 
 
