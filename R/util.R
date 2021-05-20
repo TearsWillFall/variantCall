@@ -171,7 +171,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
         n <- n_vcfs
         m <- expand.grid(rep(list(0:1),n))
         m <- m[rowSums(m)==x ,]
-        lapply(X=1:nrows(m),FUN=function(y){
+        lapply(X=1:nrow(m),FUN=function(y){
           vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("~",paste0(y,collapse=TRUE)),filter=filter,output_dir=paste0(output_file_dir,"/SET_",x,"/SET_",paste0(y,collapse=TRUE)),verbose=verbose)
         })
     }else{
