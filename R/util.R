@@ -180,7 +180,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
       vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("=",x),filter=filter,output_dir=paste0(out_file_dir,"/SET_",x),verbose=verbose)
     }
   })
-  files=list.files(out_file_dir,recursive=TRUE)
+  files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
   files=files[grepl("sites.txt",files)]
   tables=lapply(files,FUN=read.table)
   tables=dplyr::bind_rows(tables)
