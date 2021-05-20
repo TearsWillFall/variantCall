@@ -740,7 +740,7 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
 
   indel_candidates=""
   if (tumor_bam!=""){
-    indel_candidates=paste0(" --indelCandidates ",paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC"),"/results/variants/candidateSmallIndels.vcf.gz"))
+    indel_candidates=paste0(" --indelCandidates ",paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC"),"/results/variants/candidateSmallIndels.vcf.gz")
   }
 
 
