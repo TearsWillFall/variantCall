@@ -717,7 +717,7 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
   }
   if (tumor_bam!=""){
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_SOMATIC")
-  else{
+  }else{
     out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_GERMLINE")
   }
   if (!dir.exists(out_file_dir)){
