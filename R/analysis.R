@@ -876,7 +876,7 @@ annotate_germline_variants=function(){
 #' @export
 
 
-ts_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",patient_id="",germ_pattern="GL",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
+variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",patient_id="",germ_pattern="GL",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
 
   sep="/"
   if(output_dir==""){
