@@ -20,5 +20,5 @@ Imports:
     data.table
 biocViews:
 Remotes:
-    git::https://github.com/TearsWillFall/ULPwgs.git
+    git::https://github.com/TearsWillFall/ULPwgs.git,
     git::https://github.com/yanlinlin82/ggvenn.git
