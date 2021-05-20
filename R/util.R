@@ -139,11 +139,10 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",set_formu
 #' @param vcf_dir [OPTIONAL] Path to a directory with vcf files to generate a set for. Only if vcf is not given.
 #' @param filter [OPTIONAL] Filter variants by. Default PASS
 #' @param output_dir [OPTIONAL] Path to output directory. Default current directory
-#' @param threads [OPTIONAL] Number of threads to use. Default 3
 #' @param verbose [Optional] Enables progress messages. Default False.
 #' @export
 
-generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filter="PASS",output_dir="",verbose=FALSE,threads=3){
+generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filter="PASS",output_dir="",verbose=FALSE){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -166,7 +165,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
     vcfs=paste0(" ",vcf,collapse=" ")
   }
 
-  parallel::mclapply(X=1:n_vcfs,mc.cores=threads,FUN=function(x){
+  lapply(X=1:n_vcfs,FUN=function(x){
     if (x>1 & x<n_vcfs){
         n <- n_vcfs
         m <- expand.grid(rep(list(0:1),n))
