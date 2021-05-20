@@ -828,7 +828,44 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 }
 
 
-annotate_germline_variants=function(bin_path=,bin_path2="tools/bcftools/bcftools",var_dir="",filter="PASS",output_dir="",verbose=verbose,threads=threads){
+process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",var_dir="",filter="PASS",output_dir="",verbose=verbose,threads=threads){
+
+  files=list.files(var_dir,recursive=TRUE,full.names=TRUE,pattern="vcf.gz")
+
+  # Platypus pipeline variants
+
+  platypus=files[grepl("PLATYPUS",files)]
+  platypus_snps=platypus[grepl("SNPs",platypus)]
+  platypus_snps_germline=platypus_snps[grepl("GERMLINE",platypus_snps)]
+  platypus_snps_somatic=platypus_snps[grepl("SOMATIC",platypus_snps)]
+  platypus_indels=platypus[grepl("INDELs",platypus)]
+  platypus_indels_germline=platypus_indels[grepl("GERMLINE",platypus_indels)]
+  platypus_indels_somatic=platypus_indels[grepl("SOMATIC",platypus_indels)]
+
+
+  # GATK pipeline variants
+
+  haplotypecaller=files[grepl("HAPLOTYPECALLER",files)]
+  haplotypecaller_snps=haplotypecaller[grepl("SNPs",haplotypecaller)]
+  haplotypecaller_indels=haplotypecaller[grepl("INDELs",haplotypecaller)]
+
+  mutect=files[grepl("MUTECT",files)]
+  mutect_snps=mutect[grepl("SNPs",mutect)]
+  mutect_indels=mutect[grepl("INDELs",mutect)]
+
+
+  # Strelka/Manta pipeline variants
+  strelka=files[grepl("STRELKA",files)]
+  strelka_snps=files[grepl("SNPs",strelka)]
+  strelka_snps_germline=strelka_snps[grepl("GERMLINE",strelka_snps)]
+  strelka_snps_somatic=strelka_snps[grepl("SOMATIC",strelka_snps)]
+  strelka_indels=files[grepl("INDELs",strelka)]
+  strelka_indels_germline=strelka_indels[grepl("GERMLINE",strelka_indels)]
+  strelka_indels_somatic=strelka_indels[grepl("SOMATIC",strelka_indels)]
+
+
+  ## Start processing germline variants
+
 
   ### Generate sets of VCFs with variants that have been called by Mutect2, Strelka2 and Platypus.
   ### We generate three sets:
@@ -836,24 +873,12 @@ annotate_germline_variants=function(bin_path=,bin_path2="tools/bcftools/bcftools
   ###     Set 2: Variables that appear in 2 out off the 3 variant callers
   ###     Set 3: Variables that are called by all three variant callers
 
-  files=list.files(var_dir,recursive=TRUE,full.names=TRUE,pattern="vcf.gz")
-  platypus=files[grepl("PLATYPUS",files)]
-  platypus_snps=files[grepl("SNPs",platypus)]
-  platypus_indels=files[grepl("INDELs",platypus)]
-
-  haplotypecaller=files[grepl("HAPLOTYPECALLER",files)]
-  haplotypecaller_snps=files[grepl("SNPs",haplotypecaller)]
-  haplotypecaller_indels=files[grepl("INDELs",haplotypecaller)]
-
-
-  
-
 
   ### Generate sets for SNVs
-  generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose,threads=threads)
+  generate_sets(bin_path=bin_path2,vcf=c(platypus_snps_germline,haplotypecaller_snps,strelka_snps_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
   ### Generate sets for INDELs
-  generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="INDELs_SETS",verbose=verbose,threads=threads)
+  generate_sets(bin_path=bin_path2,vcf=c(platypus_snps_indels,haplotypecaller_indels,strelka_snps_indels),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
   ### Annotate SNVs
   call_vep(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path4,vcf=vcf,verbose=verbose,output_dir="",threads=3)
