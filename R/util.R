@@ -140,11 +140,12 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",set_formu
 #' @param filter [OPTIONAL] Filter variants by. Default PASS
 #' @param output_dir [OPTIONAL] Path to output directory. Default current directory
 #' @param set_names [OPTIONAL] Names to use to identify each set.
+#' @param plot [OPTIONAL] Generate a VennDiagram plot with set intersections
 #' @param threads [OPTIONAL] Number of threads to use. Default 3
 #' @param verbose [Optional] Enables progress messages. Default False.
 #' @export
 
-generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filter="PASS",output_dir="",set_names="",verbose=FALSE,threads=3){
+generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filter="PASS",output_dir="",set_names="",verbose=FALSE,threads=3,plot=TRUE){
   sep="/"
   if(output_dir==""){
     sep=""
