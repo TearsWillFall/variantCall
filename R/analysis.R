@@ -828,13 +828,15 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 }
 
 
-annotate_germline_variants=function(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose,threads=threads){
+annotate_germline_variants=function(bin_path=,bin_path2="tools/bcftools/bcftools",var_dir="",filter="PASS",output_dir="",verbose=verbose,threads=threads){
 
   ### Generate sets of VCFs with variants that have been called by Mutect2, Strelka2 and Platypus.
   ### We generate three sets:
   ###     Set 1: With variables unique to a specific variant caller
   ###     Set 2: Variables that appear in 2 out off the 3 variant callers
   ###     Set 3: Variables that are called by all three variant callers
+
+  files=list.files(var_dir,recursive=TRUE,full.names=TRUE)
 
   ### Generate sets for SNVs
   generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose,threads=threads)
@@ -1301,9 +1303,21 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
   bin_path=bin_path2,bin_path2=bin_path3,bin_path3=bin_path4,qual="",mq="",type="indel",verbose=verbose,output_dir=paste0(out_file_dir,"/INDELs"))
 
   ## Split Platypus multisample VCFs per sample
-
   split_vcf(bin_path=bin_path2,vcf=paste0(out_file_dir,"/SNPs/",sample_name,"_FILTERED/",sample_name,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/RESULTS/SNPs"))
+
   split_vcf(bin_path=bin_path2,vcf=paste0(out_file_dir,"/INDELs/",sample_name,"_FILTERED/",sample_name,".FILTERED.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/RESULTS/INDELs"))
   system(paste0("rm -rf ",out_file_dir,"/SNPs"))
   system(paste0("rm -rf ",out_file_dir,"/INDELs"))
+
+  ## Split Platypus VCFs between somatic/germline
+
+  dir.create(paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE"))
+  dir.create(paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC"))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC")))
+
+  dir.create(paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE"))
+  dir.create(paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC"))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
 }
