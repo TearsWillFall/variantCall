@@ -836,7 +836,18 @@ annotate_germline_variants=function(bin_path=,bin_path2="tools/bcftools/bcftools
   ###     Set 2: Variables that appear in 2 out off the 3 variant callers
   ###     Set 3: Variables that are called by all three variant callers
 
-  files=list.files(var_dir,recursive=TRUE,full.names=TRUE)
+  files=list.files(var_dir,recursive=TRUE,full.names=TRUE,pattern="vcf.gz")
+  platypus=files[grepl("PLATYPUS",files)]
+  platypus_snps=files[grepl("SNPs",platypus)]
+  platypus_indels=files[grepl("INDELs",platypus)]
+
+  haplotypecaller=files[grepl("HAPLOTYPECALLER",files)]
+  haplotypecaller_snps=files[grepl("SNPs",haplotypecaller)]
+  haplotypecaller_indels=files[grepl("INDELs",haplotypecaller)]
+
+
+  
+
 
   ### Generate sets for SNVs
   generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose,threads=threads)
