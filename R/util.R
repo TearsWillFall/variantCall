@@ -177,7 +177,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
     }else{
       vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("=",x),filter=filter,output_dir=paste0(output_file_dir,"/SET_",x),verbose=verbose)
     }
-  }
+  })
 }
 
 
