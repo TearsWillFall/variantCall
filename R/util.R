@@ -175,7 +175,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
           vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("~",paste0(y,collapse=TRUE)),filter=filter,output_dir=paste0(output_file_dir,"/SET_",x,"/SET_",paste0(y,collapse=TRUE)),verbose=verbose)
         })
     }else{
-      vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("=",x),filter=filter,output_dir=paste0(output_file_dir,"/SET_",x),verbose=verbose)
+      vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("=",x),filter=filter,output_dir=paste0(out_file_dir,"/SET_",x),verbose=verbose)
     }
   })
 }
