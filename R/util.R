@@ -187,11 +187,10 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
   tables=tables %>% dplyr::mutate(Variant=paste(V1,V2,V3,V4,sep="_"))
   colnames(tables)=c("chr","pos","ref","alt","inter","ID")
   sets=lapply(X=1:n_vcfs,FUN=function(z){
-    search="...";
-    substring(search,z,z)<- "1";
-    return(tables[grepl(search,tables$V5),]$Variant);
-  }
-  )
+    search=rep(".",n_vcfs)
+    search[z]="1";
+    return(tables[grepl(paste0(search,collapse=""),tables$V5),]$Variant);
+  })
 
   if(set_names==""){
     names(sets)=paste0("Set_",1:n_vcfs)
