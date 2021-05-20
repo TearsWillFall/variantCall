@@ -461,10 +461,6 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 }
 
 
-
-
-
-
 #' Variant calling of Somatic and Germline (MuTECT2, Platypus and Strelka) mutations and produces their subsequent annotation (VEP)
 #'
 #' This function calls somatic and germline mutations, in previously pre-processed sequencing data.
@@ -830,6 +826,35 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
   }
   system(paste0("python2.7 ",out_file_dir,"/runWorkflow.py  -j ",threads))
 }
+
+
+annotate_germline_variants=function(){
+
+  ### Generate sets of VCFs with variants that have been called by Mutect2, Strelka2 and Platypus.
+  ### We generate three sets:
+  ###     Set 1: With variables unique to a specific variant caller
+  ###     Set 2: Variables that appear in 2 out off the 3 variant callers
+  ###     Set 3: Variables that are called by all three variant callers
+
+  generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose)
+
+
+
+  call_vep(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path4,vcf=vcf,verbose=verbose,output_dir="",threads=3)
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -18,12 +18,6 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 
 
 
-generate_sets=function(){
-
-
-}
-
-
 
 
 
@@ -87,7 +81,7 @@ learn_orientation=function(bin_path="tools/gatk/gatk",f1r2="",f1r2_dir="",output
 #' Generate a set between a group of vcfs usign bcftools
 #'
 #' This function takes a path to either a vcf file or to a directory of vcf files
-#' and outputs an inset/outset between these two vcf files.
+#' and outputs an inset/outset between these vcf files.
 #'
 #' @param bin_path [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools
 #' @param set_formula [REQUIRED] Formula to filter variants. Default =+2.
@@ -105,12 +99,14 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",set_formu
   if(output_dir==""){
     sep=""
     output_dir="SET"
-  }else{
-    output_dir=paste0(output_dir,"/SET")
   }
 
   if (filter!=""){
     filter=paste0(" -f ",filter)
+  }
+
+  if (!dir.exists(output_dir)){
+      dir.create(output_dir,recursive=TRUE)
   }
 
   if (vcf_dir!=""){
@@ -129,6 +125,59 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",set_formu
 
   }
   system(paste0(bin_path," isec -p ", output_dir,vcfs,filter,private))
+}
+
+
+
+#' Generate a 1:n sets between a group of vcfs
+#'
+#' This function takes a path to either a vcf file or to a directory of vcf files
+#' and outputs an inset/outset between these vcf files.
+#'
+#' @param bin_path [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools
+#' @param vcf [OPTIONAL] Path to a single vcf file or a vector of vcf files. Only if vcf_dir is not given.
+#' @param vcf_dir [OPTIONAL] Path to a directory with vcf files to generate a set for. Only if vcf is not given.
+#' @param filter [OPTIONAL] Filter variants by. Default PASS
+#' @param output_dir [OPTIONAL] Path to output directory. Default current directory
+#' @param threads [OPTIONAL] Number of threads to use. Default 3
+#' @param verbose [Optional] Enables progress messages. Default False.
+#' @export
+
+generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filter="PASS",output_dir="",verbose=FALSE,threads=3){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  out_file_dir=paste0(output_dir,sep,"SETS")
+
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+
+  if (vcf_dir!=""){
+    vcfs=list.files(vcfs,full.names=TRUE)
+    vcfs=vcfs[grepl(".vcf.gz$",files)]
+    vcfs=paste0(vcfs,collapse=" ")
+    n_vcfs=length(vcfs)
+  }else{
+    n_vcfs=length(vcfs)
+    vcfs=paste0(" ",vcf,collapse=" ")
+  }
+
+  parallel::mclapply(X=1:n_vcfs,mc.cores=threads,FUN=function(x){
+    if (x>1 & x<n_vcfs){
+        n <- n_vcfs
+        m <- expand.grid(rep(list(0:1),n))
+        m <- m[rowSums(m)==x ,]
+        lapply(X=1:nrows(m),FUN=function(y){
+          vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("~",paste0(y,collapse=TRUE)),filter=filter,output_dir=paste0(output_file_dir,"/SET_",x,"/SET_",paste0(y,collapse=TRUE)),verbose=verbose)
+        })
+    }else{
+      vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("=",x),filter=filter,output_dir=paste0(output_file_dir,"/SET_",x),verbose=verbose)
+    }
+  }
 }
 
 
