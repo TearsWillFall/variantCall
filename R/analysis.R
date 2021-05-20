@@ -846,16 +846,16 @@ annotate_germline_variants=function(bin_path=bin_path2,vcf=vcf,filter="PASS",out
   call_vep(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path4,vcf=vcf,verbose=verbose,output_dir="",threads=3)
 
   ### Generate a VCF with common SNPs MAF>1%
-  filter_VEP=function(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
+  filter_VEP(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
 
   ### Keep only Heterozygous SNPs
-  vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir="")
+  vcf_filter_variants(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",qual=20,mq=40,state="het",verbose=verbose,output_dir="")
 
   ### Keep only Heterozygous SNPs found across all samples for this patient
   generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="HETEROZYGOUS_SNPs_SETS",verbose=verbose,threads=threads)
 
   ### Generate a VCF with rare SNVs MAF<1% or not described
-  filter_VEP=function(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
+  filter_VEP(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
 
 }
 
