@@ -10,6 +10,9 @@ It is recommended to supply a vcf with indel candidates. This can be generated u
 call_variants_strelka(
   bin_path = "tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",
   bin_path2 = "tools/manta-1.6.0/build/bin/configManta.py",
+  bin_path3 = "tools/bcftools/bcftools",
+  bin_path4 = "tools/htslib/bgzip",
+  bin_path5 = "tools/htslib/tabix",
   tumor_bam = "",
   normal_bam = "",
   ref_genome = "",
@@ -25,6 +28,12 @@ call_variants_strelka(
 \item{bin_path}{\link{REQUIRED} Path to strelka binary. Somatic or Germline.}
 
 \item{bin_path2}{\link{REQUIRED} Path to manta binary. Somatic or Germline.}
+
+\item{bin_path3}{\link{REQUIRED} Path to bcftools binary.}
+
+\item{bin_path4}{\link{REQUIRED} Path to bgzip binary.}
+
+\item{bin_path5}{\link{REQUIRED} Path to tabix binary.}
 
 \item{tumor_bam}{\link{REQUIRED} Path to tumor  bam file.}
 

@@ -532,7 +532,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     call_mutect2_parallel(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,bam_dir=bam_dir,germ_pattern=germ_pattern,ref_genome=ref_genome,germ_resource=germ_resource,pon=pon,output_dir=out_file_dir,region_bed=region_bed,threads=threads,verbose=verbose,patient_id=patient_id,chr_filter=chr_filter,orientation=orientation,interval=interval,db=db)
 
     ## Call Germline SNVs+INDELs Using Strelka & Manta
-    call_variants_strelka(bin_path=bin_path7,bin_path2=bin_path8,bin_path3=bin_path2,bin_path4=bin_path3,bin_path5=bin_path4,normal_bam=normal_bam,patient_id=patient_id,ref_genome=ref_genome,output_dir=out_file_dir,verbose=verbose,targeted=TRUE,threads=threads)
+    call_variants_strelka(bin_path=bin_path7,bin_path2=bin_path8,bin_path3=bin_path2,bin_path4=bin_path3,bin_path5=bin_path4,normal_bam=normal_bam,patient_id=patient_id,ref_genome=ref_genome,output_dir=paste0(out_file_dir,"/",patient_id,"_STRELKA_AND_MANTA_VARIANTS_VCF/",patient_id,"_GERMLINE"),verbose=verbose,targeted=TRUE,threads=threads)
 
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
@@ -715,22 +715,22 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
   }else{
     sample_name=patient_id
   }
+  if (tumor_bam!=""){
+    out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_SOMATIC")
+  else{
+    out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_GERMLINE")
+  }
+  if (!dir.exists(out_file_dir)){
+        dir.create(out_file_dir,recursive=TRUE)
+  }
 
   call_sv_manta(bin_path=bin_path2,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=output_dir,verbose=verbose,targeted=targeted,threads=threads,patient_id=patient_id)
 
   if (tumor_bam!=""){
-    out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_SOMATIC")
-    out_file_dir_manta=paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC")
     tumor_bam=paste(" --tumorBam ",tumor_bam)
     normal_bam=paste(" --normalBam ",normal_bam)
   }else{
-    out_file_dir=paste0(output_dir,sep,sample_name,"_STRELKA_SNV_GERMLINE")
-    out_file_dir_manta=paste0(output_dir,sep,sample_name,"_MANTA_SV_GERMLINE")
     normal_bam=paste0(" --bam ", normal_bam,collapse=" --bam ")
-  }
-
-  if (!dir.exists(out_file_dir)){
-      dir.create(out_file_dir)
   }
 
   exome=""
@@ -740,7 +740,7 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
 
   indel_candidates=""
   if (tumor_bam!=""){
-    indel_candidates=paste0(" --indelCandidates ",paste0(out_file_dir_manta,"/results/variants/candidateSmallIndels.vcf.gz"))
+    indel_candidates=paste0(" --indelCandidates ",paste0(output_dir,sep,sample_name,"_MANTA_SV_SOMATIC"),"/results/variants/candidateSmallIndels.vcf.gz"))
   }
 
 
@@ -837,9 +837,6 @@ annotate_germline_variants=function(){
   ###     Set 3: Variables that are called by all three variant callers
 
   generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose)
-
-
-
   call_vep(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path4,vcf=vcf,verbose=verbose,output_dir="",threads=3)
 
 }
@@ -879,7 +876,7 @@ annotate_germline_variants=function(){
 #' @export
 
 
-call_variants_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",patient_id="",germ_pattern="GL",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
+ts_strelka_parallel=function(bin_path="tools/strelka-2.9.10/build/bin/configureStrelkaSomaticWorkflow.py",bin_path2="tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",ref_genome="",output_dir="",patient_id="",germ_pattern="GL",verbose=FALSE,targeted=FALSE,jobs=1,threads=3,exec_options="local"){
 
   sep="/"
   if(output_dir==""){
