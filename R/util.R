@@ -200,7 +200,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
   }
   if (plot){
     p1=ggvenn::ggvenn(sets)
-    ggsave(paste0(out_file_dir,"/variantSets_VennDiagram.png"),height=10,width=10)
+    ggplot2::ggsave(paste0(out_file_dir,"/variantSets_VennDiagram.png"),height=10,width=10)
   }
   write.table(tables,file=paste0(out_file_dir,"/variantSets.txt"),quote=FALSE,row.names=FALSE,col.names=TRUE)
 }
