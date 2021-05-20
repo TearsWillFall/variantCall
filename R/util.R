@@ -139,11 +139,12 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",set_formu
 #' @param vcf_dir [OPTIONAL] Path to a directory with vcf files to generate a set for. Only if vcf is not given.
 #' @param filter [OPTIONAL] Filter variants by. Default PASS
 #' @param output_dir [OPTIONAL] Path to output directory. Default current directory
+#' @param set_names [OPTIONAL] Names to use to identify each set.
 #' @param threads [OPTIONAL] Number of threads to use. Default 3
 #' @param verbose [Optional] Enables progress messages. Default False.
 #' @export
 
-generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filter="PASS",output_dir="",verbose=FALSE,threads=3){
+generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filter="PASS",output_dir="",set_names="",verbose=FALSE,threads=3){
   sep="/"
   if(output_dir==""){
     sep=""
@@ -178,6 +179,29 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
       vcf_sets(bin_path=bin_path,vcf=vcf,vcf_dir=vcf_dir,set_formula=paste0("=",x),filter=filter,output_dir=paste0(out_file_dir,"/SET_",x),verbose=verbose)
     }
   })
+  files=list.files(out_file_dir,recursive=TRUE)
+  files=files[grepl("sites.txt",files)]
+  tables=lapply(files,FUN=read.table)
+  tables=dplyr::bind_rows(tables)
+  tables=tables %>% mutate(Variant=paste(V1,V2,V3,V4,sep="_"))
+  colnames(tables)=c("chr","pos","ref","alt","inter","ID")
+  sets=lapply(X=1:n_vcfs,FUN=function(z){
+    search="...";
+    substring(search,z,z)<- "1";
+    return(tables[grepl(search,tables$V5),]$Variant);
+  }
+  )
+
+  if(set_names==""){
+    names(sets)=paste0("Set_",1:n_vcfs)
+  }else{
+    names(sets)=set_names
+  }
+  if (plot){
+    p1=ggvenn::ggvenn(sets)
+    ggsave(paste0(out_file_dir,"/variantSets_VennDiagram.png"),height=10,width=10)
+  }
+  write.table(tables,file=paste0(out_file_dir,"/variantSets.txt"),quote=FALSE,row.names=FALSE,col.names=TRUE)
 }
 
 

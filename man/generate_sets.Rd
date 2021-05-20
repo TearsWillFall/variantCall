@@ -10,6 +10,7 @@ generate_sets(
   vcf_dir = "",
   filter = "PASS",
   output_dir = "",
+  set_names = "",
   verbose = FALSE,
   threads = 3
 )
@@ -24,6 +25,8 @@ generate_sets(
 \item{filter}{\link{OPTIONAL} Filter variants by. Default PASS}
 
 \item{output_dir}{\link{OPTIONAL} Path to output directory. Default current directory}
+
+\item{set_names}{\link{OPTIONAL} Names to use to identify each set.}
 
 \item{verbose}{\link{Optional} Enables progress messages. Default False.}
 
