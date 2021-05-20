@@ -182,7 +182,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
   })
   files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
   files=files[grepl("sites.txt",files)]
-  tables=lapply(files,FUN=read.table)
+  tables=lapply(files,FUN=read.table,colClasses="character")
   tables=dplyr::bind_rows(tables)
   tables=tables %>% dplyr::mutate(Variant=paste(V1,V2,V3,V4,sep="_"))
   colnames(tables)=c("chr","pos","ref","alt","inter","ID")
@@ -199,7 +199,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
   }
   if (plot){
     p1=ggvenn::ggvenn(sets)
-    p1=p1+ggplot2::labs(title="Variant sets",caption=paste0("N=",nrow(tables)))
+    p1=p1+ggplot2::labs(title="Variant sets",subtitle=paste0("N=",nrow(tables)))
     ggplot2::ggsave(paste0(out_file_dir,"/variantSets_VennDiagram.png"),height=10,width=10)
   }
   write.table(tables,file=paste0(out_file_dir,"/variantData.txt"),quote=FALSE,row.names=FALSE,col.names=TRUE)
