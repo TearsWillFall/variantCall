@@ -828,7 +828,7 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 }
 
 
-annotate_germline_variants=function(){
+annotate_germline_variants=function(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose,threads=threads){
 
   ### Generate sets of VCFs with variants that have been called by Mutect2, Strelka2 and Platypus.
   ### We generate three sets:
@@ -836,8 +836,26 @@ annotate_germline_variants=function(){
   ###     Set 2: Variables that appear in 2 out off the 3 variant callers
   ###     Set 3: Variables that are called by all three variant callers
 
-  generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose)
+  ### Generate sets for SNVs
+  generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="SNPs_SETS",verbose=verbose,threads=threads)
+
+  ### Generate sets for INDELs
+  generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="INDELs_SETS",verbose=verbose,threads=threads)
+
+  ### Annotate SNVs
   call_vep(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path4,vcf=vcf,verbose=verbose,output_dir="",threads=3)
+
+  ### Generate a VCF with common SNPs MAF>1%
+  filter_VEP=function(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
+
+  ### Keep only Heterozygous SNPs
+  vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir="")
+
+  ### Keep only Heterozygous SNPs found across all samples for this patient
+  generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="HETEROZYGOUS_SNPs_SETS",verbose=verbose,threads=threads)
+
+  ### Generate a VCF with rare SNVs MAF<1% or not described
+  filter_VEP=function(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
 
 }
 

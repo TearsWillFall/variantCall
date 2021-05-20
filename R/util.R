@@ -152,17 +152,17 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
   out_file_dir=paste0(output_dir,sep,"SETS")
 
   if (!dir.exists(out_file_dir)){
-      dir.create(out_file_dir)
+      dir.create(out_file_dir,recursive=TRUE)
   }
 
 
   if (vcf_dir!=""){
     vcfs=list.files(vcfs,full.names=TRUE)
     vcfs=vcfs[grepl(".vcf.gz$",files)]
+    n_vcfs=length(vcfs)
     vcfs=paste0(vcfs,collapse=" ")
-    n_vcfs=length(vcfs)
   }else{
-    n_vcfs=length(vcfs)
+    n_vcfs=length(vcf)
     vcfs=paste0(" ",vcf,collapse=" ")
   }
 
