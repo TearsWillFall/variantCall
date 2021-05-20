@@ -184,7 +184,7 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
   files=files[grepl("sites.txt",files)]
   tables=lapply(files,FUN=read.table)
   tables=dplyr::bind_rows(tables)
-  tables=tables %>% mutate(Variant=paste(V1,V2,V3,V4,sep="_"))
+  tables=tables %>% dplyr::mutate(Variant=paste(V1,V2,V3,V4,sep="_"))
   colnames(tables)=c("chr","pos","ref","alt","inter","ID")
   sets=lapply(X=1:n_vcfs,FUN=function(z){
     search="...";
