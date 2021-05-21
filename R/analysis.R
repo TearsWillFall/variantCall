@@ -911,7 +911,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   generate_sets(bin_path=bin_path2,vcf=c(platypus_snps_indels,haplotypecaller_indels,strelka_snps_indels),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
   ### Annotate VCFs in SETS
-  vcf_sets=list.files(out_file_dir,full.dir=TRUE,recursive=TRUE,pattern="SETS")
+  vcf_sets=list.files(out_file_dir,full.names=TRUE,recursive=TRUE,pattern="SETS")
   vcf_sets=vcf_sets[grepl("vcf",vcf_sets)]
   lapply(X=vcf_sets,FUN=function(x){
     out_file_name=paste(patient_id,ifelse(grepl("SET_1/",x)|grepl("SET_3/",x),ifelse(grepl("0000",x),"PLATYPUS",ifelse(grepl("0001",x),"HAPLOTYPECALLER",
