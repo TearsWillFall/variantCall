@@ -1358,13 +1358,32 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
 
   ## Split Platypus VCFs between somatic/germline
 
-  dir.create(paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE"))
-  dir.create(paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC"))
+  if (!dir.exists(paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE"))){
+    dir.create(paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE"))
+  }
+  if (!dir.exists(paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC"))){
+    dir.create(paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC"))
+  }
+
+  if (verbose){
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC")))
+  }
+
   system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
   system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC")))
 
-  dir.create(paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE"))
-  dir.create(paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC"))
+  if (!dir.exists(paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE"))){
+    dir.create(paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE"))
+  }
+
+  if (!dir.exists(paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC"))){
+    dir.create(paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC"))
+  }
+  if (verbose){
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
+  }
   system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
   system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
 }
