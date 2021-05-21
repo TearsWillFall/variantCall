@@ -886,7 +886,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   strelka_snps=strelka[grepl("SNPs",strelka)]
   strelka_snps_germline=strelka_snps[grepl("GERMLINE",strelka_snps)]
   strelka_snps_somatic=strelka_snps[grepl("SOMATIC",strelka_snps)]
-  strelka_indels=files[grepl("INDELs",strelka)]
+  strelka_indels=strelka[grepl("INDELs",strelka)]
   strelka_indels_germline=strelka_indels[grepl("GERMLINE",strelka_indels)]
   strelka_indels_somatic=strelka_indels[grepl("SOMATIC",strelka_indels)]
 
@@ -916,8 +916,8 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   lapply(X=vcf_sets,FUN=function(x){
     out_file_name=paste(patient_id,ifelse(grepl("SET_1/",x)|grepl("SET_3/",x),ifelse(grepl("0000",x),"PLATYPUS",ifelse(grepl("0001",x),"HAPLOTYPECALLER",
     ifelse(grepl("0002",x),"STRELKA2"))),ifelse(grepl("SET_110",x),ifelse(grepl("0000",x),"PLATYPUS_HAPLOTYPECALLER","HAPLOTYPECALLER_PLATYPUS"),ifelse(grepl("SET_101",x),ifelse(grepl("0000",x),"PLATYPUS_STRELKA2","STRELKA2_PLATYPUS"),
-    ifelse(grepl("SET_011",x),ifelse(grepl("0000",x),"HAPLOTYPECALLER_STRELKA2","STRELKA2_HAPLOTYPECALLER"),NA)))),sep="_")
-    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads)
+    ifelse(grepl("SET_011",x),ifelse(grepl("0000",x),"HAPLOTYPECALLER_STRELKA2","STRELKA2_HAPLOTYPECALLER"),NA)))),sep="_");
+    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
   })
 
   if (!dir.exists(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))){
@@ -932,7 +932,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/",patient_id,"_PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/")))
 
   ### Generate a VCF with common SNPs MAF>1%
-  filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,"_PLATYPUS.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_fir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS"))
+  filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,"_PLATYPUS.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS"))
 
   ### Generate a VCF with common SNPs MAF<1% or no MAF
   filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,"_PLATYPUS.vcf"),filter="(MAX_AF < 0.01 or not MAX_AF)",verbose=verbose,output_dir=paste0(out_file_fir,"/GERMLINE/HQ_SNPs/RARE_VARIANTS"))
