@@ -828,9 +828,10 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 }
 
 
-process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",var_dir="",filter="PASS",output_dir="",verbose=verbose,threads=threads){
+process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",var_dir="",filter="PASS",output_dir="",verbose=verbose,threads=threads){
 
-  files=list.files(var_dir,recursive=TRUE,full.names=TRUE,pattern="vcf.gz")
+  files=list.files(var_dir,recursive=TRUE,full.names=TRUE,pattern="vcf.gz$")
+
 
   # Platypus pipeline variants
 
@@ -855,6 +856,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
 
   # Strelka/Manta pipeline variants
+
   strelka=files[grepl("STRELKA",files)]
   strelka_snps=files[grepl("SNPs",strelka)]
   strelka_snps_germline=strelka_snps[grepl("GERMLINE",strelka_snps)]
@@ -880,11 +882,20 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   ### Generate sets for INDELs
   generate_sets(bin_path=bin_path2,vcf=c(platypus_snps_indels,haplotypecaller_indels,strelka_snps_indels),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
-  ### Annotate SNVs
-  call_vep(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path4,vcf=vcf,verbose=verbose,output_dir="",threads=3)
+  ### Annotate SNVs in Set 3
+  dir.create(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))
+  system(paste("cp",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf"), paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf.tmp")))
+  system(paste("mv",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf.tmp"), paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".vcf")))
+  call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs"),threads=threads)
+
+  ### Annotate INDELs in Set 3
+  dir.create(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))
+  system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf"), paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf.tmp")))
+  system(paste("mv",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf.tmp"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".vcf")))
+  call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs"),threads=threads)
 
   ### Generate a VCF with common SNPs MAF>1%
-  filter_VEP(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
+  filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"),filter="",verbose=verbose,output_dir="")
 
   ### Keep only Heterozygous SNPs
   vcf_filter_variants(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",qual=20,mq=40,state="het",verbose=verbose,output_dir="")
