@@ -893,20 +893,22 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
     out_file_name=paste(patient_id,ifelse(grepl("SET_1/",x)|grepl("SET_3/",x),ifelse(grepl("0000",x),"PLATYPUS",ifelse(grepl("0001",x),"HAPLOTYPECALLER",
     ifelse(grepl("0002",x),"STRELKA2"))),ifelse(grepl("SET_110",x),ifelse(grepl("0000",x),"PLATYPUS_HAPLOTYPECALLER","HAPLOTYPECALLER_PLATYPUS"),ifelse(grepl("SET_101",x),ifelse(grepl("0000",x),"PLATYPUS_STRELKA2","STRELKA2_PLATYPUS"),
     ifelse(grepl("SET_011",x),ifelse(grepl("0000",x),"HAPLOTYPECALLER_STRELKA2","STRELKA2_HAPLOTYPECALLER"),NA)))),sep="_")
-    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=output_name,threads=threads)
+    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads)
   })
-  dir.create(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))
-  system(paste("cp",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf"), paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf.tmp")))
-  system(paste("mv",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf.tmp"), paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".vcf")))
 
+  if (!dir.exists(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))){
+    dir.create(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))
+  }
 
-  dir.create(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))
-  system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf"), paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf.tmp")))
-  system(paste("mv",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf.tmp"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".vcf")))
-  call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs"),threads=threads)
+  system(paste("cp",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/",patient_id,"_PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_SNPs/")))
+
+  if (!dir.exists(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))){
+    dir.create(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))
+  }
+  system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/",patient_id,"_PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/")))
 
   ### Generate a VCF with common SNPs MAF>1%
-  filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"),filter="",verbose=verbose,output_dir="")
+  filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,"_PLATYPUS.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_fir,"/",))
 
   ### Keep only Heterozygous SNPs
   vcf_filter_variants(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",qual=20,mq=40,state="het",verbose=verbose,output_dir="")
@@ -1377,11 +1379,11 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
   }
 
   if (verbose){
-    print(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam),"*.vcf.gz*"),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
     print(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC")))
   }
 
-  system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam),"*.vcf.gz*"),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
   system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT/*.vcf.gz*"),paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC")))
   system(paste("rm -rf ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT")))
 
@@ -1393,10 +1395,10 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
     dir.create(paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC"))
   }
   if (verbose){
-    print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam),"*.vcf.gz*"),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
     print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
   }
-  system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam,"*.vcf.gz*")),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
   system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/*.vcf.gz*"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
   system(paste("rm -rf ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT")))
 
