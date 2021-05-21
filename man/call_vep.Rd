@@ -9,6 +9,7 @@ call_vep(
   bin_path2 = "tools/htslib/bgzip",
   bin_path3 = "tools/htslib/tabix",
   vcf = "",
+  output_name = "",
   verbose = FALSE,
   output_dir = "",
   threads = 3
@@ -22,6 +23,8 @@ call_vep(
 \item{bin_path3}{Path to bgzip binary. Default tools/htslib/tabix.}
 
 \item{vcf}{Path to vcf file.}
+
+\item{output_name}{Name used for output files. If not given the vcf file name will be used}
 
 \item{verbose}{Enables progress messages. Default False.}
 

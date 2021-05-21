@@ -890,8 +890,10 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   vcf_sets=list.files(out_file_dir,full.dir=TRUE,recursive=TRUE,pattern="SETS")
   vcf_sets=vcf_sets[grepl("vcf",vcf_sets)]
   lapply(X=vcf_sets,FUN=function(x){
-    out_file_name=paste0(patient_id,ifelse(grepl("SET_1",x)|grepl("SET_2",x)))
-    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x),verbose=verbose,output_dir=dirname(x),output_name=output_name,threads=threads)
+    out_file_name=paste(patient_id,ifelse(grepl("SET_1/",x)|grepl("SET_3/",x),ifelse(grepl("0000",x),"PLATYPUS",ifelse(grepl("0001",x),"HAPLOTYPECALLER",
+    ifelse(grepl("0002",x),"STRELKA2"))),ifelse(grepl("SET_110",x),ifelse(grepl("0000",x),"PLATYPUS_HAPLOTYPECALLER","HAPLOTYPECALLER_PLATYPUS"),ifelse(grepl("SET_101",x),ifelse(grepl("0000",x),"PLATYPUS_STRELKA2","STRELKA2_PLATYPUS"),
+    ifelse(grepl("SET_011",x),ifelse(grepl("0000",x),"HAPLOTYPECALLER_STRELKA2","STRELKA2_HAPLOTYPECALLER"),NA)))),sep="_")
+    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=output_name,threads=threads)
   })
   dir.create(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))
   system(paste("cp",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf"), paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf.tmp")))
