@@ -905,10 +905,10 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
 
   ### Generate sets for SNVs
-  generate_sets(bin_path=bin_path2,vcf=c(platypus_snps_germline,haplotypecaller_snps,strelka_snps_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
+  generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_germline,haplotypecaller_snps,strelka_snps_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
   ### Generate sets for INDELs
-  generate_sets(bin_path=bin_path2,vcf=c(platypus_snps_indels,haplotypecaller_indels,strelka_snps_indels),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
+  generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_indels,haplotypecaller_indels,strelka_snps_indels),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
   ### Annotate VCFs in SETS
   vcf_sets=list.files(out_file_dir,full.names=TRUE,recursive=TRUE,pattern="SETS")
