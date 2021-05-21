@@ -883,7 +883,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   # Strelka/Manta pipeline variants
 
   strelka=files[grepl("STRELKA",files)]
-  strelka_snps=files[grepl("SNPs",strelka)]
+  strelka_snps=strelka[grepl("SNPs",strelka)]
   strelka_snps_germline=strelka_snps[grepl("GERMLINE",strelka_snps)]
   strelka_snps_somatic=strelka_snps[grepl("SOMATIC",strelka_snps)]
   strelka_indels=files[grepl("INDELs",strelka)]
