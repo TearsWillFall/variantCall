@@ -12,7 +12,8 @@ generate_sets(
   output_dir = "",
   set_names = "",
   verbose = FALSE,
-  threads = 3
+  threads = 3,
+  plot = TRUE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ generate_sets(
 \item{verbose}{\link{Optional} Enables progress messages. Default False.}
 
 \item{threads}{\link{OPTIONAL} Number of threads to use. Default 3}
+
+\item{plot}{\link{OPTIONAL} Generate a VennDiagram plot with set intersections}
 }
 \description{
 This function takes a path to either a vcf file or to a directory of vcf files
