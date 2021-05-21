@@ -137,6 +137,7 @@ vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
 #' @param bin_path3 Path to bgzip binary. Default tools/htslib/tabix.
 #' @param vcf Path to vcf file.
+#' @param output_name Name used for output files. If not given the vcf file name will be used
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default False.
 #' @param threads Number of threads to use. Default 3.
@@ -144,14 +145,18 @@ vcf_bcftools=function(region="",bin_path="tools/bcftools/bcftools",bam="",ref_ge
 
 
 
-call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",verbose=FALSE,output_dir="",threads=3){
+call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",vcf="",output_name="",verbose=FALSE,output_dir="",threads=3){
   sep="/"
   if(output_dir==""){
     sep=""
   }
+  if (output_name==""){
+      sample_name=ULPwgs::get_sample_name(vcf)
+  }else{
+    sample_name=output_name
+  }
 
-  sample_name=ULPwgs::get_sample_name(vcf)
-  file_ext=ULPwgs::get_file_extension(vcf)
+
   out_file_dir=paste0(output_dir,sep,sample_name,"_VEP")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
@@ -169,7 +174,6 @@ call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip
   system(paste("cp", paste0(out_file,".tmp"), out_file))
   system(paste("rm -rf", paste0(out_file,".tmp")))
 }
-
 
 
 call_clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_dir="",threads=3){
@@ -828,7 +832,7 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 }
 
 
-process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",var_dir="",filter="PASS",output_dir="",verbose=verbose,threads=threads){
+process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",var_dir="",filter="PASS",output_dir="",verbose=FALSE,threads=3){
 
   files=list.files(var_dir,recursive=TRUE,full.names=TRUE,pattern="vcf.gz$")
 
@@ -867,7 +871,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
 
   ## Start processing germline variants
-
+  patient_id=ULPwgs::get_sample_name(haplotypecaller_snps)
 
   ### Generate sets of VCFs with variants that have been called by Mutect2, Strelka2 and Platypus.
   ### We generate three sets:
@@ -882,13 +886,18 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   ### Generate sets for INDELs
   generate_sets(bin_path=bin_path2,vcf=c(platypus_snps_indels,haplotypecaller_indels,strelka_snps_indels),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
-  ### Annotate SNVs in Set 3
+  ### Annotate VCFs in SETS
+  vcf_sets=list.files(out_file_dir,full.dir=TRUE,recursive=TRUE,pattern="SETS")
+  vcf_sets=vcf_sets[grepl("vcf",vcf_sets)]
+  lapply(X=vcf_sets,FUN=function(x){
+    out_file_name=paste0(patient_id,ifelse(grepl("SET_1",x)|grepl("SET_2",x)))
+    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x),verbose=verbose,output_dir=dirname(x),output_name=output_name,threads=threads)
+  })
   dir.create(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))
   system(paste("cp",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf"), paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf.tmp")))
   system(paste("mv",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf.tmp"), paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".vcf")))
-  call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs"),threads=threads)
 
-  ### Annotate INDELs in Set 3
+
   dir.create(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))
   system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf"), paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf.tmp")))
   system(paste("mv",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/0000.vcf.tmp"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".vcf")))
@@ -1366,12 +1375,13 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
   }
 
   if (verbose){
-    print(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
     print(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC")))
   }
 
-  system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
-  system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC")))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/SNPs/GERMLINE")))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT/*.vcf.gz*"),paste0(out_file_dir,"/RESULTS/SNPs/SOMATIC")))
+  system(paste("rm -rf ",paste0(out_file_dir,"/RESULTS/SNPs/*_SPLIT")))
 
   if (!dir.exists(paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE"))){
     dir.create(paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE"))
@@ -1381,9 +1391,12 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
     dir.create(paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC"))
   }
   if (verbose){
-    print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
-    print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
+    print(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
   }
-  system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
-  system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*.vcf.gz"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam)),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
+  system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/*.vcf.gz*"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
+  system(paste("rm -rf ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT")))
+
+
 }

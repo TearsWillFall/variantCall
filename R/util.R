@@ -146,6 +146,7 @@ vcf_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",set_formu
 #' @export
 
 generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filter="PASS",output_dir="",set_names="",verbose=FALSE,threads=3,plot=TRUE){
+
   sep="/"
   if(output_dir==""){
     sep=""
