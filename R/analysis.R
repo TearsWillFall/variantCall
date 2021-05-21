@@ -832,7 +832,28 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 }
 
 
-process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",var_dir="",filter="PASS",output_dir="",verbose=FALSE,threads=3){
+#' Process variants generated using variant_call and variant_call_strelka functions
+
+#' This function takes the output directory of variant_call function and processes
+#' the variants accordingly.
+#'
+#' @param bin_path [REQUIRED] Path to vep binary. Default tools/ensembl-vep/vep
+#' @param bin_path2 [REQUIRED] Path to vep filter binary. Default tools/ensembl-vep/filter_vep
+#' @param bin_path3 [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools
+#' @param bin_path4 [REQUIRED] Path to bgzip. Default tools/htslib/bgzip
+#' @param bin_path5 [REQUIRED] Path to tabix. Default tools/htslib/tabix
+#' @param var_dir [REQUIRED] Path to variant directory.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param threads [OPTIONAL] Number of threads per job. Default 3
+#' @param verbose [DEFAULT==FALSE] Enables progress messages.
+#' @export
+
+process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",var_dir="",output_dir="",verbose=FALSE,threads=3){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
 
   files=list.files(var_dir,recursive=TRUE,full.names=TRUE,pattern="vcf.gz$")
 
@@ -869,9 +890,12 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   strelka_indels_germline=strelka_indels[grepl("GERMLINE",strelka_indels)]
   strelka_indels_somatic=strelka_indels[grepl("SOMATIC",strelka_indels)]
 
-
   ## Start processing germline variants
   patient_id=ULPwgs::get_sample_name(haplotypecaller_snps)
+
+  out_file_dir=paste0(output_dir,sep,patient_id,"_PROCESSED_VARIANTS")
+
+
 
   ### Generate sets of VCFs with variants that have been called by Mutect2, Strelka2 and Platypus.
   ### We generate three sets:
@@ -908,17 +932,19 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/",patient_id,"_PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/")))
 
   ### Generate a VCF with common SNPs MAF>1%
-  filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,"_PLATYPUS.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_fir,"/",))
+  filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,"_PLATYPUS.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_fir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS"))
 
-  ### Keep only Heterozygous SNPs
-  vcf_filter_variants(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",qual=20,mq=40,state="het",verbose=verbose,output_dir="")
+  ### Generate a VCF with common SNPs MAF<1% or no MAF
+  filter_VEP(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,"_PLATYPUS.vcf"),filter="(MAX_AF < 0.01 or not MAX_AF)",verbose=verbose,output_dir=paste0(out_file_fir,"/GERMLINE/HQ_SNPs/RARE_VARIANTS"))
+
+  ### Select Heterozygous SNPs
+  vcf_filter_variants(unfil_vcf="",bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",state="het",verbose=verbose,output_dir=paste0(out_file_fir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS"))
 
   ### Keep only Heterozygous SNPs found across all samples for this patient
-  generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="HETEROZYGOUS_SNPs_SETS",verbose=verbose,threads=threads)
+  #generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="HETEROZYGOUS_SNPs_SETS",verbose=verbose,threads=threads)
 
   ### Generate a VCF with rare SNVs MAF<1% or not described
-  filter_VEP(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
-
+  #filter_VEP(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir="")
 }
 
 
