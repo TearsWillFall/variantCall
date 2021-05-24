@@ -39,6 +39,6 @@ call_sv_svaba(
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 }
 \description{
-This function calls structural variants in a pair of tumor-normal matched samples
+This function calls structural variants in a pair of tumor-normal or in single tumor/normal samples matched samples
 using svaba
 }

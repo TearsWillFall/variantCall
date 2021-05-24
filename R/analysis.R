@@ -1254,6 +1254,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam=
     }else{
       tumor_bam=paste0(" -t ",tumor_bam)
     }
+  }
 
   norm=""
   if (!normal_bam==""){
@@ -1437,4 +1438,5 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
   system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/",ULPwgs::get_sample_name(normal_bam,"*.vcf.gz*")),paste0(out_file_dir,"/RESULTS/INDELs/GERMLINE")))
   system(paste("mv ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT/*.vcf.gz*"),paste0(out_file_dir,"/RESULTS/INDELs/SOMATIC")))
   system(paste("rm -rf ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT")))
+
 }

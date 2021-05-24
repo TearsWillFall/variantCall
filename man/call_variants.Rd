@@ -13,6 +13,7 @@ call_variants(
   bin_path6 = "tools/ensembl-vep/vep",
   bin_path7 = "tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py",
   bin_path8 = "tools/manta-1.6.0/build/bin/configManta.py",
+  bin_path9 = "tools/svaba/bin/svaba",
   bam_dir = "",
   patient_id = "",
   germ_pattern = "GL",
@@ -24,6 +25,7 @@ call_variants(
   chr_filter = "canonical",
   db = "",
   interval = "",
+  targets = "",
   orientation = TRUE,
   resources = "",
   info_key = "CNN_2D",
@@ -45,11 +47,13 @@ call_variants(
 
 \item{bin_path5}{\link{REQUIRED} Path to platypus binary. Default tools/platypus/Platypus.py.}
 
-\item{bin_path6}{\link{REQUIRED} Path to vep binary. tools/ensembl-vep/vep}
+\item{bin_path6}{\link{REQUIRED} Path to vep binary binary. tools/ensembl-vep/vep}
 
-\item{bin_path7}{\link{REQUIRED} Path to Strelka Germline Workflow. tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py}
+\item{bin_path7}{\link{REQUIRED} Path to Strelka Germline Workflow binary. tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py}
 
-\item{bin_path8}{\link{REQUIRED} Path to Manta. tools/manta-1.6.0/build/bin/configManta.py}
+\item{bin_path8}{\link{REQUIRED} Path to Manta binary. tools/manta-1.6.0/build/bin/configManta.py}
+
+\item{bin_path9}{\link{REQUIRED} Path to svaba binary. tools/svaba/bin/svaba}
 
 \item{bam_dir}{\link{REQUIRED} Path to directory with BAM files.}
 
@@ -72,6 +76,8 @@ call_variants(
 \item{db}{\link{OPTIONAL} Path to vcf with common variants. Used for contamination estimation.}
 
 \item{interval}{\link{OPTIONAL} Path to interval for common variants to analyze. Used for contamination estimation.}
+
+\item{targets}{\link{OPTIONAL} Path to BED file with capture targets.}
 
 \item{orientation}{\link{OPTIONAL} Generate a read orientation model to filter variants. Default TRUE}
 
