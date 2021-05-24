@@ -479,9 +479,10 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @param bin_path3 [REQUIRED] Path to bgzip binary. Default tools/htslib/bgzip.
 #' @param bin_path4 [REQUIRED] Path to tabix binary. Default tools/htslib/tabix.
 #' @param bin_path5 [REQUIRED] Path to platypus binary. Default tools/platypus/Platypus.py.
-#' @param bin_path6 [REQUIRED] Path to vep binary. tools/ensembl-vep/vep
-#' @param bin_path7 [REQUIRED] Path to Strelka Germline Workflow. tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py
-#' @param bin_path8 [REQUIRED] Path to Manta. tools/manta-1.6.0/build/bin/configManta.py
+#' @param bin_path6 [REQUIRED] Path to vep binary binary. tools/ensembl-vep/vep
+#' @param bin_path7 [REQUIRED] Path to Strelka Germline Workflow binary. tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py
+#' @param bin_path8 [REQUIRED] Path to Manta binary. tools/manta-1.6.0/build/bin/configManta.py
+#' @param bin_path9 [REQUIRED] Path to svaba binary. tools/svaba/bin/svaba
 #' @param bam_dir [REQUIRED] Path to directory with BAM files.
 #' @param patient_id [REQUIRED] Patient ID to analyze. Has to be in file names to subselect samples.
 #' @param germ_pattern [REQUIRED] Pattern used to identify germline samples. Ex GL
@@ -494,6 +495,7 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @param db [OPTIONAL] Path to vcf with common variants. Used for contamination estimation.
 #' @param interval [OPTIONAL] Path to interval for common variants to analyze. Used for contamination estimation.
 #' @param orientation [OPTIONAL] Generate a read orientation model to filter variants. Default TRUE
+#' @param targets [OPTIONAL] Path to BED file with capture targets.
 #' @param info_key [OPTIONAL] Annotation column to select. Default CNN_D2
 #' @param snp_tranche [OPTIONAL] SNP tranche filter value. Default 99.95
 #' @param indel_tranche [OPTIONAL] Indel tranche filter value. Default 99.44
@@ -504,8 +506,8 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @export
 
 call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bin_path5="tools/platypus/Platypus.py",bin_path6="tools/ensembl-vep/vep",
-bin_path7="tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py",bin_path8="tools/manta-1.6.0/build/bin/configManta.py",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",
-germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db="",interval="",orientation=TRUE,resources="",info_key="CNN_2D",snp_tranche=99.95,indel_tranche=99.4,threads=3,verbose=FALSE,targeted=TRUE){
+bin_path7="tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py",bin_path8="tools/manta-1.6.0/build/bin/configManta.py",bin_path9="tools/svaba/bin/svaba",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",
+germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db="",interval="",targets="",orientation=TRUE,resources="",info_key="CNN_2D",snp_tranche=99.95,indel_tranche=99.4,threads=3,verbose=FALSE,targeted=TRUE){
 
     sep="/"
     if(output_dir==""){
@@ -541,9 +543,11 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     ## Call Germline SNVs+INDELs Using HaplotypeCaller
     call_HaplotypeCaller(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,normal_bam=normal_bam,ref_genome=ref_genome,output_dir=out_file_dir,resources=resources,info_key=info_key,snp_tranche=snp_tranche,indel_tranche=indel_tranche,patient_id=patient_id,verbose=verbose,threads=threads,region=chr_pass)
 
-
     ## Call Germline + Somatic SNVs+INDELs Using Platypus
     call_platypus(bin_path=bin_path5,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id,targeted=targeted)
+
+    ## Call Germline SV+INDELs Using svaba
+    call_sv_svaba(bin_path=bin_path9,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,output_name=patient_id,targets=targets,verbose=verbose,output_dir=out_file_dir)
 
     ## Anotate Variants using VEP
     ## call_vep(bin_path=bin_path6,bin_path2=bin_path3,bin_path3=bin_path4,vcf=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF/",patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF"),threads=threads)
@@ -1203,7 +1207,7 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 
 #' Structural variant calling using svaba
 #'
-#' This function calls structural variants in a pair of tumor-normal matched samples
+#' This function calls structural variants in a pair of tumor-normal or in single tumor/normal samples matched samples
 #' using svaba
 #'
 #'
@@ -1243,9 +1247,13 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam=
   if (!targets==""){
     tgs=paste0(" -k ",targets)
   }
-  if(length(tumor_bam)>1){
-    tumor_bam=paste0(tumor_bam,collapse=" -t ")
-  }
+
+  if (!tumor_bam==""){
+    if(length(tumor_bam)>1){
+      tumor_bam=paste0(" -t ",paste0(tumor_bam,collapse=" -t "))
+    }else{
+      tumor_bam=paste0(" -t ",tumor_bam)
+    }
 
   norm=""
   if (!normal_bam==""){
@@ -1263,9 +1271,9 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam=
   }
 
   if(verbose){
-      print(paste0(bin_path," run -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+      print(paste0(bin_path," run  ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
   }
-    system(paste0(bin_path," run -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+    system(paste0(bin_path," run  ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
 }
 
 
