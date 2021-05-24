@@ -920,7 +920,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   vcf_sets=vcf_sets[grepl("SETS",vcf_sets)]
   vcf_sets=vcf_sets[grepl("vcf",vcf_sets)]
   set_names=c("PLATYPUS","HAPLOTYPECALLER","STRELKA2")
-  lapply(X=vcf_sets,FUN=function(x,set_names){
+  lapply(X=vcf_sets,FUN=function(x){
     out_file_name=paste0(patient_id,"_",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
     call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
   })
