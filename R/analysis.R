@@ -1242,21 +1242,21 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam=
 
   if (!tumor_bam==""){
     if(length(tumor_bam)>1){
-      tumor_bam=paste0(" -t ",paste0(tumor_bam,collapse=" -t "))
-    }else{
-      tumor_bam=paste0(" -t ",tumor_bam)
-    }
+      tumor_bam=paste0(tumor_bam,collapse=" -t ")
   }
 
   norm=""
   if (!normal_bam==""){
     if (length(normal_bam)>1){
-        norm=paste0(" -n ",paste(normal_bam,collapse=" -n "))
-    }else{
-        norm=paste0(" -n ",normal_bam)
+        norm=paste0("-n ",paste(normal_bam,collapse=" -n "))
+      }else{
+        if(tumor_bam==""){
+          norm=normal_bam
+        }else{
+          norm=paste0("-n ",normal_bam)
+        }
+      }
     }
-
-  }
 
   dbsnp=""
   if (!dbsnp_indels==""){
@@ -1264,9 +1264,9 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam=
   }
 
   if(verbose){
-      print(paste0(bin_path," run  ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+      print(paste0(bin_path," run  -t",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
   }
-    system(paste0(bin_path," run  ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+    system(paste0(bin_path," run  -t",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
 }
 
 
