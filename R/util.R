@@ -30,7 +30,7 @@ annotate_sv_type <- function(vcf=""){
     cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
     cols <- strsplit(cols,"\t")[[1]]
     svaba_uniq <<- read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
-    svaba_uniq$SVTYPE <<- sapply(svaba_uniq$ID, FUN=get_sv_type)
+    svaba_uniq$SVTYPE <<- sapply(svaba_uniq$ID, FUN=get_sv_type,dat=svaba_uniq)
     fil=file(paste0(ULPwgs::get_sample_name(vcf),".svaba.sv.annotated.vcf"))
     writeLines(system(paste0(' grep "##" ', vcf ),intern=TRUE),fil)
     writeLines(paste0("#",paste0(cols,collapse="\t")),fil)
@@ -44,14 +44,15 @@ annotate_sv_type <- function(vcf=""){
 #'
 #'
 #' @param x svaba generated vcf to annotate. Get vcf
+#' @param dat Table with VCF data
 #' @export
 
-get_sv_type <- function(x){
+get_sv_type <- function(x,dat){
   root <- gsub(":[12]", "", x)
   mate1 <- paste0(root, ":1")
   mate2 <- paste0(root, ":2")
-  alt1 <- svaba_uniq %>% filter(ID == mate1) %>% .$ALT
-  alt2 <- svaba_uniq %>% filter(ID == mate2) %>% .$ALT
+  alt1 <- dat %>% filter(ID == mate1) %>% .$ALT
+  alt2 <- dat %>% filter(ID == mate2) %>% .$ALT
   # Determine sv type based on breakpoint orientation
   if ((grepl("\\[", alt1) & grepl("\\[", alt2)) | (grepl("\\]", alt1) & grepl("\\]", alt2))){
       sv_type <- "INV"
