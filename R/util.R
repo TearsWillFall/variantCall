@@ -52,8 +52,8 @@ get_sv_type <- function(x,dat){
   mate1 <- paste0(root, ":1")
   mate2 <- paste0(root, ":2")
   print(dat)
-  alt1 <- dat %>% filter(ID == mate1) %>% .$ALT
-  alt2 <- dat %>% filter(ID == mate2) %>% .$ALT
+  alt1 <- dat %>% dplyr::filter(ID == mate1) %>% .$ALT
+  alt2 <- dat %>% dplyr::filter(ID == mate2) %>% .$ALT
   # Determine sv type based on breakpoint orientation
   if ((grepl("\\[", alt1) & grepl("\\[", alt2)) | (grepl("\\]", alt1) & grepl("\\]", alt2))){
       sv_type <- "INV"
