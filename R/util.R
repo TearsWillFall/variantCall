@@ -17,19 +17,57 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 }
 
 
+#' Get SV type from svaba generated VCF
+#'
+#' As given by sfrenk comment on https://github.com/walaj/svaba/issues/4 annotates SV type
+#' in svaba vcf file
+#'
+#' @param vcf svaba generated vcf to annotate. Get vcf
+#' @export
 
+annotate_sv_type <- function(vcf=""){
+    # Find mate pair
+    cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
+    cols <- strsplit(cols,"\t")[[1]]
+    svaba_uniq <- read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
+    svaba_uniq$SVTYPE <- sapply(svaba_uniq$ID, get_sv_type)
+    fil=file(paste0(ULPwgs::get_sample_name(vcf),".svaba.sv.annotated.vcf"))
+    writeLines(system(paste0(' grep "##" ', vcf ),intern=TRUE),fil)
+    writeLines(paste0("#",paste0(cols,collapse="\t")),fil)
+    write.table(svaba_uniq,append=TRUE,quote=FALSE,col.names=FALSE)
+    close(fil)
+}
 
+#' Get SV type from svaba generated VCF
+#'
+#' As given by sfrenk comment on https://github.com/walaj/svaba/issues/4 annotates SV based on its breakpoints
+#'
+#'
+#' @param x svaba generated vcf to annotate. Get vcf
+#' @export
 
+get_sv_type <- function(x){
+  root <- gsub(":[12]", "", x)
+  mate1 <- paste0(root, ":1")
+  mate2 <- paste0(root, ":2")
+  alt1 <- svaba_uniq %>% filter(ID == mate1) %>% .$ALT
+  alt2 <- svaba_uniq %>% filter(ID == mate2) %>% .$ALT
+  # Determine sv type based on breakpoint orientation
+  if ((grepl("\\[", alt1) & grepl("\\[", alt2)) | (grepl("\\]", alt1) & grepl("\\]", alt2))){
+      sv_type <- "INV"
 
+  } else if (grepl("[A-Z]\\[", alt1) & grepl("^\\]", alt2)){
+      sv_type <- "DEL"
 
+  } else if (grepl("^\\]", alt1) & grepl("[A-Z]\\[", alt2)){
+      sv_type <- "DUP/INS"
 
+  } else{
+      sv_type <- "UNKNOWN"
+  }
 
-
-
-
-
-
-
+  return(sv_type)
+}
 
 
 #' Learn Read Orientation Model (Mutect2)
