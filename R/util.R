@@ -32,10 +32,9 @@ annotate_sv_type <- function(vcf=""){
     svaba_uniq <<- read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
     svaba_uniq$SVTYPE <<- sapply(svaba_uniq$ID, FUN=get_sv_type,dat=svaba_uniq)
     fil=paste0(ULPwgs::get_sample_name(vcf),".svaba.sv.annotated.vcf")
-    writeLines(system(paste0(' grep "##" ', vcf ),intern=TRUE),fil)
-    writeLines(paste0("#",paste0(cols,collapse="\t")),fil)
+    cat(system(paste0('grep "##" ', vcf ),intern=TRUE),fil,sep="\n")
+    cat(paste0("#",paste0(cols,collapse="\t")),fil,sep="\n",append=TRUE)
     write.table(svaba_uniq,append=TRUE,quote=FALSE,col.names=FALSE)
-    close(fil)
 }
 
 #' Get SV type from svaba generated VCF
