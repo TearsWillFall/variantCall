@@ -51,6 +51,7 @@ get_sv_type <- function(x,dat){
   root <- gsub(":[12]", "", x)
   mate1 <- paste0(root, ":1")
   mate2 <- paste0(root, ":2")
+  print(dat)
   alt1 <- dat %>% filter(ID == mate1) %>% .$ALT
   alt2 <- dat %>% filter(ID == mate2) %>% .$ALT
   # Determine sv type based on breakpoint orientation
