@@ -29,10 +29,11 @@ annotate_sv_type <- function(vcf=""){
     # Find mate pair
     cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
     cols <- strsplit(cols,"\t")[[1]]
-    svaba_uniq <<- read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
-    svaba_uniq$SVTYPE <<- sapply(svaba_uniq$ID, FUN=get_sv_type,dat=svaba_uniq)
+    svaba_uniq = read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
+    svaba_uniq$INFO = paste0(svaba_uniq$INFO,";SVANOT=",sapply(svaba_uniq$ID, FUN=get_sv_type,dat=svaba_uniq))
     fil=paste0(ULPwgs::get_sample_name(vcf),".svaba.sv.annotated.vcf")
     cat(system(paste0('grep "##" ', vcf ),intern=TRUE),file=fil,sep="\n")
+    cat('##INFO=<ID=SVANOT,Number=1,Type=String,Description=\"Structural variant annotation\">',file=fil,sep="\n",append=TRUE)
     cat(paste0("#",paste0(cols,collapse="\t")),file=fil,sep="\n",append=TRUE)
     write.table(x=svaba_uniq,file=fil,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
 }
