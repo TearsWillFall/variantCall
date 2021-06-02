@@ -31,7 +31,7 @@ annotate_sv_type <- function(vcf=""){
     cols <- strsplit(cols,"\t")[[1]]
     svaba_uniq <<- read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
     svaba_uniq$SVTYPE <<- sapply(svaba_uniq$ID, FUN=get_sv_type,dat=svaba_uniq)
-    fil=file(paste0(ULPwgs::get_sample_name(vcf),".svaba.sv.annotated.vcf"))
+    fil=paste0(ULPwgs::get_sample_name(vcf),".svaba.sv.annotated.vcf")
     writeLines(system(paste0(' grep "##" ', vcf ),intern=TRUE),fil)
     writeLines(paste0("#",paste0(cols,collapse="\t")),fil)
     write.table(svaba_uniq,append=TRUE,quote=FALSE,col.names=FALSE)
@@ -51,7 +51,6 @@ get_sv_type <- function(x,dat){
   root <- gsub(":[12]", "", x)
   mate1 <- paste0(root, ":1")
   mate2 <- paste0(root, ":2")
-  print(dat)
   alt1 <- dat %>% dplyr::filter(ID == mate1) %>% .$ALT
   alt2 <- dat %>% dplyr::filter(ID == mate2) %>% .$ALT
   # Determine sv type based on breakpoint orientation
