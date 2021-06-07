@@ -847,12 +847,13 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 #' @param bin_path4 [REQUIRED] Path to bgzip. Default tools/htslib/bgzip
 #' @param bin_path5 [REQUIRED] Path to tabix. Default tools/htslib/tabix
 #' @param var_dir [REQUIRED] Path to variant directory.
+#' @param bed_snps [REQUIRED] Path to BED with Panel SNPs
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param threads [OPTIONAL] Number of threads per job. Default 3
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",var_dir="",output_dir="",verbose=FALSE,threads=3){
+process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",var_dir="",snps_bed="",output_dir="",verbose=FALSE,threads=3){
 
   sep="/"
   if(output_dir==""){
