@@ -897,10 +897,14 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
   # svaba pipeline variants
 
-  strelka=files[grepl("SVABA",files)]
-  strelka_snps=strelka[grepl("SNPs",strelka)]
-  strelka_snps_germline=strelka_snps[grepl("GERMLINE",strelka_snps)]
-  strelka_snps_somatic=strelka_snps[grepl("SOMATIC",strelka_snps)]
+  svaba=files[grepl("SVABA",files)]
+  svaba_indels=svaba[grepl("SNPs",svaba)]
+  svaba_sv=svaba[grepl("SNPs",svaba)]
+  svaba_indels_germline=svaba_indels[grepl("GERMLINE",svaba_indels)]
+  svaba_indels_somatic=svaba_indels[grepl("SOMATIC",svaba_indels)]
+  svaba_sv_germline=svaba_sv[grepl("GERMLINE",svaba_sv)]
+  svaba_sv_somatic=svaba_sv[grepl("SOMATIC",svaba_sv)]
+
 
   ## Start processing germline variants
   patient_id=ULPwgs::get_sample_name(haplotypecaller_snps)
