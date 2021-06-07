@@ -933,7 +933,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   vcf_sets=vcf_sets[grepl("vcf",vcf_sets)]
   set_names=c("PLATYPUS","HAPLOTYPECALLER","STRELKA2")
   lapply(X=vcf_sets,FUN=function(x){
-    out_file_name=paste0(patient_id,"_",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
+    out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
     call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
   })
 
@@ -960,7 +960,8 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   ### Generate an Unique Set of Heterozygous SNPs found in all samples
   generate_sets(bin_path=bin_path3,vcf=c(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/",patient_id,"_PLATYPUS_FILTERED/",patient_id,"_PLATYPUS.vcf"),platypus_snps_somatic),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS"),verbose=verbose,threads=threads,set_names=c("COMMON_SNPs",paste0("TUMOR_SAMPLE_",1:length(platypus_snps_somatic))))
 
-
+  ### Select heterozygous SNPs target in panel
+  vcf_intersect_bed(bed=snps_bed,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/PANEL"),vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/SNPs_SETS/SETS/SET_",length(platypus_snps_somatic),"/0000.vcf"))
 
 
   ### Keep only Heterozygous SNPs found across all samples for this patient

@@ -38,6 +38,50 @@ annotate_sv_type <- function(vcf=""){
     write.table(x=svaba_uniq,file=fil,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
 }
 
+
+#' Intersect vcf with bed file
+#'
+#' Generate a set of variants covered by the regions found in/out the bed file
+#'
+#' @param vcf Path to VCF file
+#' @param bed Path to BED file
+#' @param output_dir Path to output directory
+#' @export
+
+vcf_intersect_bed <- function(vcf="",bed="",output_dir=""){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+
+  out_file_dir=paste0(output_dir,sep)
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+  cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
+  cols <- strsplit(cols,"\t")[[1]]
+  variants = read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
+  regions= read.table(bed, stringsAsFactors = FALSE)
+  regions$V1=sub("chr","",regions$V1)
+  variants_in=variants[variants$CHROM==regions$V1 & variants$POS==regions$V2,]
+  variants_out=variants[!variants$CHROM==regions$V1 & !variants$POS==regions$V2,]
+  file_out=paste0(out_file_dir,ULPwgs::get_sample_name(vcf),".IN_BED.vcf")
+  file_out2=paste0(out_file_dir,ULPwgs::get_sample_name(vcf),".OUT_BED.vcf")
+  cat(system(paste0('grep "##" ', vcf ),intern=TRUE),file=file_out,sep="\n")
+  cat(system(paste0('grep "##" ', vcf ),intern=TRUE),file=file_out2,sep="\n")
+  cat(paste0('##In-section between vcf=',vcf," and bed=", bed),file=file_out,sep="\n",append=TRUE)
+  cat(paste0('##Out-section between vcf=',vcf," and bed=", bed),file=file_out2,sep="\n",append=TRUE)
+  cat(paste0("#",paste0(cols,collapse="\t")),file=fil,sep="\n",append=TRUE)
+  write.table(x=variants,file=file_out,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
+  write.table(x=variants,file=file_out,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
+}
+
+
+
+
+
+
+
 #' Get SV type from svaba generated VCF
 #'
 #' As given by sfrenk comment on https://github.com/walaj/svaba/issues/4 annotates SV based on its breakpoints
@@ -196,7 +240,6 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir,recursive=TRUE)
   }
-
 
   if (vcf_dir!=""){
     vcfs=list.files(vcfs,full.names=TRUE)
@@ -669,6 +712,7 @@ vcf_sort=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output
 #' @export
 
 filter_VEP=function(bin_path="tools/ensembl-vep/filter_vep",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",unf_vcf="",filter="",verbose=FALSE,output_dir=""){
+
   sep="/"
   if(output_dir==""){
     sep=""
