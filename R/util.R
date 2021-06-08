@@ -43,12 +43,13 @@ annotate_sv_type <- function(vcf=""){
 #'
 #' Generate a set of variants covered by the regions found in/out the bed file
 #'
-#' @param vcf Path to VCF file
-#' @param bed Path to BED file
-#' @param output_dir Path to output directory
+#' @param vcf [REQUIRED] Path to VCF file
+#' @param bed [REQUIRED] Path to BED file
+#' @param output_name [OPTIONAL] Name for output_files. IF not given it will use input vcf name
+#' @param output_dir [OPTIONAL] Path to output directory. if not given outputs to current directory.
 #' @export
 
-vcf_intersect_bed <- function(vcf="",bed="",output_dir=""){
+vcf_intersect_bed <- function(vcf="",bed="",output_name="",output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
