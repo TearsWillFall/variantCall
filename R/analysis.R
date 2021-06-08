@@ -1282,7 +1282,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
       }else{
         if(tumor_bam==""){
           out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/GERMLINE")
-          norm=normal_bam
+          norm=paste0(normal_bam," -I -L 6")
         }else{
           out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/SOMATIC")
           norm=paste0("-n ",normal_bam)
