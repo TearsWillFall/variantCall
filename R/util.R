@@ -26,7 +26,7 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 #' @param output_dir Path to directory to output results
 #' @export
 
-annotate_sv_type <- function(vcf="",ouput_dir=""){
+annotate_sv_type <- function(vcf="",output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
