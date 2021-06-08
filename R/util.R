@@ -58,13 +58,14 @@ vcf_intersect_bed <- function(vcf="",bed="",output_dir=""){
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
+
   cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
   cols <- strsplit(cols,"\t")[[1]]
   variants = read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
   regions= read.table(bed, stringsAsFactors = FALSE)
   regions$V1=sub("chr","",regions$V1)
-  variants_in=variants[variants$CHROM==regions$V1 & variants$POS==regions$V2,]
-  variants_out=variants[!variants$CHROM==regions$V1 & !variants$POS==regions$V2,]
+  variants_in=variants[variants$CHROM %in% regions$V1 & variants$POS %in% regions$V2,]
+  variants_out=variants[!variants$CHROM %in% regions$V1 & !variants$POS %in% regions$V2,]
   file_out=paste0(out_file_dir,ULPwgs::get_sample_name(vcf),".IN_BED.vcf")
   file_out2=paste0(out_file_dir,ULPwgs::get_sample_name(vcf),".OUT_BED.vcf")
   cat(system(paste0('grep "##" ', vcf ),intern=TRUE),file=file_out,sep="\n")
