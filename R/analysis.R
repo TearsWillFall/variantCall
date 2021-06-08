@@ -547,7 +547,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
     call_platypus(bin_path=bin_path5,bin_path2=bin_path2,bin_path3=bin_path3,bin_path4=bin_path4,tumor_bam=tumor_bam,normal_bam=normal_bam,ref_genome=ref_genome,vcf_overlay=paste0(out_file_dir,"/",patient_id,"_MUTECT2_VARIANTS_VCF/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_dir=out_file_dir,verbose=verbose,threads=threads,output_name=patient_id,targeted=targeted)
 
     ## Call Germline SV+INDELs Using svaba
-    call_sv_svaba(bin_path=bin_path9,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,output_name=patient_id,targets=targets,verbose=verbose,output_dir=out_file_dir)
+    call_sv_svaba(bin_path=bin_path9,bin_path2=bin_path3,bin_path3=bin_path4,normal_bam=normal_bam,ref_genome=ref_genome,threads=threads,output_name=patient_id,targets=targets,verbose=verbose,output_dir=out_file_dir)
 
     ## Anotate Variants using VEP
     ## call_vep(bin_path=bin_path6,bin_path2=bin_path3,bin_path3=bin_path4,vcf=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF/",patient_id,"_FILTERED_TRENCHES/",patient_id,".FILTERED.vcf.gz"),verbose=verbose,output_dir=paste0(out_file_dir,"/",patient_id,"_HAPLOTYPECALLER_VARIANTS_VCF"),threads=threads)
