@@ -67,8 +67,9 @@ vcf_intersect_bed <- function(vcf="",bed="",output_name="",output_dir=""){
   cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
   cols <- strsplit(cols,"\t")[[1]]
   variants = read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
+  variants$CHROM=as.character(variants$CHROM)
   regions= read.table(bed, stringsAsFactors = FALSE)
-  regions$V1=sub("chr","",regions$V1)
+  regions$V1=as.character(sub("chr","",regions$V1))
   variants_in=dplyr::semi_join(variants,regions,by=c("CHROM"="V1","POS"="V2"))
   variants_out=dplyr::anti_join(variants,regions,by=c("CHROM"="V1","POS"="V2"))
   file_out=paste0(out_file_dir,sample_name,".IN_BED.vcf")
