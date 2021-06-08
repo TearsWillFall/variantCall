@@ -899,7 +899,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   # svaba pipeline variants
 
   svaba=files[grepl("SVABA",files)]
-  svaba_indels=svaba[grepl("SNPs",svaba)]
+  svaba_indels=svaba[grepl("indel",svaba)]
   svaba_sv=svaba[grepl("SNPs",svaba)]
   svaba_indels_germline=svaba_indels[grepl("GERMLINE",svaba_indels)]
   svaba_indels_somatic=svaba_indels[grepl("SOMATIC",svaba_indels)]
@@ -921,7 +921,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   ###     Set 3: Variables that are called by all three variant callers
 
 
-  ### Generate sets for SNVs
+  ### Generate sets for SNPs
   generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_germline,haplotypecaller_snps,strelka_snps_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
   ### Generate sets for INDELs
@@ -949,10 +949,12 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   }
   system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/",patient_id,".PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/")))
 
+  ## GENERATE DATA FOR SNPs
+
   ### Generate a VCF with common SNPs MAF>1%
   filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".PLATYPUS.VEP.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS"))
 
-  ### Generate a VCF with common SNPs MAF<1% or no MAF
+  ### Generate a VCF with rare SNPs MAF<1% or no MAF
   filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".PLATYPUS.VEP.vcf"),filter="\'(MAX_AF < 0.01 or not MAX_AF)\'",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/RARE_VARIANTS"))
 
   ### Select Heterozygous SNPs for common SNPs
@@ -963,6 +965,25 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
   ### Select heterozygous SNPs part of the panel
   vcf_intersect_bed(bed=bed_snps,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/PANEL"),vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/SETS/SET_",(length(platypus_snps_somatic)+1),"/0000.vcf"),output_name=patient_id)
+
+
+  ## GENERATE DATA FOR INDELS
+
+  ### Generate a VCF with common INDELs MAF>1%
+  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".PLATYPUS.VEP.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/COMMON_VARIANTS"))
+
+  ### Generate a VCF with rare INDELs MAF<1% or no MAF
+  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".PLATYPUS.VEP.vcf"),filter="\'(MAX_AF < 0.01 or not MAX_AF)\'",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/RARE_VARIANTS"))
+
+
+
+
+
+
+
+
+
+
 
 
   ### Keep only Heterozygous SNPs found across all samples for this patient
@@ -1223,6 +1244,8 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 #' @param tumor_bam [REQUIRED]  Path to tumor bam file.
 #' @param normal_bam [OPTIONAL] Path to germline bam file.
 #' @param bin_path [REQUIRED] Path to svaba binary executable. Default path tools/svaba/svaba.
+#' @param bin_path2 [REQUIRED] Path to bgzip binary executable. Default path tools/htslib/bgzip.
+#' @param bin_path3 [REQUIRED] Path to tabix binary executable. Default path tools/htslib/tabix.
 #' @param ref_genome [REQUIRED] Path to reference genome fasta file.
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
@@ -1232,7 +1255,7 @@ call_ASEQ=function(vcf="",bin_path="tools/ASEQ/binaries/linux64/ASEQ",bam="",mrq
 #' @param output_name [OPTIONAL] Name for the output.
 #' @export
 
-call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam="",ref_genome="",threads=3,output_name="",targets="",dbsnp_indels="",verbose=FALSE,output_dir=""){
+call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",normal_bam="",ref_genome="",threads=3,output_name="",targets="",dbsnp_indels="",verbose=FALSE,output_dir=""){
   sep="/"
 
   if(output_dir==""){
@@ -1245,18 +1268,6 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam=
     sample_name=output_name
   }
 
-  out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA")
-  if (!dir.exists(out_file_dir)){
-      dir.create(out_file_dir)
-  }
-
-  out_file=paste0(out_file_dir,"/",sample_name)
-
-  tgs=""
-  if (!targets==""){
-    tgs=paste0(" -k ",targets)
-  }
-
   if (!tumor_bam==""){
     if(length(tumor_bam)>1){
       tumor_bam=paste0(tumor_bam,collapse=" -t ")
@@ -1265,16 +1276,33 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam=
 
   norm=""
   if (!normal_bam==""){
+
     if (length(normal_bam)>1){
         norm=paste0("-n ",paste(normal_bam,collapse=" -n "))
       }else{
         if(tumor_bam==""){
+          out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/GERMLINE")
           norm=normal_bam
         }else{
+          out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/SOMATIC")
           norm=paste0("-n ",normal_bam)
         }
       }
     }
+
+  out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA")
+  if (!dir.exists(out_file_dir,recursive=TRUE)){
+      dir.create(out_file_dir,recursive=TRUE)
+  }
+
+
+  out_file=paste0(out_file_dir,"/",sample_name)
+
+  tgs=""
+  if (!targets==""){
+    tgs=paste0(" -k ",targets)
+  }
+
 
   dbsnp=""
   if (!dbsnp_indels==""){
@@ -1285,6 +1313,30 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",normal_bam=
       print(paste0(bin_path," run  -t",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
   }
     system(paste0(bin_path," run  -t",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+
+  annotate_sv_type(vcf=paste0(out_file_dir,"/",sample_name,".svaba.sv.vcf"))
+  out_file_dir_sv=paste0(out_file_dir,"/SVs")
+  out_file_dir_indels=paste0(out_file_dir,"/INDELs")
+  if (!dir.exists(out_file_dir_sv,recursive=TRUE)){
+      dir.create(out_file_dir_sv,recursive=TRUE)
+  }
+  if (!dir.exists(out_file_dir_indels,recursive=TRUE)){
+      dir.create(out_file_dir_indels,recursive=TRUE)
+  }
+
+  system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.sv.annotated.vcf"), out_file_dir_sv))
+  system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.sv.annotated.vcf"), paste0(out_file_dir_sv"/",sample_name,".svaba.sv.annotated.vcf.tmp")))
+  bgzip(bin_path=bin_path3,file=paste0(out_file_dir_sv"/",sample_name,".svaba.sv.annotated.vcf"))
+  tab_indx(bin_path=bin_path4,file=paste0(paste0(out_file_dir_sv"/",sample_name,".svaba.sv.annotated.vcf"),".gz"))
+  system(paste("cp", paste0(paste0(out_file_dir_sv"/",sample_name,".svaba.sv.annotated.vcf"),".tmp"), paste0(out_file_dir_sv"/",sample_name,".svaba.sv.annotated.vcf")))
+  system(paste("rm -rf", paste0(paste0(out_file_dir_sv"/",sample_name,".svaba.sv.annotated.vcf.tmp"),".tmp")))
+
+  system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"), out_file_dir_indels))
+  system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"), paste0(out_file_dir_indels"/",sample_name,".indel.vcf.tmp")))
+  bgzip(bin_path=bin_path3,file=paste0(out_file_dir_indels"/",sample_name,".svaba.indel.vcf"))
+  tab_indx(bin_path=bin_path4,file=paste0(paste0(out_file_dir_indels"/",sample_name,".svaba.indel.vcf"),".gz"))
+  system(paste("cp", paste0(paste0(out_file_dir_indels"/",sample_name,".svaba.indel.vcf"),".tmp"), paste0(out_file_dir_indels"/",sample_name,".svaba.indel.vcf")))
+  system(paste("rm -rf", paste0(paste0(out_file_dir_indels"/",sample_name,".svaba.indel.vcf.tmp"),".tmp")))
 }
 
 
