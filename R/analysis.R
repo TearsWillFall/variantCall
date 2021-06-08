@@ -840,7 +840,7 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
       dir.create(out_file_dir_sv,recursive=TRUE)
   }
 
-  if (tumor_bam=""){
+  if (tumor_bam==""){
     system(paste("cp",paste0(out_file_dir,"/results/variants/diploidSV.vcf.gz"),out_file_dir_sv))
     system(paste("gunzip",paste0(out_file_dir_sv,"/*")))
     system(paste("cp",paste0(out_file_dir,"/results/variants/diploidSV.vcf.gz"),out_file_dir_sv))
