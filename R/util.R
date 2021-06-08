@@ -265,7 +265,8 @@ generate_sets=function(bin_path="tools/bcftools/bcftools",vcf="",vcf_dir="",filt
   })
   files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE)
   files=files[grepl("sites.txt",files)]
-  tables=lapply(files,FUN=read.table,colClasses="character")
+  tables=lapply(files,FUN=function(x){
+    tryCatch(read.table(x,colClasses="character"),error=function(x) NULL)})
   tables=dplyr::bind_rows(tables)
   tables=tables %>% dplyr::mutate(Variant=paste(V1,V2,V3,V4,sep="_"))
   colnames(tables)=c("chr","pos","ref","alt","inter","ID")
