@@ -1335,9 +1335,9 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"), out_file_dir_indels))
   system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"), paste0(out_file_indels,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file_indels)
-  tab_indx(bin_path=bin_path3,file=paste0(out_file_indel,".gz"))
-  system(paste("cp", paste0(out_file_indel,".tmp"), out_file_indel))
-  system(paste("rm -rf", paste0(out_file_indel,".tmp")))
+  tab_indx(bin_path=bin_path3,file=paste0(out_file_indels,".gz"))
+  system(paste("cp", paste0(out_file_indels,".tmp"), out_file_indels))
+  system(paste("rm -rf", paste0(out_file_indels,".tmp")))
 }
 
 
