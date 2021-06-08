@@ -1291,7 +1291,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
     }
 
   out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA")
-  if (!dir.exists(out_file_dir,recursive=TRUE)){
+  if (!dir.exists(out_file_dir){
       dir.create(out_file_dir,recursive=TRUE)
   }
 
@@ -1317,10 +1317,10 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   annotate_sv_type(vcf=paste0(out_file_dir,"/",sample_name,".svaba.sv.vcf"))
   out_file_dir_sv=paste0(out_file_dir,"/SVs")
   out_file_dir_indels=paste0(out_file_dir,"/INDELs")
-  if (!dir.exists(out_file_dir_sv,recursive=TRUE)){
+  if (!dir.exists(out_file_dir_sv)){
       dir.create(out_file_dir_sv,recursive=TRUE)
   }
-  if (!dir.exists(out_file_dir_indels,recursive=TRUE)){
+  if (!dir.exists(out_file_dir_indels)){
       dir.create(out_file_dir_indels,recursive=TRUE)
   }
   out_file_sv=paste0(out_file_dir_sv,"/",sample_name,".svaba.sv.annotated.vcf")
