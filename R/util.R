@@ -35,7 +35,7 @@ annotate_sv_type <- function(vcf=""){
     cat(system(paste0('grep "##" ', vcf ),intern=TRUE),file=fil,sep="\n")
     cat('##INFO=<ID=SVANOT,Number=1,Type=String,Description=\"Structural variant annotation\">',file=fil,sep="\n",append=TRUE)
     cat(paste0("#",paste0(cols,collapse="\t")),file=fil,sep="\n",append=TRUE)
-    write.table(x=svaba_uniq,file=fil,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
+    write.table(x=svaba_uniq,file=fil,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t",row.names=FALSE)
 }
 
 
