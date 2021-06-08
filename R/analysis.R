@@ -962,7 +962,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   generate_sets(bin_path=bin_path3,vcf=c(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),platypus_snps_somatic),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS"),verbose=verbose,threads=threads,set_names=c("COMMON_SNPs",paste0("TUMOR_SAMPLE_",1:length(platypus_snps_somatic))))
 
   ### Select heterozygous SNPs part of the panel
-  vcf_intersect_bed(bed=snps_bed,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/PANEL"),vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/SNPs_SETS/SETS/SET_",(length(platypus_snps_somatic)+1),"/0000.vcf"))
+  vcf_intersect_bed(bed=snps_bed,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/PANEL"),vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/SETS/SET_",(length(platypus_snps_somatic)+1),"/0000.vcf"))
 
 
   ### Keep only Heterozygous SNPs found across all samples for this patient
