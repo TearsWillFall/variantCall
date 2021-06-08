@@ -899,8 +899,8 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   # svaba pipeline variants
 
   svaba=files[grepl("SVABA",files)]
-  svaba_indels=svaba[grepl("indel",svaba)]
-  svaba_sv=svaba[grepl("SNPs",svaba)]
+  svaba_indels=svaba[grepl("INDELs",svaba)]
+  svaba_sv=svaba[grepl("SV",svaba)]
   svaba_indels_germline=svaba_indels[grepl("GERMLINE",svaba_indels)]
   svaba_indels_somatic=svaba_indels[grepl("SOMATIC",svaba_indels)]
   svaba_sv_germline=svaba_sv[grepl("GERMLINE",svaba_sv)]
@@ -925,7 +925,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_germline,haplotypecaller_snps,strelka_snps_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
 
   ### Generate sets for INDELs
-  generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_germline,haplotypecaller_indels,strelka_indels_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
+  generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_germline,haplotypecaller_indels,strelka_indels_germline,svaba_indels_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2","svaba"))
 
   ### Annotate VCFs in SETS
   vcf_sets=list.files(out_file_dir,full.names=TRUE,recursive=TRUE)
