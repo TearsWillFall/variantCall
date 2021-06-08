@@ -58,7 +58,11 @@ vcf_intersect_bed <- function(vcf="",bed="",output_dir=""){
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
-
+  if(output_name!=""){
+    sample_name=output_name
+  }else{
+    sample_name=ULPwgs::get_sample_name(vcf)
+  }
   cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
   cols <- strsplit(cols,"\t")[[1]]
   variants = read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
@@ -66,16 +70,16 @@ vcf_intersect_bed <- function(vcf="",bed="",output_dir=""){
   regions$V1=sub("chr","",regions$V1)
   variants_in=variants[variants$CHROM %in% regions$V1 & variants$POS %in% regions$V2,]
   variants_out=variants[!variants$CHROM %in% regions$V1 & !variants$POS %in% regions$V2,]
-  file_out=paste0(out_file_dir,ULPwgs::get_sample_name(vcf),".IN_BED.vcf")
-  file_out2=paste0(out_file_dir,ULPwgs::get_sample_name(vcf),".OUT_BED.vcf")
+  file_out=paste0(out_file_dir,sample_name,".IN_BED.vcf")
+  file_out2=paste0(out_file_dir,sample_name,".OUT_BED.vcf")
   cat(system(paste0('grep "##" ', vcf ),intern=TRUE),file=file_out,sep="\n")
   cat(system(paste0('grep "##" ', vcf ),intern=TRUE),file=file_out2,sep="\n")
   cat(paste0('##Filter In-section between vcf=',vcf," and bed=", bed),file=file_out,sep="\n",append=TRUE)
   cat(paste0('##Filter Out-section between vcf=',vcf," and bed=", bed),file=file_out2,sep="\n",append=TRUE)
   cat(paste0("#",paste0(cols,collapse="\t")),file=file_out,sep="\n",append=TRUE)
   cat(paste0("#",paste0(cols,collapse="\t")),file=file_out2,sep="\n",append=TRUE)
-  write.table(x=variants,file=file_out,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
-  write.table(x=variants,file=file_out2,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
+  write.table(x=variants_in,file=file_out,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t",row.names=FALSE)
+  write.table(x=variants_out,file=file_out2,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t",row.names=FALSE)
 }
 
 
