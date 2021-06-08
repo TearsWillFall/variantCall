@@ -956,7 +956,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".PLATYPUS.VEP.vcf"),filter="\'(MAX_AF < 0.01 or not MAX_AF)\'",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/RARE_VARIANTS"))
 
   ### Select Heterozygous SNPs for common SNPs
-  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/",patient_id,"_FILTERED_VEP/",patient_id,".FILTERED.vcf"),bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",state="het",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS"))
+  vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/",patient_id,"_FILTERED_VEP/",patient_id,".FILTERED.VEP.vcf"),bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",state="het",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS"))
 
   ### Generate an Unique Set of Heterozygous SNPs found in all samples
   generate_sets(bin_path=bin_path3,vcf=c(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/",patient_id,"_FILTERED/",patient_id,"_FILTERED.vcf"),platypus_snps_somatic),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS"),verbose=verbose,threads=threads,set_names=c("COMMON_SNPs",paste0("TUMOR_SAMPLE_",1:length(platypus_snps_somatic))))
