@@ -833,6 +833,25 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
     print(paste0("python2.7 ",out_file_dir,"/runWorkflow.py -j ",threads))
   }
   system(paste0("python2.7 ",out_file_dir,"/runWorkflow.py  -j ",threads))
+
+  out_file_dir_sv=paste0(out_file_dir,"/results/variants/SVs")
+
+  if (!dir.exists(out_file_dir_sv)){
+      dir.create(out_file_dir_sv,recursive=TRUE)
+  }
+
+  if (tumor_bam=""){
+    system(paste("cp",paste0(out_file_dir,"/results/variants/diploidSV.vcf.gz"),out_file_dir_sv))
+    system(paste("gunzip",paste0(out_file_dir_sv,"/*")))
+    system(paste("cp",paste0(out_file_dir,"/results/variants/diploidSV.vcf.gz"),out_file_dir_sv))
+    system(paste("cp",paste0(out_file_dir,"/results/variants/diploidSV.vcf.gz.tbi"),out_file_dir_sv))
+  }else{
+    system(paste("cp",paste0(out_file_dir,"/results/variants/somaticSV.vcf.gz"),out_file_dir_sv))
+    system(paste("gunzip",paste0(out_file_dir_sv,"/*")))
+    system(paste("cp",paste0(out_file_dir,"/results/variants/somaticSV.vcf.gz"),out_file_dir_sv))
+    system(paste("cp",paste0(out_file_dir,"/results/variants/somaticSV.vcf.gz.tbi"),out_file_dir_sv))
+  }
+
 }
 
 
@@ -927,6 +946,10 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   ### Generate sets for INDELs
   generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_germline,haplotypecaller_indels,strelka_indels_germline,svaba_indels_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2","svaba"))
 
+  ### Generate sets for SVs
+  generate_sets(bin_path=bin_path3,vcf=c(strelka_germline_sv,svaba_germline_sv),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
+
+
   ### Annotate VCFs in SETS
   vcf_sets=list.files(out_file_dir,full.names=TRUE,recursive=TRUE)
   vcf_sets=vcf_sets[grepl("GERMLINE",vcf_sets)]
@@ -947,7 +970,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   if (!dir.exists(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))){
     dir.create(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))
   }
-  system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/",patient_id,".PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/")))
+  system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_4/",patient_id,".PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/")))
 
   ## GENERATE DATA FOR SNPs
 
@@ -1285,7 +1308,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
           norm=paste0(normal_bam," -I -L 6")
         }else{
           out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/SOMATIC")
-          norm=paste0("-n ",normal_bam)
+          norm=paste0(" -n ",normal_bam)
         }
       }
     }
