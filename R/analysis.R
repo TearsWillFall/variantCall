@@ -1301,7 +1301,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   if (!normal_bam==""){
 
     if (length(normal_bam)>1){
-        norm=paste0("-n ",paste(normal_bam,collapse=" -n "))
+        norm=paste0(" -n ",paste(normal_bam,collapse=" -n "))
       }else{
         if(tumor_bam==""){
           out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/GERMLINE")
@@ -1332,9 +1332,9 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   }
 
   if(verbose){
-      print(paste0(bin_path," run  -t",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+      print(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
   }
-    system(paste0(bin_path," run  -t",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+    system(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
 
   annotate_sv_type(vcf=paste0(out_file_dir,"/",sample_name,".svaba.sv.vcf"))
   out_file_dir_sv=paste0(out_file_dir,"/SVs")
