@@ -501,7 +501,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
               ref=paste0("\'%ID!=\"",ref,"\" ")
             }else{
               if (state!=""){
-                state=paste0("\'%GT[0]=\"",state,"\" ")
+                state=paste0("\'GT[0]=\"",state,"\" ")
               }
             }
           }
