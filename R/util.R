@@ -72,7 +72,7 @@ vcf_intersect_bed <- function(vcf="",bed="",output_dir=""){
   cat(paste0('##Filter In-section between vcf=',vcf," and bed=", bed),file=file_out,sep="\n",append=TRUE)
   cat(paste0('##Filter Out-section between vcf=',vcf," and bed=", bed),file=file_out2,sep="\n",append=TRUE)
   cat(paste0("#",paste0(cols,collapse="\t")),file=file_out,sep="\n",append=TRUE)
-  at(paste0("#",paste0(cols,collapse="\t")),file=file_out2,sep="\n",append=TRUE)
+  cat(paste0("#",paste0(cols,collapse="\t")),file=file_out2,sep="\n",append=TRUE)
   write.table(x=variants,file=file_out,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
   write.table(x=variants,file=file_out2,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t")
 }
