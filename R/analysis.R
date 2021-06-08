@@ -1323,7 +1323,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   if (!dir.exists(out_file_dir_indels,recursive=TRUE)){
       dir.create(out_file_dir_indels,recursive=TRUE)
   }
-  out_file_sv=paste0(out_file_dir_sv"/",sample_name,".svaba.sv.annotated.vcf")
+  out_file_sv=paste0(out_file_dir_sv,"/",sample_name,".svaba.sv.annotated.vcf")
   system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.sv.annotated.vcf"), out_file_dir_sv))
   system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.sv.annotated.vcf"), paste0(out_file_sv,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file_sv)
@@ -1331,7 +1331,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   system(paste("cp", paste0(out_file_sv,".tmp"), out_file_sv))
   system(paste("rm -rf", paste0(out_file_sv,".tmp")))
 
-  out_file_indels=paste0(out_file_dir_indels"/",sample_name,".svaba.indel.vcf")
+  out_file_indels=paste0(out_file_dir_indels,"/",sample_name,".svaba.indel.vcf")
   system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"), out_file_dir_indels))
   system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"), paste0(out_file_indels,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file_indels)
