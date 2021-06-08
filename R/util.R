@@ -510,7 +510,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
     }
 
 
-    if (state!=""&!grepl("%",state)){
+    if (state!=""&!grepl("GT",state)){
       state=paste0(" & GT[0]=\"",state,"\" ")
     }
 
