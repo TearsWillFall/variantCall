@@ -1306,9 +1306,12 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
         if(tumor_bam==""){
           out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/GERMLINE")
           norm=paste0(normal_bam," -I -L 6")
+          out_file=paste0(out_file_dir,"/",sample_name)
         }else{
           out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/SOMATIC")
           norm=paste0(" -n ",normal_bam)
+          sample_name=ULPwgs::get_sample_name(tumor_bam[1])
+          out_file=paste0(out_file_dir,"/",sample_name)
         }
       }
     }
@@ -1316,9 +1319,6 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir,recursive=TRUE)
   }
-
-
-  out_file=paste0(out_file_dir,"/",sample_name)
 
   tgs=""
   if (!targets==""){
@@ -1336,7 +1336,12 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   }
     system(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
 
-  annotate_sv_type(vcf=paste0(out_file_dir,"/",sample_name,".svaba.sv.vcf"))
+  if (tumor_bam==""){
+    annotate_sv_type(vcf=paste0(out_file_dir,"/",sample_name,".svaba.sv.vcf"))
+  }else{
+    annotate_sv_type(vcf=paste0(out_file_dir,"/",sample_name,".svaba.somatic.sv.vcf"))
+  }
+
   out_file_dir_sv=paste0(out_file_dir,"/SVs")
   out_file_dir_indels=paste0(out_file_dir,"/INDELs")
   if (!dir.exists(out_file_dir_sv)){
@@ -1354,8 +1359,8 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
   system(paste("rm -rf", paste0(out_file_sv,".tmp")))
 
   out_file_indels=paste0(out_file_dir_indels,"/",sample_name,".svaba.indel.vcf")
-  system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"), out_file_dir_indels))
-  system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"), paste0(out_file_indels,".tmp")))
+  system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba*.indel.vcf"), out_file_dir_indels))
+  system(paste("cp",paste0(out_file_dir,"/",sample_name,".svaba*.indel.vcf"), paste0(out_file_indels,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file_indels)
   tab_indx(bin_path=bin_path3,file=paste0(out_file_indels,".gz"))
   system(paste("cp", paste0(out_file_indels,".tmp"), out_file_indels))
