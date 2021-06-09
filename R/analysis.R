@@ -1346,10 +1346,10 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
     dbsnp=paste0(" -D ",dbsnp_indels)
   }
 
-  if(verbose){
-      print(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
-  }
-    system(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+  # if(verbose){
+  #     print(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+  # }
+  #   system(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
 
 
   out_file_dir_sv=paste0(out_file_dir,"/SVs")
@@ -1366,7 +1366,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
     compress_and_index_vcf(bin_path=bin_path2,bin_path2=bin_path3,vcf=paste0(out_file_dir,"/",sample_name,".svaba.indel.vcf"),output_dir=out_file_dir_indels)
     compress_and_index_vcf(bin_path=bin_path2,bin_path2=bin_path3,vcf=paste0(out_file_dir,"/",sample_name,".svaba.sv.annotated.vcf"),output_dir=out_file_dir_sv)
   }else{
-    system(paste("mv",paste0(out_file_dir,"/",sample_name,".svaba.germline*.vcf"), out_file_dir_ger))
+    system(paste("mv",paste0(out_file_dir,"/",sample_name,".svaba.*germline*.vcf"), out_file_dir_ger))
     annotate_sv_type(vcf=paste0(out_file_dir,"/",sample_name,".svaba.somatic.sv.vcf"),output_dir=out_file_dir)
     annotate_sv_type(vcf=paste0(out_file_dir_ger,"/",sample_name,".svaba.germline.sv.vcf"),output_dir=out_file_dir_ger)
     out_file_dir_ger_sv=paste0(out_file_dir_ger,"/SVs")
