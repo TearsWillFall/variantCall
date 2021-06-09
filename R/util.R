@@ -476,8 +476,6 @@ bgzip=function(bin_path="tools/htslib/bgzip",file="",verbose=FALSE){
 #' @param output_dir [Optional] Path to the output directory.
 #' @export
 
-
-
 split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,output_dir=""){
     sep="/"
 
@@ -505,7 +503,6 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
   })
 
 }
-
 
 #' VCF filtering using bcftools
 #'
