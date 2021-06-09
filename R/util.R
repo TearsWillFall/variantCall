@@ -65,7 +65,7 @@ annotate_sv_type <- function(vcf="",output_dir=""){
 #' @param output_dir [OPTIONAL] Path to output directory
 #' @export
 
-compress_and_index_vcf=function(bin_path="tools/htslib/bgzip",bin_pat2="tools/htslib/tabix",vcf="",output_dir=""){
+compress_and_index_vcf=function(bin_path="tools/htslib/bgzip",bin_path2="tools/htslib/tabix",vcf="",output_dir=""){
   sep="/"
   if(output_dir==""){
     sep=""
