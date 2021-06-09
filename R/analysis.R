@@ -1011,7 +1011,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
     ### Generate sets for SVs
     generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[x],svaba_somatic_sv_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
-  }
+  })
 
 
 
