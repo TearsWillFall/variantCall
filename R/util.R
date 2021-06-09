@@ -33,19 +33,53 @@ annotate_sv_type <- function(vcf="",output_dir=""){
   }
 
   out_file_dir=paste0(output_dir,sep)
-  if (!dir.exists(out_file_dir)){
+  if (!dir.exists(out_file_dir) & !out_file_dir==""){
       dir.create(out_file_dir)
   }
   # Find mate pair
+
   cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
   cols <- strsplit(cols,"\t")[[1]]
-  svaba_uniq = read.table(vcf, col.names = cols, stringsAsFactors = FALSE)
-  svaba_uniq$INFO = paste0(svaba_uniq$INFO,";SVANOT=",sapply(svaba_uniq$ID, FUN=get_sv_type,dat=svaba_uniq))
+  svaba_uniq=tryCatch(
+    {svaba_uniq = read.table(vcf, col.names = cols, stringsAsFactors = FALSE);
+     svaba_uniq$INFO = paste0(svaba_uniq$INFO,";SVANOT=",sapply(svaba_uniq$ID, FUN=get_sv_type,dat=svaba_uniq))}
+        ,error=function(e){
+      svaba_uniq=data.frame(matrix(ncol = length(cols), nrow = 0));
+      colnames(svaba_uniq)=cols;
+      return(svaba_uniq)})
   fil=paste0(out_file_dir,paste0(ULPwgs::get_sample_name(vcf),".svaba.sv.annotated.vcf"))
   cat(system(paste0('grep "##" ', vcf ),intern=TRUE),file=fil,sep="\n")
   cat('##INFO=<ID=SVANOT,Number=1,Type=String,Description=\"Structural variant annotation\">',file=fil,sep="\n",append=TRUE)
   cat(paste0("#",paste0(cols,collapse="\t")),file=fil,sep="\n",append=TRUE)
   write.table(x=svaba_uniq,file=fil,append=TRUE,quote=FALSE,col.names=FALSE,sep="\t",row.names=FALSE)
+}
+
+
+
+#' Compress and index vcf file
+#'
+#' This function takes an uncompressed vcf file and uses bgzip and tabix to
+#' compress and index the file while preserving the original file
+#'
+#' @param vcf [REQUIRED] Path to VCF to compress
+#' @param output_dir [OPTIONAL] Path to output directory
+#' @export
+
+compress_and_index_vcf=function(bin_path="tools/htslib/bgzip",bin_pat2="tools/htslib/tabix",vcf="",output_dir=""){
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  out_file_dir=paste0(output_dir,sep)
+
+  system(paste("cp",paste0(vcf), paste0(vcf,".tmp")))
+  bgzip(bin_path=bin_path,file=vcf)
+  tab_indx(bin_path=bin_path2,file=paste0(vcf,".gz"))
+  system(paste("mv",paste0(vcf,".tmp"), vcf))
+  if (!dir.exists(out_file_dir) & !out_file_dir==""){
+      dir.create(out_file_dir,recursive=TRUE)
+      system(paste("mv",paste0(vcf,".gz*"), out_file_dir))
+  }
 }
 
 
@@ -66,7 +100,7 @@ vcf_intersect_bed <- function(vcf="",bed="",output_name="",output_dir=""){
   }
 
   out_file_dir=paste0(output_dir,sep)
-  if (!dir.exists(out_file_dir)){
+  if (!dir.exists(out_file_dir) & !out_file_dir==""){
       dir.create(out_file_dir)
   }
   if(output_name!=""){
