@@ -913,8 +913,9 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   strelka_indels=strelka[grepl("INDELs",strelka)]
   strelka_indels_germline=strelka_indels[grepl("GERMLINE",strelka_indels)]
   strelka_indels_somatic=strelka_indels[grepl("SOMATIC",strelka_indels)]
-
-
+  strelka_sv=strelka[grepl("SV",strelka)]
+  strelka_sv_germline=strelka_sv[grepl("GERMLINE",strelka_sv)]
+  strelka_sv_somatic=strelka_sv[grepl("GERMLINE",strelka_sv)]
   # svaba pipeline variants
 
   svaba=files[grepl("SVABA",files)]
@@ -926,7 +927,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   svaba_sv_somatic=svaba_sv[grepl("SOMATIC",svaba_sv)]
 
 
-  ## Start processing germline variants
+  ## Start processing GERMLINE variants
   patient_id=ULPwgs::get_sample_name(haplotypecaller_snps)
 
   out_file_dir=paste0(output_dir,sep,patient_id,"_PROCESSED_VARIANTS")
@@ -947,7 +948,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_germline,haplotypecaller_indels,strelka_indels_germline,svaba_indels_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2","svaba"))
 
   ### Generate sets for SVs
-  generate_sets(bin_path=bin_path3,vcf=c(strelka_germline_sv,svaba_germline_sv),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
+  generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_germline,svaba_sv_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
 
 
   ### Annotate VCFs in SETS
@@ -999,6 +1000,18 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".PLATYPUS.VEP.vcf"),filter="\'(MAX_AF < 0.01 or not MAX_AF)\'",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/RARE_VARIANTS"))
 
 
+  ## Start processing SOMATIC variants
+
+  lapply(1:length(platypus_snps_somatic),FUN=function(x){
+    ### Generate sets for SNPs
+    generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_somatic[x],mutect_snps[x],strelka_snps_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","Mutect2","Strelka2"))
+
+    ### Generate sets for INDELs
+    generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_somatic[x],mutect_indels[x],strelka_indels_somatic[x],svaba_indels_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2","svaba"))
+
+    ### Generate sets for SVs
+    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[x],svaba_somatic_sv_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
+  }
 
 
 
@@ -1366,7 +1379,7 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
     }
     compress_and_index_vcf(bin_path=bin_path2,bin_path2=bin_path3,vcf=paste0(out_file_dir_ger,"/",sample_name,".svaba.sv.annotated.vcf"),output_dir=out_file_dir_ger_sv)
 
-    compress_and_index_vcf(bin_path=bin_path2,bin_path2=bin_path3,vcf=paste0(out_file_dir_ger,"/",sample_name,".svaba.germline.indel.vcf"),output_dir=out_file_dir_ger_indel)
+    compress_and_index_vcf(bin_path=bin_path2,bin_path2=bin_path3,vcf=paste0(out_file_dir_ger,"/",sample_name,".svaba.germline.indel.vcf"),output_dir=out_file_dir_ger_indels)
 
     compress_and_index_vcf(bin_path=bin_path2,bin_path2=bin_path3,vcf=paste0(out_file_dir,"/",sample_name,".svaba.somatic.indel.vcf"),output_dir=out_file_dir_indels)
 

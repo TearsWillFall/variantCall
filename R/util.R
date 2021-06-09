@@ -76,9 +76,11 @@ compress_and_index_vcf=function(bin_path="tools/htslib/bgzip",bin_path2="tools/h
   bgzip(bin_path=bin_path,file=vcf)
   tab_indx(bin_path=bin_path2,file=paste0(vcf,".gz"))
   system(paste("mv",paste0(vcf,".tmp"), vcf))
-  if (!dir.exists(out_file_dir) & !out_file_dir==""){
-      dir.create(out_file_dir,recursive=TRUE)
-      system(paste("mv",paste0(vcf,".gz*"), out_file_dir))
+  if (!out_file_dir==""){
+    if (!dir.exists(out_file_dir) ){
+        dir.create(out_file_dir,recursive=TRUE)
+    }
+    system(paste("mv",paste0(vcf,".gz*"), out_file_dir))
   }
 }
 
