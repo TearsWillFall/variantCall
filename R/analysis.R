@@ -768,6 +768,16 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
     bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",type="snp",verbose=verbose,output_dir=paste0(out_file_dir,"/results/variants/SNPs"))
     vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/results/variants/variants.vcf.gz"),
     bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",type="indel",verbose=verbose,output_dir=paste0(out_file_dir,"/results/variants/INDELs"))
+  }else{
+    if (!dir.exists(paste0(out_file_dir,"/results/variants/SNPs"))){
+          dir.create(paste0(out_file_dir,"/results/variants/SNPs"),recursive=TRUE)
+    }
+
+    if (!dir.exists(paste0(out_file_dir,"/results/variants/INDELs"))){
+          dir.create(paste0(out_file_dir,"/results/variants/INDELs"),recursive=TRUE)
+    }
+    system(paste("mv",paste0(out_file_dir,"/results/variants/somatic.snvs*"),paste0(out_file_dir,"/results/variants/SNPs")))
+    system(paste("mv",paste0(out_file_dir,"/results/variants/somatic.indel*"),paste0(out_file_dir,"/results/variants/INDELs")))
   }
 }
 
@@ -1318,14 +1328,13 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
         norm=paste0(" -n ",paste(normal_bam,collapse=" -n "))
       }else{
         if(tumor_bam==""){
-          out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/GERMLINE")
+          out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA_GERMLINE")
           norm=paste0(normal_bam," -I -L 6")
           out_file=paste0(out_file_dir,"/",sample_name)
         }else{
-          out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA/SOMATIC")
-          out_file_dir_ger=paste0(output_dir,sep,sample_name,"_SV_SVABA/GERMLINE")
+          out_file_dir=paste0(output_dir,sep,sample_name,"_SV_SVABA_SOMATIC")
+          out_file_dir_ger=paste0(output_dir,sep,sample_name,"_SV_SVABA_GERMLINE")
           norm=paste0(" -n ",normal_bam)
-          sample_name=ULPwgs::get_sample_name(tumor_bam[1])
           out_file=paste0(out_file_dir,"/",sample_name)
         }
       }
@@ -1346,10 +1355,10 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
     dbsnp=paste0(" -D ",dbsnp_indels)
   }
 
-  # if(verbose){
-  #     print(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
-  # }
-  #   system(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+  if(verbose){
+      print(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
+  }
+    system(paste0(bin_path," run  -t ",tumor_bam,norm,tgs," -a ",out_file," -p ",threads," -G ",ref_genome,dbsnp))
 
 
   out_file_dir_sv=paste0(out_file_dir,"/SVs")
