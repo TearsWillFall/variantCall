@@ -1158,9 +1158,8 @@ call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",norm
     tumor_samples=paste0(" ",tumor_samples)
   }
 
-
   if (is.vector(normal_samples) & length(normal_samples)>1){
-    normal_samples=paste(normal_samples,collapse=" ")
+    normal_samples=paste(" --normal ", paste(normal_samples,collapse=" "))
   }else{
     normal_samples=paste0(" --normal ",normal_samples)
   }
