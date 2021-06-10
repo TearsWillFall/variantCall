@@ -621,9 +621,9 @@ fix_mnps=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   out_file=paste0(out_file_dir,sample_name,".vcf")
 
   if(verbose){
-    print(paste(bin_path,"view  norm -m +any ",vcf,">",out_file))
+    print(paste(bin_path,"norm -m +any ",vcf,">",out_file))
   }
-  system(paste(bin_path,"view  norm -m +any ",vcf,">",out_file))
+  system(paste(bin_path,"norm -m +any ",vcf,">",out_file))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
