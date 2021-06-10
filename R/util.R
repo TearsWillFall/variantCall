@@ -595,7 +595,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
 
 #' VCF fix MNPs
 #'
-#' Collapse multiple lines with the same genomic position into a single line in vcf
+#' Exclude MNPs from vcf file
 #'
 #' @param bin_path Path to bcftools binary. Default tools/bcftools/bcftools.
 #' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
@@ -621,9 +621,9 @@ fix_mnps=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
   out_file=paste0(out_file_dir,sample_name,".vcf")
 
   if(verbose){
-    print(paste(bin_path,"norm -m -any ",vcf,">",out_file))
+    print(paste(bin_path,"view --exclude-types mnps ",vcf,">",out_file))
   }
-  system(paste(bin_path,"norm -m -any ",vcf,">",out_file))
+  system(paste(bin_path,"view --exclude-types mnps ",vcf,">",out_file))
   system(paste("cp", out_file, paste0(out_file,".tmp")))
   bgzip(bin_path=bin_path2,file=out_file)
   tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))

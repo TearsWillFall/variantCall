@@ -12,11 +12,12 @@
 #' @param output_name [OPTIONAL] Name for the output. If not given the name of one of the samples will be used.
 #' @param pon [Optional] Path to panel of normal.
 #' @param output_dir Path to the output directory.
+#' @param mnps Report MNPs in vcf file.
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
 
-call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",verbose=FALSE,orientation=TRUE){
+call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_bam="",ref_genome="",germ_resource="",pon="",output_dir="",output_name="",verbose=FALSE,orientation=TRUE,mnps=TRUE){
 
   sep="/"
 
@@ -69,6 +70,8 @@ call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_b
   if (orientation){
       f1r2=paste0(" --f1r2-tar-gz ",out_file_dir,"/",sample_name,".",region,".f1r2.tar.gz")
   }
+
+  if ()
 
   if(verbose){
       print(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm," --germline-resource ",germ_resource, pon," -O ",out_file, reg,f1r2))
