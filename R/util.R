@@ -605,6 +605,7 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
 #' @param verbose Enables progress messages. Default False.
 #' @export
 
+
 fix_mnps=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",verbose=FALSE,output_dir=""){
 
   sep="/"

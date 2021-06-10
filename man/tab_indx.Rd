@@ -7,11 +7,11 @@
 tab_indx(bin_path = "tools/htslib/tabix", file = "", verbose = FALSE)
 }
 \arguments{
-\item{bin_path}{\link{Required} Path to bcftools binary. Default tools/htslib/tabix.}
+\item{bin_path}{\link{REQUIRED} Path to bcftools binary. Default tools/htslib/tabix.}
 
-\item{file}{\link{Required} Path to VCF file to index.}
+\item{file}{\link{REQUIRED} Path to VCF file to index.}
 
-\item{verbose}{\link{Optional} Enables progress messages. Default False.}
+\item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
 }
 \description{
 This function takes a .vcf.bgz tab separated genomic region file and generates an index for it

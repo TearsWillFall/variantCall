@@ -4,10 +4,12 @@
 \alias{get_sv_type}
 \title{Get SV type from svaba generated VCF}
 \usage{
-get_sv_type(x)
+get_sv_type(x, dat)
 }
 \arguments{
 \item{x}{svaba generated vcf to annotate. Get vcf}
+
+\item{dat}{Table with VCF data}
 }
 \description{
 As given by sfrenk comment on https://github.com/walaj/svaba/issues/4 annotates SV based on its breakpoints

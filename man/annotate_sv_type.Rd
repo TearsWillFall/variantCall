@@ -4,10 +4,12 @@
 \alias{annotate_sv_type}
 \title{Get SV type from svaba generated VCF}
 \usage{
-annotate_sv_type(vcf = "")
+annotate_sv_type(vcf = "", output_dir = "")
 }
 \arguments{
 \item{vcf}{svaba generated vcf to annotate. Get vcf}
+
+\item{output_dir}{Path to directory to output results}
 }
 \description{
 As given by sfrenk comment on https://github.com/walaj/svaba/issues/4 annotates SV type

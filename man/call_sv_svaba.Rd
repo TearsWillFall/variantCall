@@ -7,6 +7,8 @@
 call_sv_svaba(
   tumor_bam = "",
   bin_path = "tools/svaba/bin/svaba",
+  bin_path2 = "tools/htslib/bgzip",
+  bin_path3 = "tools/htslib/tabix",
   normal_bam = "",
   ref_genome = "",
   threads = 3,
@@ -21,6 +23,10 @@ call_sv_svaba(
 \item{tumor_bam}{\link{REQUIRED}  Path to tumor bam file.}
 
 \item{bin_path}{\link{REQUIRED} Path to svaba binary executable. Default path tools/svaba/svaba.}
+
+\item{bin_path2}{\link{REQUIRED} Path to bgzip binary executable. Default path tools/htslib/bgzip.}
+
+\item{bin_path3}{\link{REQUIRED} Path to tabix binary executable. Default path tools/htslib/tabix.}
 
 \item{normal_bam}{\link{OPTIONAL} Path to germline bam file.}
 

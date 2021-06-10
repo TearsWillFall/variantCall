@@ -13,6 +13,7 @@ process_variants(
   bin_path4 = "tools/htslib/bgzip",
   bin_path5 = "tools/htslib/tabix",
   var_dir = "",
+  bed_snps = "",
   output_dir = "",
   verbose = FALSE,
   threads = 3
@@ -30,6 +31,8 @@ process_variants(
 \item{bin_path5}{\link{REQUIRED} Path to tabix. Default tools/htslib/tabix}
 
 \item{var_dir}{\link{REQUIRED} Path to variant directory.}
+
+\item{bed_snps}{\link{REQUIRED} Path to BED with Panel SNPs}
 
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
 
