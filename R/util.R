@@ -524,6 +524,7 @@ split_vcf=function(bin_path="tools/bcftools/bcftools",vcf="",verbose=FALSE,outpu
 
 
 
+
 vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",qual=30,mq=40,state="",ref="",type="",filter="",verbose=FALSE,output_dir=""){
 
   sep="/"
@@ -591,6 +592,51 @@ vcf_filter_variants=function(unfil_vcf="",bin_path="tools/bcftools/bcftools",bin
   system(paste("cp", paste0(out_file,".tmp"), out_file))
   system(paste("rm -rf", paste0(out_file,".tmp")))
 }
+
+#' VCF fix MNPs
+#'
+#' Collapse multiple lines with the same genomic position into a single line in vcf
+#'
+#' @param bin_path Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param vcf Path to unfiltered vcf file.
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default False.
+#' @export
+
+fix_mnps=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",verbose=FALSE,output_dir=""){
+
+  sep="/"
+  if(output_dir==""){
+    sep=""
+  }
+  sample_name=ULPwgs::get_sample_name(vcf)
+  out_file_dir=paste0(output_dir,sep)
+  if (!dir.exists(out_file_dir) & !out_file_dir==""){
+      dir.create(out_file_dir,recursive=TRUE)
+  }
+
+  out_file=paste0(out_file_dir,"/",sample_name,".vcf")
+
+  if(verbose){
+    print(paste(bin_path,"view  norm -m +any ",vcf,">",out_file))
+  }
+  system(paste(bin_path,"view  norm -m +any ",vcf,">",out_file))
+  system(paste("cp", out_file, paste0(out_file,".tmp")))
+  bgzip(bin_path=bin_path2,file=out_file)
+  tab_indx(bin_path=bin_path3,file=paste0(out_file,".gz"))
+  system(paste("cp", paste0(out_file,".tmp"), out_file))
+  system(paste("rm -rf", paste0(out_file,".tmp")))
+}
+
+
+
+
+
+
+
+
 
 
 #' VCF file concatenation
