@@ -71,13 +71,16 @@ call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_b
       f1r2=paste0(" --f1r2-tar-gz ",out_file_dir,"/",sample_name,".",region,".f1r2.tar.gz")
   }
 
-  if ()
+  filter_mnps=""
+  if (!mnps){
+    filter_mnps=" -max-mnp-distance 0 "
+  }
 
   if(verbose){
-      print(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm," --germline-resource ",germ_resource, pon," -O ",out_file, reg,f1r2))
+      print(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm," --germline-resource ",germ_resource, pon," -O ",out_file, reg,f1r2,filter_mnps))
 
   }
-  system(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm, " --germline-resource ",germ_resource, pon, " -O ",out_file, reg,f1r2))
+  system(paste0(bin_path," Mutect2 -R ",ref_genome,tumor, norm, " --germline-resource ",germ_resource, pon, " -O ",out_file, reg,f1r2,filter_mnps))
 }
 
 
