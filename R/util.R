@@ -618,7 +618,7 @@ fix_mnps=function(vcf="",bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
       dir.create(out_file_dir,recursive=TRUE)
   }
 
-  out_file=paste0(out_file_dir,"/",sample_name,".vcf")
+  out_file=paste0(out_file_dir,sample_name,".vcf")
 
   if(verbose){
     print(paste(bin_path,"view  norm -m +any ",vcf,">",out_file))
