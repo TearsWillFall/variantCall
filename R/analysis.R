@@ -84,7 +84,6 @@ call_mutect2=function(region="",bin_path="tools/gatk/gatk",tumor_bam="",normal_b
 }
 
 
-
 #' Variant calling using bcftools
 #'
 #' This function calls variants in a sample.
