@@ -131,7 +131,7 @@ vcf_intersect_bed <- function(vcf="",bed="",output_name="",output_dir=""){
 }
 
 
-#' VCF communality 
+#' VCF communality
 #'
 #' Estimate % of common SNPs between two VCF files and returns the communality between them
 #'
@@ -147,7 +147,7 @@ vcf_communality <- function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",ou
     sep=""
   }
 
-    # out_file_dir=paste0(output_dir,sep)
+  out_file_dir=paste0(output_dir,sep)
     # if (!dir.exists(out_file_dir) & !out_file_dir==""){
     #     dir.create(out_file_dir)
     # }
