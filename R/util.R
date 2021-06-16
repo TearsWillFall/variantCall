@@ -142,21 +142,22 @@ vcf_intersect_bed <- function(vcf="",bed="",output_name="",output_dir=""){
 #' @export
 
 vcf_communality <- function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",output_name="",output_dir=""){
+
   sep="/"
   if(output_dir==""){
     sep=""
   }
 
   out_file_dir=paste0(output_dir,sep)
-    # if (!dir.exists(out_file_dir) & !out_file_dir==""){
-    #     dir.create(out_file_dir)
-    # }
+  if (!dir.exists(out_file_dir) & !out_file_dir==""){
+      dir.create(out_file_dir)
+  }
     # if(output_name!=""){
     #   sample_name=output_name
     # }else{
     #   sample_name=ULPwgs::get_sample_name(vcf)
     # }
-  vcf_sets=function(bin_path=bin_path,vcf=c(vcf,vcf2),set_formula="=+2",filter="PASS",output_dir=paste0(out_file_dir,"/SETS"),verbose=verbose)
+  vcf_sets(bin_path=bin_path,vcf=c(vcf,vcf2),set_formula="=+2",filter="PASS",output_dir=paste0(out_file_dir,"/SETS"),verbose=verbose)
   not_common=system(paste0("cat ",out_file_dir,"/SETS/SET_1/sites.txt | wc -l"),intern=TRUE)
   common=system(paste0("cat ",out_file_dir,"/SETS/SET_2/sites.txt | wc -l"),intern=TRUE)
   communality=common/(common+not_common)
