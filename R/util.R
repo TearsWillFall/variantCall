@@ -138,10 +138,11 @@ vcf_intersect_bed <- function(vcf="",bed="",output_name="",output_dir=""){
 #' @param vcf [REQUIRED] Path to VCF file
 #' @param vcf2 [REQUIRED] Path to VCF file
 #' @param output_name [OPTIONAL] Name for output_files. IF not given it will use input vcf name
+#' @param verbose [OPTIONAL] Extra verbose. Default FALSE
 #' @param output_dir [OPTIONAL] Path to output directory. if not given outputs to current directory.
 #' @export
 
-vcf_communality <- function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",output_name="",output_dir=""){
+vcf_communality <- function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",output_name="",output_dir="",verbose=FALSE){
 
   sep="/"
   if(output_dir==""){
