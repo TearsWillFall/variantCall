@@ -162,7 +162,7 @@ vcf_communality <- function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",ou
   not_common=as.numeric(system(paste0("cat ",paste0(out_file_dir,paste0(ULPwgs::get_sample_name(vcf),"_AND_",ULPwgs::get_sample_name(vcf2))),"/SETS/SET_1/sites.txt | wc -l"),intern=TRUE))
   common=as.numeric(system(paste0("cat ",paste0(out_file_dir,paste0(ULPwgs::get_sample_name(vcf),"_AND_",ULPwgs::get_sample_name(vcf2))),"/SETS/SET_2/sites.txt | wc -l"),intern=TRUE))
   communality=common/(common+not_common)
-  return(data.frame(vcf=vcf,communality=communality,common=common,not_common)
+  return(data.frame(vcf=vcf,communality=communality,common=common,not_common))
   }
 
 
