@@ -27,5 +27,5 @@ fix_mnps(
 \item{output_dir}{Path to the output directory.}
 }
 \description{
-Collapse multiple lines with the same genomic position into a single line in vcf
+Exclude MNPs from vcf file
 }

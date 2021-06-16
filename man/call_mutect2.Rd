@@ -15,7 +15,8 @@ call_mutect2(
   output_dir = "",
   output_name = "",
   verbose = FALSE,
-  orientation = TRUE
+  orientation = TRUE,
+  mnps = TRUE
 )
 }
 \arguments{
@@ -38,6 +39,8 @@ call_mutect2(
 \item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of one of the samples will be used.}
 
 \item{verbose}{Enables progress messages. Default False.}
+
+\item{mnps}{Report MNPs in vcf file.}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or
