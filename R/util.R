@@ -159,8 +159,8 @@ vcf_communality <- function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",ou
     #   sample_name=ULPwgs::get_sample_name(vcf)
     # }
   vcf_sets(bin_path=bin_path,vcf=c(vcf,vcf2),set_formula="=+2",filter="PASS",output_dir=paste0(out_file_dir,"/SETS"),verbose=verbose)
-  not_common=system(paste0("cat ",out_file_dir,"/SETS/SET_1/sites.txt | wc -l"),intern=TRUE)
-  common=system(paste0("cat ",out_file_dir,"/SETS/SET_2/sites.txt | wc -l"),intern=TRUE)
+  not_common=as.numeric(system(paste0("cat ",out_file_dir,"/SETS/SET_1/sites.txt | wc -l"),intern=TRUE))
+  common=as.numeric(system(paste0("cat ",out_file_dir,"/SETS/SET_2/sites.txt | wc -l"),intern=TRUE))
   communality=common/(common+not_common)
   return(communality)
   }
