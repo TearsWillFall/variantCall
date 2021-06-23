@@ -9,7 +9,8 @@ vcf_communality(
   vcf = "",
   vcf2 = "",
   output_name = "",
-  output_dir = ""
+  output_dir = "",
+  verbose = FALSE
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ vcf_communality(
 \item{output_name}{\link{OPTIONAL} Name for output_files. IF not given it will use input vcf name}
 
 \item{output_dir}{\link{OPTIONAL} Path to output directory. if not given outputs to current directory.}
+
+\item{verbose}{\link{OPTIONAL} Extra verbose. Default FALSE}
 }
 \description{
 Estimate \% of common SNPs between two VCF files and returns the communality between them

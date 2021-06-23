@@ -370,7 +370,7 @@ call_HaplotypeCaller=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftoo
   }
 
   if(region!=""){
-    region=paste0(" -L ",region,collapse=" -L ")
+    region=paste0(" -L ",paste0(region,collapse=" -L "))
   }
 
   if(verbose){
@@ -743,7 +743,7 @@ call_variants_strelka=function(bin_path="tools/strelka-2.9.10/build/bin/configur
     tumor_bam=paste(" --tumorBam ",tumor_bam)
     normal_bam=paste(" --normalBam ",normal_bam)
   }else{
-    normal_bam=paste0(" --bam ", normal_bam,collapse=" --bam ")
+    normal_bam=paste0(" --bam ", paste0(normal_bam,collapse=" --bam "))
   }
 
   exome=""
