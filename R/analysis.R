@@ -525,7 +525,7 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
 
     chr_pass=""
     if(chr_filter=="canonical"){
-      chr_pass=c(1:22,"X","Y","M","MT")
+      chr_pass=c(1:22,"X","Y","MT")
     ## Include autosomal chromosomal and nothing else
     }else if(chr_filter=="autosomal"){
       chr_pass=c(1:22)
