@@ -1200,11 +1200,18 @@ call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",norm
     targets=paste(  " --targets ",targets)
   }
 
-  if(verbose){
-    print(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,mal,ref_output,output_dir," --p ",threads,add))
+  if (pool_ref==""){
+    if(verbose){
+      print(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,mal,ref_output,output_dir," --p ",threads,add))
+    }
+    system(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,mal,ref_output,output_dir," --p ",threads,add))
+  }else{
+    pool_ref=paste(" -r ",pool_ref)
+    if(verbose){
+      print(paste(bin_path,"batch ",tumor_samples,pool_ref,fasta,mal,ref_output,output_dir," --p ",threads,add))
+    }
+    system(paste(bin_path,"batch ",tumor_samples,pool_ref,fasta,mal,ref_output,output_dir," --p ",threads,add))
   }
-  system(paste(bin_path,"batch ",tumor_samples,normal_samples,targets,fasta,mal,ref_output,output_dir," --p ",threads,add))
-
 }
 
 
