@@ -1143,6 +1143,7 @@ call_sv_manta_parallel=function(bin_path="tools/manta-1.6.0/build/bin/configMant
 #' @param bin_path Path to cnvkit binary.
 #' @param tumor_samples [REQUIRED] Path to tumor samples bam files. For multiple samples pass as vector with their paths.
 #' @param normal_samples [OPTIONAL] Path to normal samples bam files. For multiple samples pass as vector with their paths. Used to create a reference.
+#' @param pool_ref [OPTIONAL] Path to reference of normals. Needs to be generated beforehand from normals/normals
 #' @param targets [OPTIONAL] Path to exome capture targets. Required if targeted or panel.
 #' @param access [OPTIONAL] Path to bed with accessibility information.
 #' @param diagram [DEFAULT==TRUE] Plot diagram of segments.
@@ -1155,7 +1156,7 @@ call_sv_manta_parallel=function(bin_path="tools/manta-1.6.0/build/bin/configMant
 #' @export
 
 
-call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",normal_samples="",targets="",fasta="",access="",ref_output="",output_dir="",diagram=TRUE,scatter=TRUE,threads=3,verbose=FALSE,male=TRUE){
+call_segments=function(bin_path="~/tools/cnvkit/cnvkit.py",tumor_samples="",normal_samples="",pool_ref="",targets="",fasta="",access="",ref_output="",output_dir="",diagram=TRUE,scatter=TRUE,threads=3,verbose=FALSE,male=TRUE){
 
   if (is.vector(tumor_samples) & length(tumor_samples)>1){
     tumor_samples=paste(tumor_samples,collapse=" ")
