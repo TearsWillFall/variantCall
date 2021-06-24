@@ -43,7 +43,7 @@ annotate_sv_type <- function(vcf="",output_dir=""){
   svaba_uniq=tryCatch(
     {svaba_uniq = read.table(vcf, col.names = cols, stringsAsFactors = FALSE);
      svaba_uniq$INFO = paste0(svaba_uniq$INFO,";SVANOT=",sapply(svaba_uniq$ID, FUN=get_sv_type,dat=svaba_uniq));
-      return(svaba_uniq)}
+     svaba_uniq}
         ,error=function(e){
       svaba_uniq=data.frame(matrix(ncol = length(cols), nrow = 0));
       colnames(svaba_uniq)=cols;
