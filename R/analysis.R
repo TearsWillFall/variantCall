@@ -1348,6 +1348,9 @@ call_sv_svaba=function(tumor_bam="",bin_path="tools/svaba/bin/svaba",bin_path2="
           out_file_dir_ger=paste0(output_dir,sep,sample_name,"_SV_SVABA_GERMLINE")
           norm=paste0(" -n ",normal_bam)
           out_file=paste0(out_file_dir,"/",sample_name)
+          if (!dir.exists(out_file_dir_ger)){
+              dir.create(out_file_dir_ger,recursive=TRUE)
+          }
         }
       }
     }
