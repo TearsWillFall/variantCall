@@ -1272,7 +1272,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
     if (!dir.exists(out_file_dir)){
         dir.create(out_file_dir)
     }
-    if (unfil_vcf_dir==""){
+    if (unfil_vcf_dir!=""){
       files0=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
       files0=files0[grepl("vcf.gz$",files0)]
 
