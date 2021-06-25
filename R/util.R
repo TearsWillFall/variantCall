@@ -1299,6 +1299,6 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
     }
 
     files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
-    pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
+    pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,bin_path=bin_path4,cl=cl)
     on.exit(parallel::stopCluster(cl))
   }
