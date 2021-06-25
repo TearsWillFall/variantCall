@@ -1251,6 +1251,7 @@ get_pileup_summary=function(bam="",bin_path="tools/gatk/gatk",db="",interval="",
 #' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
 #' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
 #' @param bin_path4 Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ
+#' @param unfil_vcf Path to unfiltered VCF file.
 #' @param unfil_vcf_dir Path to unfiltered VCF file directory.
 #' @param qual Quality filter. Default 30.
 #' @param mq Mapping quality filter. Default 40.
@@ -1262,7 +1263,7 @@ get_pileup_summary=function(bam="",bin_path="tools/gatk/gatk",db="",interval="",
 #' @param threads Number of threads to use. Default 3
 #' @export
 
-format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",threads=3){
+format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf="",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",threads=3){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -1271,25 +1272,35 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
     if (!dir.exists(out_file_dir)){
         dir.create(out_file_dir)
     }
-    files0=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
-    files0=files0[grepl("vcf.gz$",files0)]
+    if (unfil_vcf_dir=""){
+      files0=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+      files0=files0[grepl("vcf.gz$",files0)]
 
-    cl=parallel::makeCluster(threads)
-    pbapply::pbapply(X=as.data.frame(files0),1,FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,cl=cl)
-    files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FILTERED")
-    files2=files2[grepl("vcf$",files2)]
-    files2=as.data.frame(files2)
-    names(files2)="VCF_path"
-    files2$Sample=apply(files2,1,FUN=ULPwgs::get_sample_name)
+      cl=parallel::makeCluster(threads)
+      pbapply::pbapply(X=as.data.frame(files0),1,FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,cl=cl)
+      files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FILTERED")
+      files2=files2[grepl("vcf$",files2)]
+      files2=as.data.frame(files2)
+      names(files2)="VCF_path"
+      files2$Sample=apply(files2,1,FUN=ULPwgs::get_sample_name)
 
-    files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
-    files3=files3[grepl("bam$",files3)]
-    files3=as.data.frame(files3)
-    names(files3)="BAM_path"
-    files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
-    files=dplyr::left_join(files2,files3,by="Sample")
+      files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+      files3=files3[grepl("bam$",files3)]
+      files3=as.data.frame(files3)
+      names(files3)="BAM_path"
+      files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
+      files=dplyr::left_join(files2,files3,by="Sample")
+      pbapply::pblapply(X=1:nrow(files), FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
 
-    pbapply::pblapply(X=1:nrow(files), FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
+    }else{
+      files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+      files3=files3[grepl("bam$",files3)]
+      files3=as.data.frame(files3)
+      names(files3)="BAM_path"
+      files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
+      pbapply::pblapply(X=1:nrow(files), FUN=function(x){call_ASEQ(vcf=unfil_vcf),bin_path=bin_path4,bam=as.character(files3[x]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
+    }
+
     files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
     pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
     on.exit(parallel::stopCluster(cl))
