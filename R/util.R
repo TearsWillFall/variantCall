@@ -1272,11 +1272,11 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
     if (!dir.exists(out_file_dir)){
         dir.create(out_file_dir)
     }
+    cl=parallel::makeCluster(threads)
     if (unfil_vcf_dir!=""){
       files0=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
       files0=files0[grepl("vcf.gz$",files0)]
 
-      cl=parallel::makeCluster(threads)
       pbapply::pbapply(X=as.data.frame(files0),1,FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,cl=cl)
       files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FILTERED")
       files2=files2[grepl("vcf$",files2)]
