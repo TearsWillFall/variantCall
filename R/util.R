@@ -1295,7 +1295,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
     }else{
       files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
       files3=files3[grepl("bam$",files3)]
-      pbapply::pblapply(X=1:nrow(files3), FUN=function(x){call_ASEQ(vcf=unfil_vcf,bin_path=bin_path4,bam=as.character(files3[x]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
+      pbapply::pblapply(X=1:length(files3), FUN=function(x){call_ASEQ(vcf=unfil_vcf,bin_path=bin_path4,bam=as.character(files3[x]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},cl=cl)
     }
 
     files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
