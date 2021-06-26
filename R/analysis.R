@@ -227,11 +227,12 @@ call_clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_
 #' @param orientation [OPTIONAL] Generate a read orientation model to filter variants. Default False
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @param validate_id [OPTIONAL] Validate patient_id in BAM dir. Default TRUE
 #' @export
 #' @import pbapply
 
 
-call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",db="",interval="",threads=3,verbose=FALSE,chr_filter="canonical",orientation=TRUE){
+call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",tumor_bam="",normal_bam="",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",germ_resource="",pon="",output_dir="",region_bed="",db="",interval="",threads=3,verbose=FALSE,chr_filter="canonical",orientation=TRUE,validate_id=TRUE){
 
   if (patient_id==""){
     sample_name=ULPwgs::get_sample_name(tumor_bam[1])
@@ -256,7 +257,11 @@ call_mutect2_parallel=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcfto
   ## If a path to bam_dir is supplied and no individual bams are given identify bams in dir based on patient_id and germ_pattern
 
   if (tumor_bam=="" & normal_bam=="" & bam_dir!="" & patient_id!=""){
-    files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    if(validate_id){
+        files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    }else{
+      files=list.files(bam_dir,recursive=TRUE,full.names=TRUE)
+    }
     files=files[grepl("bam$",files)]
     tumor_bam=files[!grepl(germ_pattern,files)]
     normal_bam=files[grepl(germ_pattern,files)]
@@ -508,11 +513,12 @@ call_bcftools_parallel=function(bin_path="tools/bcftools/bcftools",bam="",ref_ge
 #' @param chr_filter [OPTIONAL] Chromosomes to analyze. canonical/autosomal/all or a list of chromosomes
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @param validate_id [OPTIONAL] Validate patient_id in BAM dir. Default TRUE.
 #' @export
 
 call_variants=function(bin_path="tools/gatk/gatk",bin_path2="tools/bcftools/bcftools",bin_path3="tools/htslib/bgzip",bin_path4="tools/htslib/tabix",bin_path5="tools/platypus/Platypus.py",bin_path6="tools/ensembl-vep/vep",
 bin_path7="tools/strelka-2.9.10/build/bin/configureStrelkaGermlineWorkflow.py",bin_path8="tools/manta-1.6.0/build/bin/configManta.py",bin_path9="tools/svaba/bin/svaba",bam_dir="",patient_id="",germ_pattern="GL",ref_genome="",
-germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db="",interval="",targets="",orientation=TRUE,resources="",info_key="CNN_2D",snp_tranche=99.95,indel_tranche=99.4,threads=3,verbose=FALSE,targeted=TRUE){
+germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db="",interval="",targets="",orientation=TRUE,resources="",info_key="CNN_2D",snp_tranche=99.95,indel_tranche=99.4,threads=3,verbose=FALSE,targeted=TRUE,validate_id=TRUE){
 
     sep="/"
     if(output_dir==""){
@@ -534,7 +540,12 @@ germ_resource="",pon="",output_dir="",region_bed="",chr_filter="canonical",db=""
       chr_pass=chr_filter
     }
 
-    files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    if (validate_id){
+        files=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
+    }else{
+        files=list.files(bam_dir,recursive=TRUE,full.names=TRUE)
+    }
+
     files=files[grepl("bam$",files)]
     tumor_bam=files[!grepl(germ_pattern,files)]
     normal_bam=files[grepl(germ_pattern,files)]
