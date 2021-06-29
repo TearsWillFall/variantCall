@@ -988,7 +988,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   vcf_sets_INDELs=vcf_sets[grepl("INDELs",vcf_sets)]
   vcf_sets_INDELs=vcf_sets_INDELs[grepl("SET_4",vcf_sets_INDELs)]
   vcf_sets_SVs=vcf_sets[grepl("SVs",vcf_sets)]
-  vcf_sets_SVs=vcf_sets_SVs[grepl("SET_4",vcf_sets_SVs)
+  vcf_sets_SVs=vcf_sets_SVs[grepl("SET_4",vcf_sets_SVs)]
   set_names=c("PLATYPUS","HAPLOTYPECALLER","STRELKA2")
 
   lapply(X=vcf_sets_SNPs,FUN=function(x){
@@ -1003,7 +1003,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   })
 
   set_names=c("STRELKA","SVABA")
-  lapply(X=vcf_sets_INDELs,FUN=function(x){
+  lapply(X=vcf_sets_SVs,FUN=function(x){
     out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
     call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
   })
