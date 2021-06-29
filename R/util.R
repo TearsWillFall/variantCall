@@ -1483,12 +1483,13 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
     if (!dir.exists(out_file_dir)){
         dir.create(out_file_dir,recursive=TRUE)
     }
+  
     out_file=paste0(patient_id,".sample.info.txt")
     files=list.files(snp_dir,full.names=TRUE,recursive=TRUE)
     tumor=files[grepl("TumorPileup",files)]
     germ=files[grepl("NormalPileup",files)]
-    tumor=lapply(tumor,FUN=ULPwgs::get_sample_name)
-    germ=lapply(germ,FUN=ULPwgs::get_sample_name)
+    tumor=unlist(lapply(tumor,FUN=ULPwgs::get_sample_name))
+    germ=unlist(lapply(germ,FUN=ULPwgs::get_sample_name))
     sample_info=data.frame(Tumor.Array.Name="",Tumor.Bam.Name=tumor,Normal.Array.Name="",Normal.Bam.Name=germ)
     write.table(sample_info,file=paste0(out_file_dir,"/",out_file),quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
 }
