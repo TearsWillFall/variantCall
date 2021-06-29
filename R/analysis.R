@@ -243,7 +243,7 @@ beta_method="STM",adm_method="2D",verbose=FALSE,output_dir="",jobs=1,threads=3){
 
   format_SNP_data(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,
   bin_path4=bin_path4,unfil_vcf=vcf,bam_dir=bam_dir,germ_pattern=germ_pattern,
-  patient_id=patient_id,verbose=verbose,
+  patient_id=patient_id,verbose=verbose,qual=20,
   output_dir=out_file_dir,threads=threads*jobs)
 
   snp_dir=paste0(out_file_dir,"/",patient_id,"_PROCESSED_SNPs/RESULTS")
