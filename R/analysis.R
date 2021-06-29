@@ -939,7 +939,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   strelka_indels=strelka[grepl("INDELs",strelka)]
   strelka_indels_germline=strelka_indels[grepl("GERMLINE",strelka_indels)]
   strelka_indels_somatic=strelka_indels[grepl("SOMATIC",strelka_indels)]
-  strelka_sv=strelka[grepl("SV",strelka)]
+  strelka_sv=strelka[grepl("SVs",strelka)]
   strelka_sv_germline=strelka_sv[grepl("GERMLINE",strelka_sv)]
   strelka_sv_somatic=strelka_sv[grepl("GERMLINE",strelka_sv)]
   # svaba pipeline variants
