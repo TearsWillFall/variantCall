@@ -235,8 +235,7 @@ beta_method="STM",adm_method="2D",verbose=FALSE,output_dir="",jobs=1,threads=3){
     sep=""
   }
 
-  sample_name=ULPwgs::get_sample_name(vcf)
-  out_file_dir=paste0(output_dir,sep,sample_name,"_CLONET")
+  out_file_dir=paste0(output_dir,sep,patient_id,"_CLONET")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
