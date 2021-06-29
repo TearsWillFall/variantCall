@@ -12,6 +12,8 @@ call_clonet(
   bin_path5 = "tools/CLONET/CLONET.R",
   vcf = "",
   bam_dir = "",
+  segment_data = "",
+  patient_id = "",
   germ_pattern = "GL",
   min_snp_cov = 10,
   min_nsnps = 10,
@@ -28,7 +30,6 @@ call_clonet(
   ale_imb_thr = 0.5,
   beta_method = "STM",
   adm_method = "2D",
-  patient_id = "",
   verbose = FALSE,
   output_dir = "",
   jobs = 1,
@@ -49,6 +50,10 @@ call_clonet(
 \item{vcf}{\link{REQUIRED} Path to VCF file with heterozygous SNPs.}
 
 \item{bam_dir}{\link{REQUIRED} Path to directory with BAM files.}
+
+\item{segment_data}{\link{REQUIRED} Path to file with formated segment data.}
+
+\item{patient_id}{Patient ID. Default Patient}
 
 \item{germ_pattern}{Germline pattern. Default GL}
 
@@ -80,8 +85,6 @@ call_clonet(
 
 \item{adm_method}{Method for admixture estimation. Default 2D. Options 1D/2D}
 
-\item{patient_id}{Patient ID. Default Patient}
-
 \item{verbose}{Enables progress messages. Default FALSE.}
 
 \item{output_dir}{Path to the output directory.}
@@ -89,8 +92,6 @@ call_clonet(
 \item{jobs}{Number of Samples to analyze in parallel. Default 1}
 
 \item{threads}{Number of threads per job to use. Default 3}
-
-\item{segment_data}{\link{REQUIRED} Path to file with formated segment data.}
 }
 \description{
 This function takes multiple parameters and perform the following analysis:

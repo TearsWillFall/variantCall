@@ -1463,11 +1463,12 @@ generate_CLONET_config=function(patient_id="PATIENT",clonet_dir="tools/CLONET",s
 #' This function generates a sample_info file for CLONET pipeline
 #'
 #' This function takes the path to the directory with processed SNPS generated with format_SNP_data function
-#' and generates a tab separated file with samples info ready to use for CLONET pipeline
+#' and generates a tab separated file with samples info ready to use for CLONET pipeline.
 #'
 #' @param patient_id Patient ID. Default Patient
 #' @param snp_dir Path to formated SNP data dir.
 #' @param output_dir Path to output directory.
+#' @export
 
 generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
     sep="/"
