@@ -1378,7 +1378,7 @@ generate_CLONET_config=function(patient_id="PATIENT",clonet_dir="tools/CLONET",s
 
     config_data=paste("
     ## Output directory
-    output_DIR <-", paste0("'",output_dir,"/RESULTS'"),"
+    output_DIR <-", paste0("'",output_dir,"/OUTPUT/'"),"
 
     ## Path to CLONET functions
     path_to_CLONET_functions <-", paste0("'",clonet_dir,"/'"),"
