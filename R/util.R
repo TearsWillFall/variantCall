@@ -1493,7 +1493,12 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
     sample_info=data.frame(Tumor.Array.Name="",Tumor.Bam.Name=tumor,Normal.Array.Name="",Normal.Bam.Name=germ)
     write.table(sample_info,file=paste0(out_file_dir,"/",out_file),quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
 }
-
-plot_celullarity_and_clonality=function(){
-
+sample_data="~/Documents/Samples_tab.txt"
+clonet_dir="~/Downloads/TR017/Results"
+plot_celullarity_and_clonality=function(clonet_dir="",sample_data=""){
+    admixture=read.table(paste0(clonet_dir,"/globalAdmTable.txt"),header=TRUE)
+    ploidy=read.table(paste0(clonet_dir,"/ploidyTable.txt"),header=TRUE)
+    sample_info=read.table(sample_data,header=TRUE)
+    full_data=dplyr::left_join(admixture,ploidy,by="sample")
+    full_data=fuzzyjoin::fuzzy_inner_join(full_data,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
 }

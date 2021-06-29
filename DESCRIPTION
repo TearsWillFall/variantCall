@@ -17,7 +17,10 @@ Imports:
     dplyr,
     tictoc,
     pbapply,
-    data.table
+    data.table,
+    fuzzyjoin,
+    stringr,
+    lubridate
 biocViews:
 Remotes:
     git::https://github.com/TearsWillFall/ULPwgs.git,
