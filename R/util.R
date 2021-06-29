@@ -1390,7 +1390,7 @@ generate_CLONET_config=function(patient_id="PATIENT",clonet_dir="tools/CLONET",s
     segmentListFile <-", paste0("'",segment_data,"'"),"
 
     # folder with informative SNPs
-    pileup_dir <- ",paste0("'",snp_dir,"'"),"
+    pileup_dir <- ",paste0("'/",snp_dir,"'"),"
 
     # Suffix of the informative SNPs pileup
     PaPI_Suffix <- '.snps'
@@ -1483,7 +1483,7 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
     if (!dir.exists(out_file_dir)){
         dir.create(out_file_dir,recursive=TRUE)
     }
-  
+
     out_file=paste0(patient_id,".sample.info.txt")
     files=list.files(snp_dir,full.names=TRUE,recursive=TRUE)
     tumor=files[grepl("TumorPileup",files)]
