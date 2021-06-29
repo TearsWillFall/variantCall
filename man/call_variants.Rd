@@ -33,7 +33,8 @@ call_variants(
   indel_tranche = 99.4,
   threads = 3,
   verbose = FALSE,
-  targeted = TRUE
+  targeted = TRUE,
+  validate_id = TRUE
 )
 }
 \arguments{
@@ -92,6 +93,8 @@ call_variants(
 \item{verbose}{\link{OPTIONAL} Enables progress messages. Default False.}
 
 \item{targeted}{\link{OPTIONAL} Sequencing method Exome/Targeted. Default TRUE}
+
+\item{validate_id}{\link{OPTIONAL} Validate patient_id in BAM dir. Default TRUE.}
 
 \item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of one of the samples will be used.}
 }

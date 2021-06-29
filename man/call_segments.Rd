@@ -11,6 +11,7 @@ call_segments(
   bin_path = "~/tools/cnvkit/cnvkit.py",
   tumor_samples = "",
   normal_samples = "",
+  pool_ref = "",
   targets = "",
   fasta = "",
   access = "",
@@ -29,6 +30,8 @@ call_segments(
 \item{tumor_samples}{\link{REQUIRED} Path to tumor samples bam files. For multiple samples pass as vector with their paths.}
 
 \item{normal_samples}{\link{OPTIONAL} Path to normal samples bam files. For multiple samples pass as vector with their paths. Used to create a reference.}
+
+\item{pool_ref}{\link{OPTIONAL} Path to reference of normals. Needs to be generated beforehand from normals/normals}
 
 \item{targets}{\link{OPTIONAL} Path to exome capture targets. Required if targeted or panel.}
 

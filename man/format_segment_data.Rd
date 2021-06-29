@@ -8,7 +8,7 @@ format_segment_data(
   seg_file = "",
   dir_segment = "",
   pattern = "",
-  cols_to_keep = c(1, 2, 3, 5),
+  cols_to_keep = c("chr", "start", "end", "log2", "sample"),
   output_dir = "",
   output_name = "",
   verbose = FALSE
@@ -21,7 +21,9 @@ format_segment_data(
 
 \item{pattern}{\link{FALSE} Pattern to use if directory for segmentation files is given.}
 
-\item{cols_to_keep}{\link{DEFAULT==c(1,2,3,5)} Columns to keep from original segmentation bed files}
+\item{cols_to_keep}{[DEFAULT==c("chr","start","end","log2","sample"))] Columns to keep from original segmentation bed files
+
+[DEFAULT==c("chr","start","end","log2","sample"))]: R:DEFAULT==c(\%22chr\%22,\%22start\%22,\%22end\%22,\%22log2\%22,\%22sample\%22))}
 
 \item{output_dir}{Path to the output directory.}
 

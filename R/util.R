@@ -940,7 +940,7 @@ format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=
   return (dat)
   })
   data=dplyr::bind_rows(data)
-  names(data)[c(1,2,3,5)]=c("chr","start","end","log2","sample")
+  names(data)[c(1,2,3,5,ncol(data))]=c("chr","start","end","log2","sample")
   data=data[,c(cols_to_keep)]
 
   sep="/"

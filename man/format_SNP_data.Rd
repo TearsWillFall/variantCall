@@ -9,6 +9,7 @@ format_SNP_data(
   bin_path2 = "tools/htslib/bgzip",
   bin_path3 = "tools/htslib/tabix",
   bin_path4 = "tools/ASEQ/binaries/linux64/ASEQ",
+  unfil_vcf = "",
   unfil_vcf_dir = "",
   bam_dir = "",
   qual = 30,
@@ -28,6 +29,8 @@ format_SNP_data(
 \item{bin_path3}{Path to tabix binary. Default tools/htslib/tabix.}
 
 \item{bin_path4}{Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ}
+
+\item{unfil_vcf}{Path to unfiltered VCF file.}
 
 \item{unfil_vcf_dir}{Path to unfiltered VCF file directory.}
 

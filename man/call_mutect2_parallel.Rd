@@ -24,7 +24,8 @@ call_mutect2_parallel(
   threads = 3,
   verbose = FALSE,
   chr_filter = "canonical",
-  orientation = TRUE
+  orientation = TRUE,
+  validate_id = TRUE
 )
 }
 \arguments{
@@ -67,6 +68,8 @@ call_mutect2_parallel(
 \item{chr_filter}{\link{OPTIONAL} Chromosomes to analyze. canonical/autosomal/all or a list of chromosomes}
 
 \item{orientation}{\link{OPTIONAL} Generate a read orientation model to filter variants. Default False}
+
+\item{validate_id}{\link{OPTIONAL} Validate patient_id in BAM dir. Default TRUE}
 }
 \description{
 This function calls somatic variants in a pair of tumor-normal matched samples, or
