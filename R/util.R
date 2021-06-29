@@ -143,7 +143,7 @@ vcf_intersect_bed <- function(vcf="",bed="",output_name="",output_dir=""){
 #' @param output_dir [OPTIONAL] Path to output directory. if not given outputs to current directory.
 #' @export
 
-vcf_communality <- function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",output_name="",output_dir="",verbose=FALSE){
+vcf_communality =function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",output_name="",output_dir="",verbose=FALSE){
 
   sep="/"
   if(output_dir==""){
@@ -914,7 +914,7 @@ format_ASEQ_pileup=function(file="",verbose=FALSE,output_dir=""){
 #' @param seg_file [REQUIRED] Path/s to segmentation file/s. dir_segment and seg_file are mutually excluding.
 #' @param dir_segment [REQUIRED] Path to directory with segmentation files.
 #' @param pattern [FALSE] Pattern to use if directory for segmentation files is given.
-#' @param cols_to_keep [DEFAULT==c(1,2,3,5)] Columns to keep from original segmentation bed files
+#' @param cols_to_keep [DEFAULT==c("chr","start","end","log2","sample"))] Columns to keep from original segmentation bed files
 #' @param output_dir Path to the output directory.
 #' @param output_name Name of the file to output.
 #' @param verbose Enables progress messages. Default False.
@@ -922,7 +922,7 @@ format_ASEQ_pileup=function(file="",verbose=FALSE,output_dir=""){
 
 
 
-format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=c(1,2,3,5),output_dir="",output_name="",verbose=FALSE){
+format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=c("chr","start","end","log2","sample"),output_dir="",output_name="",verbose=FALSE){
 
   if(dir_segment!="" & seg_file!=""){
 
@@ -935,14 +935,14 @@ format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=
     files=seg_file
   }
 
-
   data=lapply(files,FUN=function(x) {dat=read.table(file=x,header=TRUE);
   dat$sample=ULPwgs::get_sample_name(x);
   return (dat)
   })
   data=dplyr::bind_rows(data)
-  data=data[,c(cols_to_keep,ncol(data))]
-  names(data)=c("chr","start","end","log2","sample")
+  names(data)[c(1,2,3,5)]=c("chr","start","end","log2","sample")
+  data=data[,c(cols_to_keep)]
+
   sep="/"
   if(output_dir==""){
     sep=""
