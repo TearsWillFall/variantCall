@@ -947,9 +947,9 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   svaba=files[grepl("SVABA",files)]
   svaba_indels=svaba[grepl("INDELs",svaba)]
   svaba_sv=svaba[grepl("SVs",svaba)]
-  svaba_indels_germline=svaba_indels[grepl("GERMLINE",svaba_indels)]
+  svaba_indels_germline=svaba_indels[grepl("/GERMLINE",svaba_indels)]
   svaba_indels_somatic=svaba_indels[grepl("SOMATIC",svaba_indels)]
-  svaba_sv_germline=svaba_sv[grepl("GERMLINE",svaba_sv)]
+  svaba_sv_germline=svaba_sv[grepl("/GERMLINE",svaba_sv)]
   svaba_sv_somatic=svaba_sv[grepl("SOMATIC",svaba_sv)]
 
 
