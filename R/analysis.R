@@ -261,9 +261,9 @@ beta_method="STM",adm_method="2D",verbose=FALSE,output_dir="",jobs=1,threads=3){
   clonet_config=paste0(out_file_dir,"/",patient_id,"_CLONET_CONFIG/",patient_id,".Config.R")
 
   if(verbose){
-    print(paste("RScript",bin_path5,clonet_config))
+    print(paste("Rscript",bin_path5,clonet_config))
   }
-  system(paste("RScript",bin_path5,clonet_config))
+  system(paste("Rscript",bin_path5,clonet_config))
 }
 
 
