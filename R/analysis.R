@@ -1051,13 +1051,13 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
   lapply(1:length(platypus_snps_somatic),FUN=function(x){
     ### Generate sets for SNPs
-    generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_somatic[x],mutect_snps[x],strelka_snps_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","Mutect2","Strelka2"))
+    generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_somatic[x],mutect_snps[x],strelka_snps_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(platypus_snps_somatic[x])),verbose=verbose,threads=threads,set_names=c("Platypus","Mutect2","Strelka2"))
 
     ### Generate sets for INDELs
-    generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_somatic[x],mutect_indels[x],strelka_indels_somatic[x],svaba_indels_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2","svaba"))
+    generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_somatic[x],mutect_indels[x],strelka_indels_somatic[x],svaba_indels_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(platypus_snps_somatic[x])),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2","svaba"))
 
     ### Generate sets for SVs
-    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[x],svaba_somatic_sv_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
+    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[x],svaba_somatic_sv_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(platypus_snps_somatic[x])),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
   })
 
 
