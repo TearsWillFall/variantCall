@@ -1488,5 +1488,5 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
     tumor=files[grepl("TumorPileup",files)]
     germ=files[grepl("NormalPileup",files)]
     sample_info=data.frame(Tumor.Array.Name="",Tumor.Bam.Name=as.vector(tumor),Normal.Array.Name="",Normal.Bam.Name=as.vector(germ))
-    write.table(sample_info,file=paste0(out_file_dir,"/",out_file),quote=FALSE,row.names=FALSE,col.names=FALSE)
+    write.table(sample_info,file=paste0(out_file_dir,"/",out_file),quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
 }
