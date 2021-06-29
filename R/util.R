@@ -1485,6 +1485,7 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
     }
     out_file=paste0(patient_id,".sample.info.txt")
     files=list.files(snp_dir,full.names=TRUE,recursive=TRUE)
+    files=lapply(files,FUN=ULPwgs::get_sample_name)
     tumor=files[grepl("TumorPileup",files)]
     germ=files[grepl("NormalPileup",files)]
     sample_info=data.frame(Tumor.Array.Name="",Tumor.Bam.Name=as.vector(tumor),Normal.Array.Name="",Normal.Bam.Name=as.vector(germ))
