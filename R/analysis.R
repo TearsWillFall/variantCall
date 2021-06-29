@@ -248,7 +248,7 @@ beta_method="STM",adm_method="2D",verbose=FALSE,output_dir="",jobs=1,threads=3){
 
   snp_dir=paste0(out_file_dir,"/",patient_id,"_PROCESSED_SNPs/RESULTS")
 
-  generate_CLONET_sample_info(snp_dir=,patient_id=patient_id,output_dir=out_file_dir)
+  generate_CLONET_sample_info(snp_dir=snp_dir,patient_id=patient_id,output_dir=out_file_dir)
 
   sample_info=paste0(out_file_dir,"/",patient_id,"_CLONET_SAMPLE_INFO/",patient_id,".sample.info.txt")
 
