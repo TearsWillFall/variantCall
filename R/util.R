@@ -1380,6 +1380,9 @@ generate_CLONET_config=function(patient_id="PATIENT",clonet_dir="tools/CLONET",s
     ## Output directory
     output_DIR <-", paste0("'",output_dir,"/RESULTS'"),"
 
+    ## Path to CLONET functions
+    path_to_CLONET_functions <-", paste0("'",clonet_dir,"/Functions/CLONET.BasicFunctions.R"),"
+
     # information about sample names
     sampleInfoFile <-",paste0("'",sample_info,"'"),"
 
