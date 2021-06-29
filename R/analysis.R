@@ -905,7 +905,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
     sep=""
   }
 
-  files=list.files(var_dir,recursive=TRUE,full.names=TRUE,pattern="vcf.gz$")
+  files=system(paste0("find ",var_dir," |grep vcf.gz$"),intern=TRUE)
 
 
   # Platypus pipeline variants
