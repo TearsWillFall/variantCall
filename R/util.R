@@ -1316,8 +1316,8 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
         dir.create(out_file_dir2_tumor,recursive=TRUE)
     }
 
-    system(paste("mv -t ",out_file_dir2_tumor,paste(tumor_snps,collapse=" ")))
-    system(paste("mv -t ",out_file_dir2_ger,paste(ger_snps,collapse=" ")))
+    system(paste("cp -t ",out_file_dir2_tumor,paste(tumor_snps,collapse=" ")))
+    system(paste("cp -t ",out_file_dir2_ger,paste(ger_snps,collapse=" ")))
     if (remove_tmp){
       system(paste0("ls -d ", paste0(out_file_dir,"/*"), " |egrep -v RESULTS | xargs rm -rf"))
     }
