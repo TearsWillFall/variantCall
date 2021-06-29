@@ -12,13 +12,15 @@ format_SNP_data(
   unfil_vcf = "",
   unfil_vcf_dir = "",
   bam_dir = "",
+  germ_pattern = "GL",
   qual = 30,
   mq = 40,
   min_cov = 20,
   patient_id = "",
   verbose = FALSE,
   output_dir = "",
-  threads = 3
+  threads = 3,
+  remove_tmp = TRUE
 )
 }
 \arguments{
@@ -36,6 +38,8 @@ format_SNP_data(
 
 \item{bam_dir}{Path to BAM file directory.}
 
+\item{germ_pattern}{Germline identifier.}
+
 \item{qual}{Quality filter. Default 30.}
 
 \item{mq}{Mapping quality filter. Default 40.}
@@ -44,11 +48,13 @@ format_SNP_data(
 
 \item{patient_id}{Patient identifier.}
 
-\item{verbose}{Enables progress messages. Default False.}
+\item{verbose}{Enables progress messages. Default FALSE.}
 
 \item{output_dir}{Path to the output directory.}
 
 \item{threads}{Number of threads to use. Default 3}
+
+\item{remove_tmp}{Remove temporary files. Default TRUE}
 }
 \description{
 This function takes a path of a directory of unfiltered VCFs files generated using Platypus and

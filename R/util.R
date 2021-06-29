@@ -1258,12 +1258,14 @@ get_pileup_summary=function(bam="",bin_path="tools/gatk/gatk",db="",interval="",
 #' @param min_cov Minimum coverage to filter. Default 20.
 #' @param bam_dir Path to BAM file directory.
 #' @param patient_id Patient identifier.
+#' @param germ_pattern Germline identifier.
 #' @param output_dir Path to the output directory.
-#' @param verbose Enables progress messages. Default False.
+#' @param verbose Enables progress messages. Default FALSE.
+#' @param remove_tmp Remove temporary files. Default TRUE
 #' @param threads Number of threads to use. Default 3
 #' @export
 
-format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf="",unfil_vcf_dir="",bam_dir="",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",threads=3){
+format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf="",unfil_vcf_dir="",bam_dir="",germ_pattern="GL",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",threads=3,remove_tmp=TRUE){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -1301,4 +1303,185 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
     files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
     pbapply::pbapply(X=as.data.frame(files3),1,FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,cl=cl)
     on.exit(parallel::stopCluster(cl))
+    files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern=".snp")
+    tumor_snps=files[!grepl(germ_pattern,files)]
+    germ_snps=files[grepl(germ_pattern,files)]
+    out_file_dir2=paste0(out_file_dir,"/RESULTS")
+    out_file_dir2_ger=paste0(out_file_dir2,"/NormalPileup")
+    out_file_dir2_tumor=paste0(out_file_dir2,"/TumorPileup")
+    if (!dir.exists(out_file_dir2_ger)){
+        dir.create(out_file_dir2_ger,recursive=TRUE)
+    }
+    if (!dir.exists(out_file_dir2_tumor)){
+        dir.create(out_file_dir2_tumor,recursive=TRUE)
+    }
+    system(paste0("mv -t ",out_file_dir2_tumor,paste(tumor_snps,collapse=" ")))
+    system(paste0("mv -t ",out_file_dir2_ger,paste(tumor_snps,collapse=" ")))
+    if (remove_tmp){
+      system(paste0("ls -d ", paste0(out_file_dir,"/*"), "|egrep -v RESULTS| xargs rm -rf"))
+    }
   }
+
+
+#' This function generates a config files for CLONET pipeline
+#'
+#' This function takes multiple parameters and generates a config file for the CLONET tool
+## Stages to perform:
+#   1. analyse single sample and produe RData
+#   2. create beta table aggragating single samples analysis
+#   3. compute ploidy shift
+#   4. compute global admixture
+#   5. compute clonality table
+#   6. compute allele specific copy number table
+#'
+#' @param patient_id Patient ID. Default Patient
+#' @param clonet_dir Path to CLONET dir
+#' @param snp_dir Path to formated SNP data dir.
+#' @param segment_data Path to file with formated segment data.
+#' @param sample_info Path to file with sample info data.
+#' @param min_snp_cov Minimum tumor coverage for informative SNPs. Default 10.
+#' @param min_nsnps Minimum number of SNPs per segment. Default 10.
+#' @param min_seg_cov Minimum segment coverage. Default 20.
+#' @param equal_betaThr Minimum value of beta above which the two alleles are present in the same number. Default 0.9
+#' @param max_homo_dels Homozygous deletions threshold. Default 0.01
+#' @param del_log_thr Parameters of a valid deletion used to compute Adm.global. Default c(-1,-0.25)
+#' @param alpha_par  Percentage of used deletions to compute Adm.global varibility interval. Default 0.9
+#' @param clonal_thr Clonality value threshold. Default 0.85
+#' @param beta_thr Beta value threshold. Default 0.85
+#' @param stages Analysis stages to run trough.Default c(1,2,3,4,5,6)
+#' @param comp_ref_map_bias Compute reference mapping bias and to adjust beta estimation. Default FALSE
+#' @param beta_decimals Number of beta value decimals to report. Default 3
+#' @param beta_method Method for beta estimation. Default STM. Options STM/GB
+#' @param adm_method Method for admixture estimation. Default 2D. Options 1D/2D
+#' @param jobs Number of Samples to analyze in parallel. Default 1
+#' @param threads Number of threads per job to use. Default 3
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default FALSE.
+#' @export
+
+generate_CLONET_config=function(patient_id="PATIENT",clonet_dir="tools/CLONET",snp_dir="",segment_data="",
+    sample_info="",min_snp_cov=10,min_nsnps=10,min_seg_cov=20,equal_betaThr=0.9,max_homo_dels=0.01,
+    del_log_thr=c(-1,-0.25),alpha_par=0.9,clonal_thr=0.85,beta_thr=0.85,
+    stages=c(1,2,3,4,5,6),comp_ref_map_bias=FALSE,beta_decimals=3,ale_imb_thr=0.5,
+    beta_method="STM",adm_method="2D",jobs=1,threads=3,output_dir=""){
+
+    sep="/"
+    if(output_dir==""){
+      sep=""
+    }
+    out_file_dir=paste0(output_dir,sep,patient_id,"_CLONET_CONFIG")
+
+    if (!dir.exists(out_file_dir)){
+        dir.create(out_file_dir,recursive=TRUE)
+    }
+
+    config_data=paste("
+    ## Output directory
+    output_DIR <-", paste0("'",output_dir,"/RESULTS'"),"
+
+    # information about sample names
+    sampleInfoFile <-",paste0("'",sample_info,"'"),"
+
+    # list of segment
+    segmentListFile <-", paste0("'",segment_data,"'"),"
+
+    # folder with informative SNPs
+    pileup_dir <- ",paste0("'",snp_dir,"'"),"
+
+    # Suffix of the informative SNPs pileup
+    PaPI_Suffix <- '.snps'
+
+    ## Path to error table
+    errorTable_file =",paste0("'",clonet_dir,'/Examples/BasicData/errorTable.csv',"'"),"
+
+    ## Method to compete beta
+    # 'GB' : classic model defined in http://www.genomebiology.com/2014/15/8/439 (only for backward compatibility)
+    # 'STM' : new method based on error estimation on matched normal published in http://stm.sciencemag.org/content/6/254/254ra125.short (RECOMMENDED)
+    betaCompute.method <-",paste0("'",beta_method,"'"),"
+
+    ## Method to compete Adm.global
+    # '1D' : classic model that use only deletions (only for backward compatibility)
+    # '2D' : model based on cnA vs cnB transformation (RECOMMENDED)
+    adm.global.method <- ",paste0("'",adm_method,"'"),"
+
+    # minimum tumor coverage to consider an informative SNP as valid
+    minCoverage <-",min_snp_cov,"
+
+    # number of samples to process in parallel
+    NsamplesToProcessInParallel <-", jobs,"
+
+    # number of cores assigned to the analysis of each process
+    perSampleCores <-", threads,"
+
+    # min number of informative SNPs for a genomic segment
+    min_nsnps <-",min_nsnps,"
+
+    # min mean coverage of a genomic segment
+    min_cov <-",min_seg_cov,"
+
+    # minimum value of beta above which the two alleles are present in the same number (cn equal to 1+1 or 2+2 or 3+3 ...) to account ref map bias
+    equalCN.betaThr <-",equal_betaThr,"
+
+    # Homozygous deletions threshold (change only if you know what you are doing)
+    maxHomoDels <-",max_homo_dels,"
+
+    ## Parameters of a valid deletion used to compute Adm.global
+    # log2 thresholds
+    deletionsLog2Levels <-",deparse(del_log_thr),"
+
+    ## Percentage of used deletions to compute Adm.global varibility interval (change only if you know what you are doing)
+    alphaPar <-",alpha_par,"
+
+    ## Threshold on clonality value (change only if you know what you are doing)
+    clonalityThreshold <-",clonal_thr,"
+
+    ## Threshold on beta value (change only if you know what you are doing)
+    betaThreshold <-",beta_thr,"
+
+    ## Stages to perform
+    # 1. analyse single sample and produe RData
+    # 2. create beta table aggragating single samples analysis
+    # 3. compute ploidy shift
+    # 4. compute global admixture
+    # 5. compute clonality table
+    # 6. compute allele specific copy number table
+    stages <-",deparse(stages),"
+
+    ## CLONET can try to compute reference mapping bias and to adjust beta estimation
+    computeRefMapBias <-",comp_ref_map_bias,"
+
+    ## number of significant digits for the beta table (NA for reporting all digits)
+    n.digits <-",beta_decimals,"
+
+    ## maximum distance from (cnA, cnB) integer copy number value
+    ## Dafault 0.5 corresponds to round cnA and cnB
+    AllelicImbalanceTh <-",ale_imb_thr)
+    cat(config_data,file=paste0(out_file_dir,"/",patient_id,".Config.R"))
+  }
+
+#' This function generates a sample_info file for CLONET pipeline
+#'
+#' This function takes the path to the directory with processed SNPS generated with format_SNP_data function
+#' and generates a tab separated file with samples info ready to use for CLONET pipeline
+#'
+#' @param patient_id Patient ID. Default Patient
+#' @param snp_dir Path to formated SNP data dir.
+#' @param output_dir Path to output directory.
+
+generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
+    sep="/"
+    if(output_dir==""){
+      sep=""
+    }
+    out_file_dir=paste0(output_dir,sep,patient_id,"_CLONET_SAMPLE_INFO")
+
+    if (!dir.exists(out_file_dir)){
+        dir.create(out_file_dir,recursive=TRUE)
+    }
+    out_file=paste0(patient_id,".sample.info.txt")
+    files=list.files(snp_dir,full.names=TRUE,recursive=TRUE)
+    tumor=files[grepl("TumorPileup",files)]
+    germ=files[grepl("NormalPileup",files)]
+    sample_info=data.frame(Tumor.Array.Name="",Tumor.Bam.Name=tumor,Normal.Array.Name="",Normal.Bam.Name=germ)
+    write.table(sample_info,file=paste0(out_file_dir,"/",out_file))
+}

@@ -180,25 +180,90 @@ call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip
   system(paste("rm -rf", paste0(out_file,".tmp")))
 }
 
+#' This function is a wrapper around CLONET function
+#'
+#' This function takes multiple parameters and perform the following analysis:
+## Stages to perform:
+#   1. analyse single sample and produe RData
+#   2. create beta table aggragating single samples analysis
+#   3. compute ploidy shift
+#   4. compute global admixture
+#   5. compute clonality table
+#   6. compute allele specific copy number table
+#
+#' @param bin_path Path to bcftools binary. Default tools/bcftools/bcftools.
+#' @param bin_path2 Path to bgzip binary. Default tools/htslib/bgzip.
+#' @param bin_path3 Path to tabix binary. Default tools/htslib/tabix.
+#' @param bin_path4 Path to ASEQ binary. Default tools/ASEQ/binaries/linux64/ASEQ
+#' @param bin_path5 Path to CLONET. Default tools/CLONET/CLONET.R
+#' @param vcf [REQUIRED] Path to VCF file with heterozygous SNPs.
+#' @param bam_dir [REQUIRED] Path to directory with BAM files.
+#' @param segment_data [REQUIRED] Path to file with formated segment data.
+#' @param patient_id Patient ID. Default Patient
+#' @param germ_pattern Germline pattern. Default GL
+#' @param min_snp_cov Minimum tumor coverage for informative SNPs. Default 10.
+#' @param min_nsnps Minimum number of SNPs per segment. Default 10.
+#' @param min_seg_cov Minimum segment coverage. Default 20.
+#' @param equal_betaThr Minimum value of beta above which the two alleles are present in the same number. Default 0.9
+#' @param max_homo_dels Homozygous deletions threshold. Default 0.01
+#' @param del_log_thr Parameters of a valid deletion used to compute Adm.global. Default c(-1,-0.25)
+#' @param alpha_par  Percentage of used deletions to compute Adm.global varibility interval. Default 0.9
+#' @param clonal_thr Clonality value threshold. Default 0.85
+#' @param beta_thr Beta value threshold. Default 0.85
+#' @param stages Analysis stages to run trough.Default c(1,2,3,4,5,6)
+#' @param comp_ref_map_bias Compute reference mapping bias and to adjust beta estimation. Default FALSE
+#' @param beta_decimals Number of beta value decimals to report. Default 3
+#' @param beta_method Method for beta estimation. Default STM. Options STM/GB
+#' @param adm_method Method for admixture estimation. Default 2D. Options 1D/2D
+#' @param jobs Number of Samples to analyze in parallel. Default 1
+#' @param threads Number of threads per job to use. Default 3
+#' @param output_dir Path to the output directory.
+#' @param verbose Enables progress messages. Default FALSE.
+#' @export
 
-call_clonet=function(bin_path="tools/CLONET/CLONET",vcf="",verbose=FALSE,output_dir="",threads=3){
+
+call_clonet=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",
+bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",
+bin_path5="tools/CLONET/CLONET.R",vcf="",bam_dir="",germ_pattern="GL",
+min_snp_cov=10,min_nsnps=10,min_seg_cov=20,equal_betaThr=0.9,max_homo_dels=0.01,
+del_log_thr=c(-1,-0.25),alpha_par=0.9,clonal_thr=0.85,beta_thr=0.85,
+stages=c(1,2,3,4,5,6),comp_ref_map_bias=FALSE,beta_decimals=3,ale_imb_thr=0.5,
+beta_method="STM",adm_method="2D",patient_id="",verbose=FALSE,output_dir="",jobs=1,threads=3){
+
   sep="/"
   if(output_dir==""){
     sep=""
   }
 
   sample_name=ULPwgs::get_sample_name(vcf)
-  out_file_dir=paste0(output_dir,sep,sample_name,"_VEP")
+  out_file_dir=paste0(output_dir,sep,sample_name,"_CLONET")
   if (!dir.exists(out_file_dir)){
       dir.create(out_file_dir)
   }
 
-  out_file=paste0(out_file_dir,"/",sample_name,".VEP.vcf")
+  format_SNP_data(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,
+  bin_path4=bin_path4,unfil_vcf=vcf,bam_dir=bam_dir,germ_pattern=germ_pattern,
+  patient_id=patient_id,verbose=verbose,
+  output_dir=out_file_dir,threads=threads)
+
+  snp_dir=paste0(out_file_dir,"/",patient_id,"_PROCESSED_SNPs/RESULTS")
+
+  generate_CLONET_sample_info(snp_dir=,patient_id=patient_id,output_dir=out_file_dir)
+
+  sample_info=paste0(out_file_dir,"/",patient_id,"_CLONET_SAMPLE_INFO/",patient_id,".sample.info.txt")
+
+  generate_CLONET_config(patient_id=patient_id,clonet_dir=dirname(bin_path5),snp_dir=snp_dir,segment_data=segment_data,
+  sample_info=sample_info,min_snp_cov=min_snp_cov,min_nsnps=min_nsnps,min_seg_cov=min_seg_cov,equal_betaThr=equal_betaThr,max_homo_dels=max_homo_dels,
+  del_log_thr=del_log_thr,alpha_par=alpha_par,clonal_thr=clonal_thr,beta_thr=beta_thr,
+  stages=stages,comp_ref_map_bias=comp_ref_map_bias,beta_decimals=beta_decimals,ale_imb_thr=ale_imb_thr,
+  beta_method=beta_method,adm_method=adm_method,jobs=jobs,threads=threads,output_dir=out_file_dir)
+
+  clonet_config=paste0(out_file_dir,"/",patient_id,"_CLONET_CONFIG/",patient_id,".Config.R")
 
   if(verbose){
-    print(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
+    print(paste("RScript",bin_path5,clonet_config))
   }
-  system(paste(bin_path,"-i",vcf,"-o",out_file,"--cache --port 3337 --everything --force_overwrite --vcf --fork",threads))
+  system(paste("RScript",bin_path5,clonet_config))
 }
 
 
