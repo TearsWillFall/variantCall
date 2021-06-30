@@ -1682,6 +1682,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
           print(pa)
           ggsave(paste0(out_file_dir,"/",unique(tissue$Patient_ID),".",x,".CLONET_per_gene_plasma.png"),width=20,height=10)
 
+        }
       }
 
 }
