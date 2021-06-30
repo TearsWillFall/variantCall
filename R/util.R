@@ -1505,6 +1505,7 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
 #' @export
 #' @import patchwork
 #' @import tidyverse
+#' @import ggplot2
 
 plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
 
