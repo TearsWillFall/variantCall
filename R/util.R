@@ -1601,7 +1601,8 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     ale_imb_table_partially$Overlap="Partial"
 
     ale_imb_table=rbind(ale_imb_table_complete,ale_imb_table_partially)
-
+    print(dim(ale_imb_table))
+    ale_imb_table
 
     ale_imb_table=ale_imb_table %>% dplyr::mutate(Type=ifelse(cnA.int==1 & cnB.int==1,"WT",
       ifelse(cnA.int==1 & cnB.int==0,"Hem.Del",
