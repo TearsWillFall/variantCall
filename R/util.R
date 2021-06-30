@@ -1523,7 +1523,7 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
     full_data=dplyr::left_join(admixture,ploidy,by="sample")
     full_data=fuzzyjoin::fuzzy_inner_join(full_data,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
 
-    plasma=full_data %>% filter(Origin=="Plasma") %>% mutate(Timepoint_ID=as.Date(lubridate::dmy(Timepoint_ID)))
+    plasma=full_data %>% dplyr::filter(Origin=="Plasma") %>% dplyr::mutate(Timepoint_ID=as.Date(lubridate::dmy(Timepoint_ID)))
 
     p=ggplot(plasma,aes(x=Timepoint_ID,y=ploidy))+geom_hline(aes(yintercept=2),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="red",alpha=0.5)+geom_point()+
     geom_line(aes(group=1),col="red")+theme_classic()+theme(axis.text.x = element_text(angle = 90),legend.position="bottom")+labs(x="Samples",y="Ploidy")
@@ -1534,7 +1534,7 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
     d=(p2/p)+plot_annotation(title = unique(full_data$Patient_ID))
     ggsave(paste0(output_dir,sep,unique(full_data$Patient_ID),"_Celularity_Plasma.png"),d)
 
-    tissue=full_data %>% filter(Origin!="Plasma")
+    tissue=full_data %>% dplyr::filter(Origin!="Plasma")
 
     if(dim(tissue)[1]>0){
       tissue$anatomy=make.unique(tissue$anatomy,sep="_")
