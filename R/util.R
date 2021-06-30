@@ -1600,8 +1600,6 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 
     ale_imb_table_partially$Overlap="Partial"
 
-    print(ale_imb_table_complete)
-    print(ale_imb_table_partially)
     ale_imb_table=rbind(ale_imb_table_complete,ale_imb_table_partially)
 
     ale_imb_table=ale_imb_table %>% dplyr::mutate(Type=ifelse(cnA.int==1 & cnB.int==1,"WT",
@@ -1625,10 +1623,11 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
       ifelse(cnA.int>=3 & cnB.int==1,"brown4",
       ifelse((is.na(cnA.int) & is.na(cnB.int)),"black","deeppink4")))))))))))
 
+    print(ale_imb_table)
     full_data=fuzzyjoin::fuzzy_inner_join(ale_imb_table,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
     full_data$Allelic_Imbalance=fct_rev(as.factor(ifelse(full_data$AllelicImbalance<=0.2,"E[AI] ≤ 0.2     ","E[AI] > 0.2     ")))
     full_data$Symbol=ifelse(grepl("CONTROL",full_data$pcf_gene_class),paste0(full_data$pcf_gene_symbol,"[C:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"),paste0(full_data$pcf_gene_symbol,"[T:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"))
-
+    print(full_data)
     plasma=full_data %>% dplyr::filter(Origin=="Plasma") %>% dplyr::mutate(Timepoint_ID=as.Date(lubridate::dmy(Timepoint_ID)))
 
     min.log2=min(full_data$log2,na.rm=TRUE)
