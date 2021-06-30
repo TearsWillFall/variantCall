@@ -1589,16 +1589,12 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 
     ale_imb_table_complete=fuzzyjoin::fuzzy_inner_join(ale_imb_table, gen_info,
                     by=c("chr"="chr","start"="start","end"="end"),
-                   match_fun=list(`==`, `<=`, `>=`))
+                   match_fun=list(`==`, `<=`, `>=`)) %>% dplyr::mutate(Overlap="Complete")
 
-
-
-    ale_imb_table_complete$Overlap="Complete"
     ale_imb_table_partially=fuzzyjoin::fuzzy_inner_join(ale_imb_table, gen_info,
-                     by=c("chr"="chr","start"="end","end"="start"),
+                    by=c("chr"="chr","start"="end","end"="start"),
                     match_fun=list(`==`, `<=`, `>=`)) %>% dplyr::group_by(pcf_gene_symbol,sample)%>% dplyr::filter(dplyr::n()>1)
-
-    ale_imb_table_partially$Overlap="Partial"
+                    %>% ungroup() %>% dplyr::mutate(Overlap="Partial")
 
     ale_imb_table=rbind(ale_imb_table_complete,ale_imb_table_partially)
     print(ale_imb_table)
