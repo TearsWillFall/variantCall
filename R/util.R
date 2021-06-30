@@ -1502,6 +1502,7 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
 #' @param clonet_dir Path to clonet output directory
 #' @param sample_data Path to file with sample info
 #' @param output_dir Path to output directory.
+#' @import patchwork,tidyverse
 #' @export
 
 
@@ -1530,8 +1531,8 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
     p2=ggplot(plasma,aes(x=Timepoint_ID,y=1-adm))+geom_hline(aes(yintercept=0.5),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="blue",alpha=0.5)+geom_point()+
     geom_ribbon(data=plasma[!is.na(plasma$adm),],aes(ymin=1-adm.min, ymax=1-adm.max,group=1), fill="blue", alpha=0.2)+geom_line(data=plasma[!is.na(plasma$adm),],aes(group=1),col="blue")+theme_classic()+theme(axis.text.x = element_blank(),axis.title.x = element_blank(),axis.ticks.x = element_blank(),legend.position="bottom")+labs(x="Samples",y="Celularity")+ylim(0,1)
 
-    d=(p2/p)+plot_annotation(title = unique(sample_info$Patient_ID))
-    ggsave(paste0(output_dir,sep,unique(sample_info$Patient_ID),"_Celularity_Plasma.png"),d)
+    d=(p2/p)+plot_annotation(title = unique(full_data$Patient_ID))
+    ggsave(paste0(output_dir,sep,unique(full_data$Patient_ID),"_Celularity_Plasma.png"),d)
 
     tissue=full_data %>% filter(Origin!="Plasma")
 
@@ -1543,7 +1544,7 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
       p2=ggplot(plasma,aes(x=reorder(anatomy,1-adm),y=1-adm))+geom_hline(aes(yintercept=0.5),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="blue",alpha=0.5)+geom_point()+
       geom_ribbon(data=plasma[!is.na(plasma$adm),],aes(ymin=1-adm.min, ymax=1-adm.max,group=1), fill="blue", alpha=0.2)+geom_line(data=plasma[!is.na(plasma$adm),],aes(group=1),col="blue")+theme_classic()+theme(axis.text.x = element_blank(),axis.title.x = element_blank(),axis.ticks.x =
       element_blank(),legend.position="bottom")+labs(x="Samples",y="Celularity")+ylim(0,1)
-      d=(p2/p)+plot_annotation(title = unique(sample_info$Patient_ID))
-      ggsave(paste0(output_dir,sep,unique(sample_info$Patient_ID),"_Celularity_Tissue.png"),d)
+      d=(p2/p)+plot_annotation(title = unique(full_data$Patient_ID))
+      ggsave(paste0(output_dir,sep,unique(full_data$Patient_ID),"_Celularity_Tissue.png"),d)
     }
 }
