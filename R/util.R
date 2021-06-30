@@ -1532,20 +1532,20 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
     p2=ggplot(plasma,aes(x=Timepoint_ID,y=1-adm))+geom_hline(aes(yintercept=0.5),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="blue",alpha=0.5)+geom_point()+
     geom_ribbon(data=plasma[!is.na(plasma$adm),],aes(ymin=1-adm.min, ymax=1-adm.max,group=1), fill="blue", alpha=0.2)+geom_line(data=plasma[!is.na(plasma$adm),],aes(group=1),col="blue")+theme_classic()+theme(axis.text.x = element_blank(),axis.title.x = element_blank(),axis.ticks.x = element_blank(),legend.position="bottom")+labs(x="Samples",y="Celularity")+ylim(0,1)
 
-    d=(p2/p)+plot_annotation(title = unique(full_data$Patient_ID))
+    d=(p2/p)+plot_annotation(title = paste0(unique(full_data$Patient_ID)," Plasma"))
     ggsave(paste0(output_dir,sep,unique(full_data$Patient_ID),"_Celularity_Plasma.png"),d)
 
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
 
     if(dim(tissue)[1]>0){
-      tissue$anatomy=make.unique(tissue$anatomy,sep="_")
-      p=ggplot(plasma,aes(x=reorder(anatomy,1-adm),y=ploidy))+geom_hline(aes(yintercept=2),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="red",alpha=0.5)+
-      geom_point()+geom_line(aes(group=1),col="red")+theme_classic()+theme(axis.text.x = element_text(angle = 90),legend.position="bottom")+labs(x="Samples",y="Ploidy")
+      tissue$anatomy=make.unique(tissue$Anatomy,sep="_")
+      p=ggplot(tissue,aes(x=reorder(Anatomy,1-adm),y=ploidy))+geom_hline(aes(yintercept=2),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="red",alpha=0.5)+geom_point()+
+      geom_line(aes(group=1),col="red")+theme_classic()+theme(axis.text.x = element_text(angle = 90),legend.position="bottom")+labs(x="Samples",y="Ploidy")
 
-      p2=ggplot(plasma,aes(x=reorder(anatomy,1-adm),y=1-adm))+geom_hline(aes(yintercept=0.5),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="blue",alpha=0.5)+geom_point()+
-      geom_ribbon(data=plasma[!is.na(plasma$adm),],aes(ymin=1-adm.min, ymax=1-adm.max,group=1), fill="blue", alpha=0.2)+geom_line(data=plasma[!is.na(plasma$adm),],aes(group=1),col="blue")+theme_classic()+theme(axis.text.x = element_blank(),axis.title.x = element_blank(),axis.ticks.x =
+      p2=ggplot(tissue,aes(x=reorder(Anatomy,1-adm),y=1-adm))+geom_hline(aes(yintercept=0.5),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="blue",alpha=0.5)+geom_point()+
+      geom_ribbon(data=tissue[!is.na(tissue$adm),],aes(ymin=1-adm.min, ymax=1-adm.max,group=1), fill="blue", alpha=0.2)+geom_line(data=tissue[!is.na(tissue$adm),],aes(group=1),col="blue")+theme_classic()+theme(axis.text.x = element_blank(),axis.title.x = element_blank(),axis.ticks.x =
       element_blank(),legend.position="bottom")+labs(x="Samples",y="Celularity")+ylim(0,1)
-      d=(p2/p)+plot_annotation(title = unique(full_data$Patient_ID))
+      d=(p2/p)+plot_annotation(title = paste0(unique(full_data$Patient_ID)," Tissue"))
       ggsave(paste0(output_dir,sep,unique(full_data$Patient_ID),"_Celularity_Tissue.png"),d)
     }
 }
