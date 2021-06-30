@@ -1655,10 +1655,9 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 
 
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
-
+    tissue$Anatomy=make.unique(tissue$Anatomy,sep="_")
     if(dim(tissue)[1]>0){
       for (x in unique(tissue$Anatomy)){
-        tissue$Anatomy=make.unique(tissue$Anatomy,sep="_")
         p01=ggplot(tissue %>% filter(grepl(x,Anatomy)),aes(x=log2))+
         geom_histogram(aes(y=..density..),binwidth=0.1,alpha=0.9,col="black")+geom_density(aes(y=..density..))+
         scale_fill_identity()+theme_classic()+xlim(min.log2-0.1,max.log2+0.1)
