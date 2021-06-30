@@ -1657,21 +1657,22 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
 
     if(dim(tissue)[1]>0){
-      for (x in unique(tissue$Timepoint_ID)){
-        p01=ggplot(tissue %>% filter(grepl(x,Timepoint_ID)),aes(x=log2))+
+      for (x in unique(tissue$Anatomy)){
+        tissue$Anatomy=make.unique(tissue$Anatomy,sep="_")
+        p01=ggplot(tissue %>% filter(grepl(x,Anatomy)),aes(x=log2))+
         geom_histogram(aes(y=..density..),binwidth=0.1,alpha=0.9,col="black")+geom_density(aes(y=..density..))+
         scale_fill_identity()+theme_classic()+xlim(min.log2-0.1,max.log2+0.1)
 
-        pa1=ggplot(tissue %>% filter(grepl(x,Timepoint_ID)))+geom_point(aes(y=beta,x=log2,col=col))+theme_classic()+geom_vline(aes(xintercept=0),linetype="dashed")+
+        pa1=ggplot(tissue %>% filter(grepl(x,Anatomy)))+geom_point(aes(y=beta,x=log2,col=col))+theme_classic()+geom_vline(aes(xintercept=0),linetype="dashed")+
         geom_vline(aes(xintercept=1),linetype="dashed")+geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+
         scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)
 
         p1a=p01/pa1+plot_layout(height=c(2,8))
 
-        p3=ggplot(tissue %>% filter(grepl(x,Timepoint_ID)))+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+
+        p3=ggplot(tissue %>% filter(grepl(x,Anatomy)))+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+
         geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+
-        ggrepel::geom_label_repel(data=tissue %>% filter(grepl(x,Timepoint_ID),AllelicImbalance>0.2,!is.na(pcf_gene_class)),aes(y=beta,x=log2,col=col,label=Symbol),force=20,max.overlaps=1000,min.segment.length = 0,parse=TRUE)+
-        geom_point(data=tissue %>% filter(grepl(x,Timepoint_ID),!is.na(pcf_gene_symbol),!is.na(Allelic_Imbalance)),aes(shape=Allelic_Imbalance,y=beta,x=log2,col=col))+
+        ggrepel::geom_label_repel(data=tissue %>% filter(grepl(x,Anatomy),AllelicImbalance>0.2,!is.na(pcf_gene_class)),aes(y=beta,x=log2,col=col,label=Symbol),force=20,max.overlaps=1000,min.segment.length = 0,parse=TRUE)+
+        geom_point(data=tissue %>% filter(grepl(x,Anatomy),!is.na(pcf_gene_symbol),!is.na(Allelic_Imbalance)),aes(shape=Allelic_Imbalance,y=beta,x=log2,col=col))+
         theme_classic()+scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)+theme(legend.position=c(0.88,0.075),legend.background = element_rect(
                 size=0.2, linetype="solid",colour="black"),
                 legend.key.width=unit(1.1,"cm"))
@@ -1683,7 +1684,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
                                   labels = tissue$Type,
                                   guide = "legend")
         leg=cowplot::get_legend(dummy)
-        p1=ggplot(tissue %>% filter(grepl(x,Timepoint_ID),!is.na(cnA)),aes(x=cnA,y=cnB,col=col))+ geom_point()+
+        p1=ggplot(tissue %>% filter(grepl(x,Anatomy),!is.na(cnA)),aes(x=cnA,y=cnB,col=col))+ geom_point()+
         scale_color_identity()+geom_abline(intercept = 0, slope = 1)+geom_hline(yintercept=c(1:(max.cnA)),linetype="dashed")+geom_vline(xintercept=c(1:(max.cnA)),linetype="dashed")+
         theme_classic()+xlim(0,max.cnA) +ylim(0,max.cnA)
 
@@ -1711,6 +1712,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 #' @import ggplot2
 
 plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
+
     sep="/"
     if(output_dir==""){
       sep=""
@@ -1727,8 +1729,8 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
     full_data=full_data %>% dplyr::mutate(CN=ifelse(cn>2,"GAIN",ifelse(cn<2,"LOSS","NEUTRAL")))
     full_data=full_data %>% dplyr::mutate(CNs=ifelse(CN=="GAIN"|CN=="LOSS","CNA","NEUTRAL"))
 
-    plasma=full_data %>% dplyr::filter(Origin=="Plasma") %>% dplyr::mutate(Timepoint_ID=as.Date(lubridate::dmy(Timepoint_ID)))
-    p1=ggplot(plasma %>% dplyr::group_by(sample,CN,Timepoint_ID,CNs)%>% dplyr::summarise(Count=n()))+geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(.~dmy(Timepoint_ID))+
+    plasma=full_data %>% dplyr::filter(Origin=="Plasma") %>% dplyr::mutate(Anatomy=as.Date(lubridate::dmy(Anatomy)))
+    p1=ggplot(plasma %>% dplyr::group_by(sample,CN,Anatomy,CNs)%>% dplyr::summarise(Count=n()))+geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(.~dmy(Anatomy))+
     theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(plasma$Patient_ID)," Plasma"),subtitle="Somatic copy number uncorrected") +
     theme(strip.text.x = element_text(size = 6))
     ggsave(paste0(output_dir,sep,unique(plasma$Patient_ID),"_SCNA_count_Plasma.png"),p)
@@ -1737,7 +1739,7 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
 
     if(dim(tissue)[1]>0){
-      p2=ggplot(tissue %>% dplyr::group_by(sample,CN,Anatomy,Timepoint_ID,CNs) %>% dplyr::summarise(Count=dplyr::n()) %>% dplyr::group_by(Timepoint_ID)%>% dplyr::mutate(TotalCN=sum(Count[CN!="NEUTRAL"])) %>% dplyr::group_by(CN)%>% dplyr::mutate(Anatomy=make.unique(Anatomy,sep="_")))+
+      p2=ggplot(tissue %>% dplyr::group_by(sample,CN,Anatomy,Anatomy,CNs) %>% dplyr::summarise(Count=dplyr::n()) %>% dplyr::group_by(Anatomy)%>% dplyr::mutate(TotalCN=sum(Count[CN!="NEUTRAL"])) %>% dplyr::group_by(CN)%>% dplyr::mutate(Anatomy=make.unique(Anatomy,sep="_")))+
       geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(~reorder(Anatomy,TotalCN))+theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(tissue$Patient_ID), " Tissue"),subtitle="Somatic copy number uncorrected")+
       theme(strip.text.x = element_text(size = 6))
       ggsave(paste0(output_dir,sep,unique(tissue$Patient_ID),"_SCNA_count_Tissue.png"),p)
