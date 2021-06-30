@@ -15,6 +15,7 @@ call_clonet(
   segment_data = "",
   patient_id = "",
   germ_pattern = "GL",
+  sample_data = "",
   min_snp_cov = 10,
   min_nsnps = 10,
   min_seg_cov = 20,
@@ -56,6 +57,8 @@ call_clonet(
 \item{patient_id}{Patient ID. Default Patient}
 
 \item{germ_pattern}{Germline pattern. Default GL}
+
+\item{sample_data}{Path to files with sample info}
 
 \item{min_snp_cov}{Minimum tumor coverage for informative SNPs. Default 10.}
 

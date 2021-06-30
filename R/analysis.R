@@ -200,6 +200,7 @@ call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip
 #' @param bam_dir [REQUIRED] Path to directory with BAM files.
 #' @param segment_data [REQUIRED] Path to file with formated segment data.
 #' @param patient_id Patient ID. Default Patient
+#' @param sample_data Path to files with sample info
 #' @param germ_pattern Germline pattern. Default GL
 #' @param min_snp_cov Minimum tumor coverage for informative SNPs. Default 10.
 #' @param min_nsnps Minimum number of SNPs per segment. Default 10.
@@ -224,7 +225,7 @@ call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip
 
 call_clonet=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",
 bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",
-bin_path5="tools/CLONET/CLONET.R",vcf="",bam_dir="",segment_data="",patient_id="",germ_pattern="GL",
+bin_path5="tools/CLONET/CLONET.R",vcf="",bam_dir="",segment_data="",patient_id="",germ_pattern="GL",sample_data="",
 min_snp_cov=10,min_nsnps=10,min_seg_cov=20,equal_betaThr=0.9,max_homo_dels=0.01,
 del_log_thr=c(-1,-0.25),alpha_par=0.9,clonal_thr=0.85,beta_thr=0.85,
 stages=c(1,2,3,4,5,6),comp_ref_map_bias=FALSE,beta_decimals=3,ale_imb_thr=0.5,
@@ -263,6 +264,9 @@ beta_method="STM",adm_method="2D",verbose=FALSE,output_dir="",jobs=1,threads=3){
     print(paste("Rscript",bin_path5,clonet_config))
   }
   system(paste("Rscript",bin_path5,clonet_config))
+
+  plot_celullarity(clonet_dir=paste0(out_file_dir,"/OUTPUT/Results"),sample_data=sample_data,output_dir=paste0(out_file_dir,"/OUTPUT/Results"))
+
 }
 
 
