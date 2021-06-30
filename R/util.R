@@ -1516,9 +1516,9 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
         dir.create(output_dir,recursive=TRUE)
     }
 
-    admixture=read.table(paste0(clonet_dir,"/globalAdmTable.txt"),header=TRUE)
-    ploidy=read.table(paste0(clonet_dir,"/ploidyTable.txt"),header=TRUE)
-    sample_info=read.table(sample_data,header=TRUE)
+    admixture=read.table(paste0(clonet_dir,"/globalAdmTable.txt"),header=TRUE,stringsAsFactors=FALSE)
+    ploidy=read.table(paste0(clonet_dir,"/ploidyTable.txt"),header=TRUE,stringsAsFactors=FALSE)
+    sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
     full_data=dplyr::left_join(admixture,ploidy,by="sample")
     full_data=fuzzyjoin::fuzzy_inner_join(full_data,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
 
