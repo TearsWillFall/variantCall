@@ -1502,8 +1502,9 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
 #' @param clonet_dir Path to clonet output directory
 #' @param sample_data Path to file with sample info
 #' @param output_dir Path to output directory.
-#' @import patchwork,tidyverse
 #' @export
+#' @import patchwork
+#' @import tidyverse
 
 
 plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
