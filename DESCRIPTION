@@ -20,7 +20,8 @@ Imports:
     data.table,
     fuzzyjoin,
     stringr,
-    lubridate
+    lubridate,
+    patchwork
 biocViews:
 Remotes:
     git::https://github.com/TearsWillFall/ULPwgs.git,

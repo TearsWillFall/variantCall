@@ -1493,12 +1493,57 @@ generate_CLONET_sample_info=function(snp_dir="",patient_id="",output_dir=""){
     sample_info=data.frame(Tumor.Array.Name="",Tumor.Bam.Name=tumor,Normal.Array.Name="",Normal.Bam.Name=germ)
     write.table(sample_info,file=paste0(out_file_dir,"/",out_file),quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
 }
-sample_data="~/Documents/Samples_tab.txt"
-clonet_dir="~/Downloads/TR017/Results"
-plot_celullarity_and_clonality=function(clonet_dir="",sample_data=""){
+
+#' This function generates a plot of ploidy and celularity levels from CLONET data
+#'
+#' This function takes the path to the directory with CLONET output, as well as a tab separated file with
+#' sample info and generates a plot of celularity and ploidy levels in the samples
+#'
+#' @param clonet_dir Path to clonet output directory
+#' @param sample_data Path to file with sample info
+#' @param output_dir Path to output directory.
+#' @export
+
+
+plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
+
+    sep="/"
+    if(output_dir==""){
+      sep=""
+    }
+
+    if (!dir.exists(output_dir)){
+        dir.create(output_dir,recursive=TRUE)
+    }
+
     admixture=read.table(paste0(clonet_dir,"/globalAdmTable.txt"),header=TRUE)
     ploidy=read.table(paste0(clonet_dir,"/ploidyTable.txt"),header=TRUE)
     sample_info=read.table(sample_data,header=TRUE)
     full_data=dplyr::left_join(admixture,ploidy,by="sample")
     full_data=fuzzyjoin::fuzzy_inner_join(full_data,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
+
+    plasma=full_data %>% filter(Origin=="Plasma") %>% mutate(Timepoint_ID=as.Date(lubridate::dmy(Timepoint_ID)))
+
+    p=ggplot(plasma,aes(x=Timepoint_ID,y=ploidy))+geom_hline(aes(yintercept=2),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="red",alpha=0.5)+geom_point()+
+    geom_line(aes(group=1),col="red")+theme_classic()+theme(axis.text.x = element_text(angle = 90),legend.position="bottom")+labs(x="Samples",y="Ploidy")
+
+    p2=ggplot(plasma,aes(x=Timepoint_ID,y=1-adm))+geom_hline(aes(yintercept=0.5),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="blue",alpha=0.5)+geom_point()+
+    geom_ribbon(data=plasma[!is.na(plasma$adm),],aes(ymin=1-adm.min, ymax=1-adm.max,group=1), fill="blue", alpha=0.2)+geom_line(data=plasma[!is.na(plasma$adm),],aes(group=1),col="blue")+theme_classic()+theme(axis.text.x = element_blank(),axis.title.x = element_blank(),axis.ticks.x = element_blank(),legend.position="bottom")+labs(x="Samples",y="Celularity")+ylim(0,1)
+
+    d=(p2/p)+plot_annotation(title = unique(sample_info$Patient_ID))
+    ggsave(paste0(output_dir,sep,unique(sample_info$Patient_ID),"_Celularity_Plasma.png"),d)
+
+    tissue=full_data %>% filter(Origin!="Plasma")
+
+    if(dim(tissue)[1]>0){
+      tissue$anatomy=make.unique(tissue$anatomy,sep="_")
+      p=ggplot(plasma,aes(x=reorder(anatomy,1-adm),y=ploidy))+geom_hline(aes(yintercept=2),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="red",alpha=0.5)+
+      geom_point()+geom_line(aes(group=1),col="red")+theme_classic()+theme(axis.text.x = element_text(angle = 90),legend.position="bottom")+labs(x="Samples",y="Ploidy")
+
+      p2=ggplot(plasma,aes(x=reorder(anatomy,1-adm),y=1-adm))+geom_hline(aes(yintercept=0.5),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="blue",alpha=0.5)+geom_point()+
+      geom_ribbon(data=plasma[!is.na(plasma$adm),],aes(ymin=1-adm.min, ymax=1-adm.max,group=1), fill="blue", alpha=0.2)+geom_line(data=plasma[!is.na(plasma$adm),],aes(group=1),col="blue")+theme_classic()+theme(axis.text.x = element_blank(),axis.title.x = element_blank(),axis.ticks.x =
+      element_blank(),legend.position="bottom")+labs(x="Samples",y="Celularity")+ylim(0,1)
+      d=(p2/p)+plot_annotation(title = unique(sample_info$Patient_ID))
+      ggsave(paste0(output_dir,sep,unique(sample_info$Patient_ID),"_Celularity_Tissue.png"),d)
+    }
 }
