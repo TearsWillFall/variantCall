@@ -1563,6 +1563,9 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
 #' @param gene_data Path to file with gene info
 #' @param output_dir Path to output directory.
 #' @export
+#' @import patchwork
+#' @import tidyverse
+#' @import ggplot2
 
 plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_data=""){
     sep="/"
