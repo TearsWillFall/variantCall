@@ -1696,3 +1696,50 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
       }
     }
 }
+
+#' This function generates a plot of ploidy and celularity levels from CLONET data
+#'
+#' This function takes the path to the directory with CLONET output, as well as a tab separated file with
+#' sample info and generates a plot of celularity and ploidy levels in the samples
+#'
+#' @param cn_call_data Path to segment data with cn calls
+#' @param sample_data Path to file with sample info
+#' @param output_dir Path to output directory.
+#' @export
+#' @import patchwork
+#' @import tidyverse
+#' @import ggplot2
+
+plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
+    sep="/"
+    if(output_dir==""){
+      sep=""
+    }
+
+    if (!dir.exists(output_dir)){
+        dir.create(output_dir,recursive=TRUE)
+    }
+
+    cn_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
+    sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
+    full_data=fuzzyjoin::fuzzy_inner_join(cn_info,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
+    full_data$cn=ifelse(full_data$chromosome=="X",  full_data$cn+1,  full_data$cn)
+    full_data=full_data %>% dplyr::mutate(CN=ifelse(cn>2,"GAIN",ifelse(cn<2,"LOSS","NEUTRAL")))
+    full_data=full_data %>% dplyr::mutate(CNs=ifelse(CN=="GAIN"|CN=="LOSS","CNA","NEUTRAL"))
+
+    plasma=full_data %>% dplyr::filter(Origin=="Plasma") %>% dplyr::mutate(Timepoint_ID=as.Date(lubridate::dmy(Timepoint_ID)))
+    p1=ggplot(plasma %>% dplyr::group_by(sample,CN,Timepoint_ID,CNs)%>% dplyr::summarise(Count=n()))+geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(.~dmy(Timepoint_ID))+
+    theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(plasma$Patient_ID)," Plasma"),subtitle="Somatic copy number uncorrected") +
+    theme(strip.text.x = element_text(size = 6))
+    ggsave(paste0(output_dir,sep,unique(plasma$Patient_ID),"_SCNA_count_Plasma.png"),p)
+
+
+    tissue=full_data %>% dplyr::filter(Origin!="Plasma")
+
+    if(dim(tissue)[1]>0){
+      p2=ggplot(tissue %>% dplyr::group_by(sample,CN,Anatomy,Timepoint_ID,CNs) %>% dplyr::summarise(Count=dplyr::n()) %>% dplyr::group_by(Timepoint_ID)%>% dplyr::mutate(TotalCN=sum(Count[CN!="NEUTRAL"])) %>% dplyr::group_by(CN)%>% dplyr::mutate(Anatomy=make.unique(Anatomy,sep="_")))+
+      geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(~reorder(Anatomy,TotalCN))+theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(tissue$Patient_ID), " Tissue"),subtitle="Somatic copy number uncorrected")+
+      theme(strip.text.x = element_text(size = 6))
+      ggsave(paste0(output_dir,sep,unique(tissue$Patient_ID),"_SCNA_count_Tissue.png"),p)
+    }
+}
