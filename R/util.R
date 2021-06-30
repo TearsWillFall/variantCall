@@ -1582,7 +1582,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 
     ale_imb_table=read.table(paste0(clonet_dir,"/allelicImbalanceTable.txt"),header=TRUE,stringsAsFactors=FALSE)
     sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
-    gen_info=read.table("/home/osvaldas/Downloads/fragment_length_bash/PCF_SELECT_GENES.txt",header=TRUE)
+    gen_info=read.table(gene_data,header=TRUE)
 
     ale_imb_table_complete=fuzzyjoin::fuzzy_inner_join(ale_imb_table, gen_info,
                     by=c("chr"="chr","start"="start","end"="end"),
