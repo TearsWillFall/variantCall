@@ -1645,7 +1645,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
       leg=cowplot::get_legend(dummy)
       p1=ggplot(plasma %>% dplyr::filter(grepl(x,Timepoint_ID),!is.na(cnA)),aes(x=cnA,y=cnB,col=col))+ geom_point()+scale_color_identity()+geom_abline(intercept = 0, slope = 1)+geom_hline(yintercept=c(1:(max.cnA)),linetype="dashed")+geom_vline(xintercept=c(1:(max.cnA)),linetype="dashed")+theme_classic()+xlim(0,max.cnA) +ylim(0,max.cnA)
 
-      leg=as.ggplot(leg)
+      leg=ggplotify::as.ggplot(leg)
       p1a=p01/pa1
       p1b=leg/p1
       pa=(p1a|p1b)
@@ -1688,7 +1688,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
         scale_color_identity()+geom_abline(intercept = 0, slope = 1)+geom_hline(yintercept=c(1:(max.cnA)),linetype="dashed")+geom_vline(xintercept=c(1:(max.cnA)),linetype="dashed")+
         theme_classic()+xlim(0,max.cnA) +ylim(0,max.cnA)
 
-        leg=as.ggplot(leg)
+        leg=ggplotify::as.ggplot(leg)
         p1a=p01/pa1
         p1b=leg/p1
         pa=(p1a|p1b)
