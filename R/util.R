@@ -1538,7 +1538,7 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
 
     if(dim(tissue)[1]>0){
-      tissue$anatomy=make.unique(tissue$Anatomy,sep="_")
+      tissue$Anatomy=make.unique(tissue$Anatomy,sep="_")
       p=ggplot(tissue,aes(x=reorder(Anatomy,1-adm),y=ploidy))+geom_hline(aes(yintercept=2),linetype="dotted",alpha=0.5)+geom_bar(stat="identity",col="black",fill="red",alpha=0.5)+geom_point()+
       geom_line(aes(group=1),col="red")+theme_classic()+theme(axis.text.x = element_text(angle = 90),legend.position="bottom")+labs(x="Samples",y="Ploidy")
 
