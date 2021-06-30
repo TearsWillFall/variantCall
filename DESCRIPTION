@@ -21,7 +21,10 @@ Imports:
     fuzzyjoin,
     stringr,
     lubridate,
-    patchwork
+    patchwork,
+    ggpubr,
+    ggrepel,
+    ggplotify
 biocViews:
 Remotes:
     git::https://github.com/TearsWillFall/ULPwgs.git,
