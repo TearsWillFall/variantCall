@@ -1566,7 +1566,6 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
 #' @import patchwork
 #' @import tidyverse
 #' @import ggplot2
-#' @import ggrepel
 
 plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_data=""){
     sep="/"
@@ -1620,11 +1619,9 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
       ifelse(cnA.int>=3 & cnB.int==1,"brown4",
       ifelse((is.na(cnA.int) & is.na(cnB.int)),"black","deeppink4")))))))))))
 
-    print(ale_imb_table)
     full_data=fuzzyjoin::fuzzy_inner_join(ale_imb_table,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
     full_data$Allelic_Imbalance=forcats::fct_rev(as.factor(ifelse(full_data$AllelicImbalance<=0.2,"E[AI] ≤ 0.2     ","E[AI] > 0.2     ")))
     full_data$Symbol=ifelse(grepl("CONTROL",full_data$pcf_gene_class),paste0(full_data$pcf_gene_symbol,"[C:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"),paste0(full_data$pcf_gene_symbol,"[T:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"))
-    print(full_data)
     plasma=full_data %>% dplyr::filter(Origin=="Plasma") %>% dplyr::mutate(Timepoint_ID=as.Date(lubridate::dmy(Timepoint_ID)))
 
     min.log2=min(full_data$log2,na.rm=TRUE)
@@ -1638,7 +1635,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
       p01=ggplot(plasma %>% dplyr::filter(grepl(x,Timepoint_ID)),aes(x=log2))+geom_histogram(aes(y=..density..),binwidth=0.1,alpha=0.9,col="black")+geom_density(aes(y=..density..))+scale_fill_identity()+theme_classic()+xlim(min.log2-0.1,max.log2+0.1)
       pa1=ggplot(plasma %>% dplyr::filter(grepl(x,Timepoint_ID)))+geom_point(aes(y=beta,x=log2,col=col))+theme_classic()+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)
       p1a=p01/pa1+plot_layout(height=c(2,8))
-      p3=ggplot(plasma %>% dplyr::filter(grepl(x,Timepoint_ID)))+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+geom_label_repel(data=plasma %>% dplyr::filter(grepl(x,Timepoint_ID),AllelicImbalance>0.2,!is.na(pcf_gene_class)),aes(y=beta,x=log2,col=col,label=Symbol),force=20,max.overlaps=1000,min.segment.length = 0,parse=TRUE)+geom_point(data=plasma %>% dplyr::filter(grepl(x,Timepoint_ID),!is.na(pcf_gene_symbol),!is.na(Allelic_Imbalance)),aes(shape=Allelic_Imbalance,y=beta,x=log2,col=col))+theme_classic()+scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)+theme(legend.position=c(0.88,0.075),legend.background = element_rect(
+      p3=ggplot(plasma %>% dplyr::filter(grepl(x,Timepoint_ID)))+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+ggrepel::geom_label_repel(data=plasma %>% dplyr::filter(grepl(x,Timepoint_ID),AllelicImbalance>0.2,!is.na(pcf_gene_class)),aes(y=beta,x=log2,col=col,label=Symbol),force=20,max.overlaps=1000,min.segment.length = 0,parse=TRUE)+geom_point(data=plasma %>% dplyr::filter(grepl(x,Timepoint_ID),!is.na(pcf_gene_symbol),!is.na(Allelic_Imbalance)),aes(shape=Allelic_Imbalance,y=beta,x=log2,col=col))+theme_classic()+scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)+theme(legend.position=c(0.88,0.075),legend.background = element_rect(
                                         size=0.2, linetype="solid",colour="black"),
               legend.key.width=unit(1.1,"cm"))
       dummy=ggplot(plasma[!is.na(plasma$cnA),])+geom_hline(aes(yintercept=0),linetype="dashed")+geom_hline(aes(yintercept=1),linetype="dashed")+geom_hline(aes(yintercept=2),linetype="dashed")+geom_hline(aes(yintercept=3),linetype="dashed") +geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+geom_vline(aes(xintercept=2),linetype="dashed")+geom_vline(aes(xintercept=3),linetype="dashed")+ geom_point(aes(x=cnA,y=cnB,col=col))+theme_classic()+geom_abline(intercept = 0, slope = 1)+xlim(0,3) +ylim(0,3)+ scale_color_identity(name = "Copy Number",
@@ -1674,7 +1671,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 
         p3=ggplot(tissue %>% filter(grepl(x,Timepoint_ID)))+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+
         geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+
-        geom_label_repel(data=tissue %>% filter(grepl(x,Timepoint_ID),AllelicImbalance>0.2,!is.na(pcf_gene_class)),aes(y=beta,x=log2,col=col,label=Symbol),force=20,max.overlaps=1000,min.segment.length = 0,parse=TRUE)+
+        ggrepel::geom_label_repel(data=tissue %>% filter(grepl(x,Timepoint_ID),AllelicImbalance>0.2,!is.na(pcf_gene_class)),aes(y=beta,x=log2,col=col,label=Symbol),force=20,max.overlaps=1000,min.segment.length = 0,parse=TRUE)+
         geom_point(data=tissue %>% filter(grepl(x,Timepoint_ID),!is.na(pcf_gene_symbol),!is.na(Allelic_Imbalance)),aes(shape=Allelic_Imbalance,y=beta,x=log2,col=col))+
         theme_classic()+scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)+theme(legend.position=c(0.88,0.075),legend.background = element_rect(
                 size=0.2, linetype="solid",colour="black"),
