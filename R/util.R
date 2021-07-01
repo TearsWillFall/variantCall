@@ -1708,7 +1708,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     r_names=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),1]
     log2_corr_mtx=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),-1]
 
-    png(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".log2_corrected_CLONET.png"),width=1600,height=1200)
+    png(filename=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".log2_corrected_CLONET.png"),width=10,height=20,units="in",res=1200)
 
     ComplexHeatmap::Heatmap(as.matrix(log2_corr_mtx),na_col="black",column_labels=c_names,
     row_labels=r_names,column_names_gp=grid::gpar(fontsize=7),cluster_rows=FALSE,cluster_columns=TRUE,
