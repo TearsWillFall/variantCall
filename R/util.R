@@ -1704,7 +1704,9 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
     write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET.txt"),x=log2_corr_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
     c_names=as.character(unique(log2_corr_per_gene$Symbol))
+    print(c_names)
     r_names=as.character(log2_corr_per_gene_wider[,1])
+    print(r_names)
     log2_corr_per_gene_wider=as.data.frame(log2_corr_per_gene_wider)
     log2_corr_mtx=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),-1]
     print(as.matrix(log2_corr_mtx))
