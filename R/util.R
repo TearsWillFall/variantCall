@@ -1698,7 +1698,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
         write.table(file=paste0(out_file_dir,"/",unique(tissue$Patient_ID),".",x,".Allelic_Imbalance_CLONET_tissue.txt"),x=sub_tissue,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
       }
     }
-    full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID),full_data$Anatomy))
+    full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy))
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
     log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
     cor_matrix=cor(t(log2_corr_per_gene_wider))
