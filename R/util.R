@@ -1658,20 +1658,20 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     tissue=tissue %>%dplyr::group_by(pcf_gene_symbol,Overlap,chr.x,start.x,end.x) %>% dplyr::mutate(Anatomy=make.unique(Anatomy,sep="_"))
     if(dim(tissue)[1]>0){
       for (x in unique(tissue$Anatomy)){
-        p01=ggplot(tissue %>% dplyr::filter(grepl(x,Anatomy)),aes(x=log2))+
+        p01=ggplot(tissue %>% dplyr::filter(Anatomy==x),aes(x=log2))+
         geom_histogram(aes(y=..density..),binwidth=0.1,alpha=0.9,col="black")+geom_density(aes(y=..density..))+
         scale_fill_identity()+theme_classic()+xlim(min.log2-0.1,max.log2+0.1)
 
-        pa1=ggplot(tissue %>% dplyr::filter(grepl(x,Anatomy)))+geom_point(aes(y=beta,x=log2,col=col))+theme_classic()+geom_vline(aes(xintercept=0),linetype="dashed")+
+        pa1=ggplot(tissue %>% dplyr::filter(Anatomy==x)+geom_point(aes(y=beta,x=log2,col=col))+theme_classic()+geom_vline(aes(xintercept=0),linetype="dashed")+
         geom_vline(aes(xintercept=1),linetype="dashed")+geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+
         scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)
 
         p1a=p01/pa1+plot_layout(height=c(2,8))
 
-        p3=ggplot(tissue %>% dplyr::filter(grepl(x,Anatomy)))+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+
+        p3=ggplot(tissue %>% dplyr::filter(Anatomy==x)+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+
         geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+
-        ggrepel::geom_label_repel(data=tissue %>% dplyr::filter(grepl(x,Anatomy),AllelicImbalance>0.2,!is.na(pcf_gene_class)),aes(y=beta,x=log2,col=col,label=Symbol),force=20,max.overlaps=1000,min.segment.length = 0,parse=TRUE)+
-        geom_point(data=tissue %>% dplyr::filter(grepl(x,Anatomy),!is.na(pcf_gene_symbol),!is.na(Allelic_Imbalance)),aes(shape=Allelic_Imbalance,y=beta,x=log2,col=col))+
+        ggrepel::geom_label_repel(data=tissue %>% dplyr::filter(Anatomy==x,AllelicImbalance>0.2,!is.na(pcf_gene_class)),aes(y=beta,x=log2,col=col,label=Symbol),force=20,max.overlaps=1000,min.segment.length = 0,parse=TRUE)+
+        geom_point(data=tissue %>% dplyr::filter(Anatomy==x,!is.na(pcf_gene_symbol),!is.na(Allelic_Imbalance)),aes(shape=Allelic_Imbalance,y=beta,x=log2,col=col))+
         theme_classic()+scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)+theme(legend.position=c(0.88,0.075),legend.background = element_rect(
                 size=0.2, linetype="solid",colour="black"),
                 legend.key.width=unit(1.1,"cm"))
@@ -1683,7 +1683,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
                                   labels = tissue$Type,
                                   guide = "legend")
         leg=cowplot::get_legend(dummy)
-        p1=ggplot(tissue %>% dplyr::filter(grepl(x,Anatomy),!is.na(cnA)),aes(x=cnA,y=cnB,col=col))+ geom_point()+
+        p1=ggplot(tissue %>% dplyr::filter(Anatomy==x,!is.na(cnA)),aes(x=cnA,y=cnB,col=col))+ geom_point()+
         scale_color_identity()+geom_abline(intercept = 0, slope = 1)+geom_hline(yintercept=c(1:(max.cnA)),linetype="dashed")+geom_vline(xintercept=c(1:(max.cnA)),linetype="dashed")+
         theme_classic()+xlim(0,max.cnA) +ylim(0,max.cnA)
 
