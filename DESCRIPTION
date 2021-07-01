@@ -26,7 +26,8 @@ Imports:
     ggrepel,
     ggplotify,
     tidyverse,
-    corrplot
+    corrplot,
+    parallel
 biocViews:
 Remotes:
     git::https://github.com/TearsWillFall/ULPwgs.git,

@@ -1631,7 +1631,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     max.cnA=max(full_data$cnA.int,na.rm=TRUE)
 
 
-    for (x in as.character(unique(plasma$Timepoint_ID))){
+    parallel::mclapply(unique(plasma$Timepoint_ID),FUN=function(x){
       sub_plasma=plasma %>% dplyr::filter(Timepoint_ID==x)
       p01=ggplot(sub_plasma,aes(x=log2))+geom_histogram(aes(y=..density..),binwidth=0.1,alpha=0.9,col="black")+geom_density(aes(y=..density..))+scale_fill_identity()+theme_classic()+xlim(min.log2-0.1,max.log2+0.1)
       pa1=ggplot(sub_plasma)+geom_point(aes(y=beta,x=log2,col=col))+theme_classic()+geom_vline(aes(xintercept=0),linetype="dashed")+geom_vline(aes(xintercept=1),linetype="dashed")+geom_vline(aes(xintercept=-1),linetype="dashed")+geom_vline(aes(xintercept=0.6),linetype="dashed")+scale_color_identity()+xlim(min.log2-0.1,max.log2+0.1)+ylim(min.beta-0.1,max.beta+0.1)
@@ -1653,12 +1653,12 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
       pa=(pa+p3)+plot_layout(width=c(3,3,6))+plot_annotation(title = x)
       ggsave(paste0(out_file_dir,"/",unique(plasma$Patient_ID),".",x,".CLONET_per_gene_plasma.png"),pa,width=20,height=10)
       write.table(file=paste0(out_file_dir,"/",unique(plasma$Patient_ID),".",x,".Allelic_Imbalance_CLONET_plasma.txt"),x=sub_plasma,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
-    }
+    },mc.cores=threads)
 
 
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
     if(dim(tissue)[1]>0){
-      for (x in unique(tissue$Anatomy)){
+      parallel::mclapply(unique(tissue$Anatomy),FUN=function(x){
         sub_tissue=tissue %>% dplyr::filter(Anatomy==x)
         p01=ggplot(sub_tissue,aes(x=log2))+
         geom_histogram(aes(y=..density..),binwidth=0.1,alpha=0.9,col="black")+geom_density(aes(y=..density..))+
@@ -1696,12 +1696,11 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
         pa=(pa+p3)+plot_layout(width=c(3,3,6))+plot_annotation(title = x)
         ggsave(paste0(out_file_dir,"/",unique(tissue$Patient_ID),".",x,".CLONET_per_gene_tissue.png"),pa,width=20,height=10)
         write.table(file=paste0(out_file_dir,"/",unique(tissue$Patient_ID),".",x,".Allelic_Imbalance_CLONET_tissue.txt"),x=sub_tissue,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
-      }
+      },mc.cores=threads)
     }
     full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy)
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
-    log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
-    print(log2_corr_per_gene_wider)
+    log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr") %>% tidyr::drop_na()
     cor_matrix=cor(t(log2_corr_per_gene_wider))
     png(file = "Log2corrected_Correlation.png",width=1920,height=2500)
     corrplot(cor_matrix, order = "hclust",tl.col="black",type="lower")
