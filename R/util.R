@@ -1705,7 +1705,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET.txt"),x=log2_corr_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
     log2_corr_per_gene_wider=as.data.frame(log2_corr_per_gene_wider)
     rownames(log2_corr_per_gene_wider)=log2_corr_per_gene_wider[,1]
-    log2_corr_mtx=t(log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<ncol(log2_corr_per_gene_wider),-1])
+    log2_corr_mtx=t(log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<ncol(log2_corr_per_gene_wider-1),-1])
     log2_corr_mtx=log2_corr_mtx[rowSums(is.na(log2_corr_per_gene_wider))<1,]
     cor_matrix=cor(log2_corr_mtx)
     print(cor_matrix)
