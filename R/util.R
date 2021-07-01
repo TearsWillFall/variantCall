@@ -1655,7 +1655,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 
 
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
-    tissue=tissue %>%dplyr::group_by(pcf_gene_symbol) %>% dplyr::mutate(Anatomy=make.unique(tissue$Anatomy,sep="_"))
+    tissue=tissue %>%dplyr::group_by(pcf_gene_symbol,Overlap,chr.x,start.x,end.x) %>% dplyr::mutate(Anatomy=make.unique(Anatomy,sep="_"))
     if(dim(tissue)[1]>0){
       for (x in unique(tissue$Anatomy)){
         p01=ggplot(tissue %>% dplyr::filter(grepl(x,Anatomy)),aes(x=log2))+
