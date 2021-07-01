@@ -1568,7 +1568,7 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
 #' @import tidyverse
 #' @import ggplot2
 
-plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_data="",theads=3){
+plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_data="",threads=3){
     sep="/"
     if(output_dir==""){
       sep=""
