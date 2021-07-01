@@ -1702,7 +1702,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy)
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
     log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
-    write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),,".Allelic_Imbalance_CLONET.txt"),x=log2_corr_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
+    write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET.txt"),x=log2_corr_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
     log2_corr_per_gene_wider=as.data.frame(log2_corr_per_gene_wider)
     rownames(log2_corr_per_gene_wider)=log2_corr_per_gene_wider[,1]
     log2_corr_mtx=t(log2_corr_per_gene_wider[complete.cases(log2_corr_per_gene_wider),-1])
