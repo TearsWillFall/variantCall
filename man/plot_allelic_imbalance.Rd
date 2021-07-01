@@ -8,7 +8,8 @@ plot_allelic_imbalance(
   clonet_dir = "",
   sample_data = "",
   output_dir = "",
-  gene_data = ""
+  gene_data = "",
+  threads = 3
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ plot_allelic_imbalance(
 \item{output_dir}{Path to output directory.}
 
 \item{gene_data}{Path to file with gene info}
+
+\item{threads}{Number of threads.}
 }
 \description{
 This function takes the path to the directory with CLONET output, as well as a tab separated file with

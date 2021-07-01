@@ -27,7 +27,8 @@ Imports:
     ggplotify,
     tidyverse,
     corrplot,
-    parallel
+    parallel,
+    ComplexHeatmap
 biocViews:
 Remotes:
     git::https://github.com/TearsWillFall/ULPwgs.git,

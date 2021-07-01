@@ -1703,14 +1703,14 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
     log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
     write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET.txt"),x=log2_corr_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
+    c_names=unique(log2_corr_per_gene$Symbol)
+    r_names=log2_corr_per_gene_wider[,1]
     log2_corr_per_gene_wider=as.data.frame(log2_corr_per_gene_wider)
-    rownames(log2_corr_per_gene_wider)=log2_corr_per_gene_wider[,1]
     log2_corr_mtx=t(log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),-1])
-    log2_corr_mtx=log2_corr_mtx[rowSums(is.na(log2_corr_per_gene_wider))<1,]
-    cor_matrix=cor(log2_corr_mtx)
-    print(cor_matrix)
-    png(file ="Log2corrected_Correlation.png",width=1920,height=2500)
-    corrplot::corrplot(cor_matrix, order = "hclust",tl.col="black",type="lower")
+    png(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".log2_corrected_CLONET.png"),width=1600,height=1200)
+    ComplexHeatmap::Heatmap(as.matrix(log2_corr_mtx),na_col="black",column_labels=c_names,
+    row_labels=r_names,column_names_gp=gpar(fontsize=7),cluster_rows=FALSE,cluster_columns=TRUE,
+    row_split=c(rep("Plasma",sum(!grepl("[a-z]",r_names))),rep("Tissue",sum(!grepl("[a-z]",r_names)))),name="log2.cor")
     dev.off()
 }
 
