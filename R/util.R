@@ -1636,7 +1636,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     max.beta=1
     max.cnA=max(full_data$cnA.int,na.rm=TRUE)
 
-  parallel::mclapply(unique(full_data$Type),FUN=function(y){
+  parallel::mclapply(unique(full_data$Origin),FUN=function(y){
     sub_origin=full_data %>% dplyr::filter(Origin==y)
     parallel::mclapply(unique(sub_origin$ID),FUN=function(x){
       sub_ID=sub_origin %>% dplyr::filter(ID==x)
