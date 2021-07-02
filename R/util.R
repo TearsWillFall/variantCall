@@ -1562,13 +1562,14 @@ plot_celullarity=function(clonet_dir="",sample_data="",output_dir=""){
 #' @param sample_data Path to file with sample info
 #' @param gene_data Path to file with gene info
 #' @param output_dir Path to output directory.
+#' @param jobs Number of jobs to run.
 #' @param threads Number of threads.
 #' @export
 #' @import patchwork
 #' @import tidyverse
 #' @import ggplot2
 
-plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_data="",threads=3){
+plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_data="",jobs=1,threads=3){
     sep="/"
     if(output_dir==""){
       sep=""
