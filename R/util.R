@@ -1627,6 +1627,8 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     full_data$Allelic_Imbalance=forcats::fct_rev(as.factor(ifelse(full_data$AllelicImbalance<=0.2,"E[AI] ≤ 0.2     ","E[AI] > 0.2     ")))
     full_data$Symbol=ifelse(grepl("CONTROL",full_data$pcf_gene_class),paste0(full_data$pcf_gene_symbol,"[C:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"),paste0(full_data$pcf_gene_symbol,"[T:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"))
     full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy)
+    write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".CLONET.txt"),x=full_data,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
+
 
     min.log2=min(full_data$log2,na.rm=TRUE)
     max.log2=max(full_data$log2,na.rm=TRUE)
