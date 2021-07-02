@@ -1589,7 +1589,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     clonality_table=read.table(paste0(clonet_dir,"/clonalityTable.txt"),header=TRUE,stringsAsFactors=FALSE)
     sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
     gen_info=read.table(gene_data,header=TRUE)
-    ale_imb_table=dplyr::left_join(ale_imb_table,clonality_table,by=c("sample"="sample","chr"="chr","start"="start","end"="end"))
+    ale_imb_table=dplyr::left_join(ale_imb_table,clonality_table)
 
     ale_imb_table_complete=fuzzyjoin::fuzzy_inner_join(ale_imb_table, gen_info,
                     by=c("chr"="chr","start"="start","end"="end"),
@@ -1660,8 +1660,6 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
       write.table(file=paste0(out_file_dir,"/",unique(sub_ID$Patient_ID),".",x,".Allelic_Imbalance_CLONET_",y,".txt"),x=sub_ID,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
     },mc.cores=jobs)
   },mc.cores=threads)
-
-
 
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
     log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
