@@ -1705,7 +1705,7 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
     cn_info=read.table(cn_call_data,header=TRUE,stringsAsFactors=FALSE)
     sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
     full_data=fuzzyjoin::fuzzy_inner_join(cn_info,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
-    full_data$cn=ifelse(full_data$chromosome=="X",  full_data$cn+1,  full_data$cn)
+    full_data$cn=ifelse(full_data$chr=="X",  full_data$cn+1,  full_data$cn)
     full_data=full_data %>% dplyr::mutate(CN=ifelse(cn>2,"GAIN",ifelse(cn<2,"LOSS","NEUTRAL")))
     full_data=full_data %>% dplyr::mutate(CNs=ifelse(CN=="GAIN"|CN=="LOSS","CNA","NEUTRAL"))
 
@@ -1757,7 +1757,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
     segments=read.table(ref_bins,stringsAsFactors=FALSE)
     full_data=fuzzyjoin::fuzzy_inner_join(cn_info,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
-    full_data$cn=ifelse(full_data$chromosome=="X",  full_data$cn+1,  full_data$cn)
+    full_data$cn=ifelse(full_data$chr=="X",  full_data$cn+1,  full_data$cn)
     full_data=full_data %>% dplyr::mutate(CN=ifelse(cn>2,"GAIN",ifelse(cn<2,"LOSS","NEUTRAL")))
     full_data=full_data %>% dplyr::mutate(CNs=ifelse(CN=="GAIN"|CN=="LOSS","CNA","NEUTRAL"))
     full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Anatomy)),full_data$Anatomy)
