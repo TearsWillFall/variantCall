@@ -1760,8 +1760,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     full_data$cn=ifelse(full_data$chr=="X",  full_data$cn+1,  full_data$cn)
     full_data=full_data %>% dplyr::mutate(CN=ifelse(cn>2,"GAIN",ifelse(cn<2,"LOSS","NEUTRAL")))
     full_data=full_data %>% dplyr::mutate(CNs=ifelse(CN=="GAIN"|CN=="LOSS","CNA","NEUTRAL"))
-    full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Anatomy)),full_data$Anatomy)
-    print(full_data)
+    full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy)
     segments$cn=2
     segments$region="-"
     solution=parallel::mclapply(unique(full_data$ID),FUN=function(x){segments_tmp=segments;CN_sub=full_data %>% filter(sample==x);
