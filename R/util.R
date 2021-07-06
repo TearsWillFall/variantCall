@@ -1710,7 +1710,7 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
     full_data=full_data %>% dplyr::mutate(CNs=ifelse(CN=="GAIN"|CN=="LOSS","CNA","NEUTRAL"))
 
     plasma=full_data %>% dplyr::filter(Origin=="Plasma") %>% dplyr::mutate(Anatomy=as.Date(lubridate::dmy(Anatomy)))
-    p1=ggplot(plasma %>% dplyr::group_by(sample,CN,Anatomy,CNs)%>% dplyr::summarise(Count=n()))+geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(.~dmy(Anatomy))+
+    p1=ggplot(plasma %>% dplyr::group_by(sample,CN,Anatomy,CNs)%>% dplyr::summarise(Count=dplyr::n()))+geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(.~dmy(Anatomy))+
     theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(plasma$Patient_ID)," Plasma"),subtitle="Somatic copy number uncorrected") +
     theme(strip.text.x = element_text(size = 6))
     ggsave(paste0(output_dir,sep,unique(plasma$Patient_ID),"_SCNA_count_Plasma.png"),p)
