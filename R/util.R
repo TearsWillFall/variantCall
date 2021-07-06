@@ -1764,7 +1764,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     segments$cn=2
     segments$region="-"
     print(unique(full_data$ID))
-    print(names(full_data))
+    print(segments)
     solution=parallel::mclapply(unique(full_data$ID),FUN=function(x){segments_tmp=segments;CN_sub=full_data %>% filter(ID==x);
     for (y in 1:nrow(CN_sub)){segments_tmp[segments_tmp$V1==CN_sub[y,]$chr & segments_tmp$V2>=CN_sub[y,]$start & segments_tmp$V3<=CN_sub[y,]$end,"cn"]=CN_sub[y,]$cn;
     segments_tmp$sample=x;segments_tmp[segments_tmp$V1==CN_sub[y,]$chr & segments_tmp$V2<=CN_sub[y,]$end & segments_tmp$V3>=CN_sub[y,]$start,"region"]=paste0(CN_sub[y,]$chr,":",CN_sub[y,]$start,"-",CN_sub[y,]$end)};
