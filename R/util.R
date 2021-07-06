@@ -1753,8 +1753,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     if (!dir.exists(output_dir)& output_dir!=""){
         dir.create(output_dir,recursive=TRUE)
     }
-
-    cn_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
+    cn_info=read.table(cn_call_data,header=TRUE,stringsAsFactors=FALSE)
     sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
     segments=read.table(ref_bins,stringsAsFactors=FALSE)
     full_data=fuzzyjoin::fuzzy_inner_join(cn_info,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
