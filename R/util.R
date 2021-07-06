@@ -1767,10 +1767,9 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     for (y in 1:nrow(CN_sub)){segments_tmp[segments_tmp$V1==CN_sub[y,]$chr & segments_tmp$V2>=CN_sub[y,]$start & segments_tmp$V3<=CN_sub[y,]$end,"cn"]=CN_sub[y,]$cn;
     segments_tmp$sample=x;segments_tmp[segments_tmp$V1==CN_sub[y,]$chr & segments_tmp$V2<=CN_sub[y,]$end & segments_tmp$V3>=CN_sub[y,]$start,"region"]=paste0(CN_sub[y,]$chr,":",CN_sub[y,]$start,"-",CN_sub[y,]$end)};
     return(segments_tmp)},mc.cores=threads)
-    print(solution)
     solution=solution %>% dplyr::bind_rows()
     solution$change=ifelse(solution$cn==2,0,ifelse(solution$cn>2,1,-1))
-    solution_wider=tidyr::pivot_wider(id_cols="V4",names_from="sample",values_from="change")
+    solution_wider=tidyr::pivot_wider(solution,id_cols="V4",names_from="sample",values_from="change")
     solution_matrix=solution_wider[,-1]
 
     dist_matrix_all=dist(t(solution_matrix))
