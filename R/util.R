@@ -1783,7 +1783,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
 
 
 
-    dist_matrix_plasma=dist(t(solution_matrix[!grepl("[aA-zZ]",solution_matrix),]))
+    dist_matrix_plasma=dist(t(solution_matrix[,!grepl("[aA-zZ]",solution_matrix)]))
     NJ_data_plasma=phangorn::NJ(dist_matrix_plasma)
     NJ_tree_plasma=ape::ladderize(NJ_data_plasma)
 
@@ -1793,7 +1793,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     dev.off()
 
 
-    dist_matrix_tissue=dist(t(solution_matrix[grepl("[aA-zZ]",solution_matrix),]))
+    dist_matrix_tissue=dist(t(solution_matrix[,grepl("[aA-zZ]",solution_matrix)]))
     NJ_data_tissue=phangorn::NJ(dist_matrix_tissue)
     NJ_tree_tissue=ape::ladderize(NJ_data_tissue)
 
