@@ -1702,7 +1702,7 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
         dir.create(output_dir,recursive=TRUE)
     }
 
-    cn_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
+    cn_info=read.table(cn_call_data,header=TRUE,stringsAsFactors=FALSE)
     sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
     full_data=fuzzyjoin::fuzzy_inner_join(cn_info,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
     full_data$cn=ifelse(full_data$chromosome=="X",  full_data$cn+1,  full_data$cn)
