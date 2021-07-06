@@ -1698,7 +1698,7 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
       sep=""
     }
 
-    if (!dir.exists(output_dir)){
+    if (!dir.exists(output_dir) & output_dir==""){
         dir.create(output_dir,recursive=TRUE)
     }
 
@@ -1713,7 +1713,7 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
     p1=ggplot(plasma %>% dplyr::group_by(sample,CN,Anatomy,CNs)%>% dplyr::summarise(Count=dplyr::n()))+geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(.~dmy(Anatomy))+
     theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(plasma$Patient_ID)," Plasma"),subtitle="Somatic copy number uncorrected") +
     theme(strip.text.x = element_text(size = 6))
-    ggsave(paste0(output_dir,sep,unique(plasma$Patient_ID),"_SCNA_count_Plasma.png"),p)
+    ggsave(paste0(output_dir,sep,unique(plasma$Patient_ID),"_SCNA_count_Plasma.png"),p1)
 
 
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
@@ -1722,7 +1722,7 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
       p2=ggplot(tissue %>% dplyr::group_by(sample,CN,Anatomy,Anatomy,CNs) %>% dplyr::summarise(Count=dplyr::n()) %>% dplyr::group_by(Anatomy)%>% dplyr::mutate(TotalCN=sum(Count[CN!="NEUTRAL"])) %>% dplyr::group_by(CN)%>% dplyr::mutate(Anatomy=make.unique(Anatomy,sep="_")))+
       geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(~reorder(Anatomy,TotalCN))+theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(tissue$Patient_ID), " Tissue"),subtitle="Somatic copy number uncorrected")+
       theme(strip.text.x = element_text(size = 6))
-      ggsave(paste0(output_dir,sep,unique(tissue$Patient_ID),"_SCNA_count_Tissue.png"),p)
+      ggsave(paste0(output_dir,sep,unique(tissue$Patient_ID),"_SCNA_count_Tissue.png"),p2)
     }
 }
 
