@@ -1676,10 +1676,6 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     row_labels=r_names,column_names_gp=grid::gpar(fontsize=7),cluster_rows=FALSE,cluster_columns=TRUE,
     row_split=c(rep("Plasma",sum(!grepl("[aA-zZ]",r_names))),rep("Tissue",sum(grepl("[aA-zZ]",r_names)))),name="log2.cor"))
     dev.off()
-
-
-
-
 }
 
 #' This function generates a plot of ploidy and celularity levels from CLONET data
@@ -1728,4 +1724,82 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
       theme(strip.text.x = element_text(size = 6))
       ggsave(paste0(output_dir,sep,unique(tissue$Patient_ID),"_SCNA_count_Tissue.png"),p)
     }
+}
+
+
+#' This function generates a plot of reltionship between samples based on Hammering Distance
+#' computed as the number of bins thats differ between samples
+
+#' This function takes the path to the directory with CLONET output, as well as a tab separated file with
+#' sample info and generates a plot of celularity and ploidy levels in the samples
+#'
+#' @param cn_call_data Path to segment data with cn calls
+#' @param sample_data Path to file with sample info
+#' @param ref_bins  Path to reference genome binned into 100kb/500kb bin
+#' @param output_dir Path to output directory.
+#' @param threads Number of threads to use.
+#' @export
+#' @import patchwork
+#' @import tidyverse
+#' @import ggplot2
+
+plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",output_dir="",threads=3){
+
+    sep="/"
+    if(output_dir==""){
+      sep=""
+    }
+
+    if (!dir.exists(output_dir)){
+        dir.create(output_dir,recursive=TRUE)
+    }
+
+    cn_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
+    sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
+    segments=read.table(ref_bins,stringsAsFactors=FALSE)
+    full_data=fuzzyjoin::fuzzy_inner_join(cn_info,sample_info, by = c("sample" = "Sample_name_corrected"), match_fun = stringr::str_detect)
+    full_data$cn=ifelse(full_data$chromosome=="X",  full_data$cn+1,  full_data$cn)
+    full_data=full_data %>% dplyr::mutate(CN=ifelse(cn>2,"GAIN",ifelse(cn<2,"LOSS","NEUTRAL")))
+    full_data=full_data %>% dplyr::mutate(CNs=ifelse(CN=="GAIN"|CN=="LOSS","CNA","NEUTRAL"))
+    full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(Anatomy)),full_data$Anatomy)
+    segments$cn=2
+    segments$region="-"
+    solution=parallel::mclapply(unique(full_data$ID),FUN=function(x){segments_tmp=segments;CN_sub=full_data %>% filter(sample==x);
+    for (y in 1:nrow(CN_sub)){segments_tmp[segments_tmp$V1==CN_sub[y,]$chr & segments_tmp$V2>=CN_sub[y,]$start & segments_tmp$V3<=CN_sub[y,]$end,"cn"]=CN_sub[y,]$cn;
+    segments_tmp$sample=x;segments_tmp[segments_tmp$V1==CN_sub[y,]$chr & segments_tmp$V2<=CN_sub[y,]$end & segments_tmp$V3>=CN_sub[y,]$start,"region"]=paste0(CN_sub[y,]$chr,":",CN_sub[y,]$start,"-",CN_sub[y,]$end)};
+    return(segments_tmp)},mc.cores=threads)
+    solution=solution %>% dplyr::bind_rows()
+    solution$change=ifelse(solution$cn==2,0,ifelse(solution$cn>2,1,-1))
+    solution_wider=tidyr::pivot_wider(id_cols="V4",names_from="sample",values_from="change")
+    solution_matrix=solution_wider[,-1]
+
+    dist_matrix_all=dist(t(solution_matrix))
+    NJ_data_all=phangorn::NJ(dist_matrix_all)
+    NJ_tree_all=ape::ladderize(NJ_data_all)
+
+    png(filename=paste0(unique(plasma$Patient_ID),".NJ_all_plasma.png"),units="in",width=12,height=10)
+      p=ape::plot.phylo(NJ_tree_all)
+      p
+    dev.off()
+
+
+
+    dist_matrix_plasma=dist(t(solution_matrix[!grepl("[aA-zZ]",solution_matrix),]))
+    NJ_data_plasma=phangorn::NJ(dist_matrix_plasma)
+    NJ_tree_plasma=ape::ladderize(NJ_data_plasma)
+
+    png(filename=paste0(unique(plasma$Patient_ID),".NJ_all_plasma.png"),units="in",width=12,height=10)
+      p=ape::plot.phylo(NJ_tree_plasma)
+      p
+    dev.off()
+
+
+    dist_matrix_tissue=dist(t(solution_matrix[grepl("[aA-zZ]",solution_matrix),]))
+    NJ_data_tissue=phangorn::NJ(dist_matrix_tissue)
+    NJ_tree_tissue=ape::ladderize(NJ_data_tissue)
+
+    png(filename=paste0(unique(plasma$Patient_ID),".NJ_all_plasma.png"),units="in",width=12,height=10)
+      p=ape::plot.phylo(NJ_tree_tissue)
+      p
+    dev.off()
 }

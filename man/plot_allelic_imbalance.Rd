@@ -9,6 +9,7 @@ plot_allelic_imbalance(
   sample_data = "",
   output_dir = "",
   gene_data = "",
+  jobs = 1,
   threads = 3
 )
 }
@@ -20,6 +21,8 @@ plot_allelic_imbalance(
 \item{output_dir}{Path to output directory.}
 
 \item{gene_data}{Path to file with gene info}
+
+\item{jobs}{Number of jobs to run.}
 
 \item{threads}{Number of threads.}
 }

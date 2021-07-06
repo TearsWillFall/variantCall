@@ -28,7 +28,9 @@ Imports:
     tidyverse,
     corrplot,
     parallel,
-    ComplexHeatmap
+    ComplexHeatmap,
+    phangorn,
+    ape
 biocViews:
 Remotes:
     git::https://github.com/TearsWillFall/ULPwgs.git,
