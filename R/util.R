@@ -1776,7 +1776,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     NJ_data_all=phangorn::NJ(dist_matrix_all)
     NJ_tree_all=ape::ladderize(NJ_data_all)
 
-    png(filename=paste0(output_dir,sep,unique(plasma$Patient_ID),".NJ_all_plasma.png"),units="in",width=12,height=10)
+    png(filename=paste0(output_dir,sep,unique(full_data$Patient_ID),".NJ_all_plasma.png"),units="in",width=12,height=10)
       p=ape::plot.phylo(NJ_tree_all)
       p
     dev.off()
@@ -1787,7 +1787,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     NJ_data_plasma=phangorn::NJ(dist_matrix_plasma)
     NJ_tree_plasma=ape::ladderize(NJ_data_plasma)
 
-    png(filename=paste0(output_dir,sep,unique(plasma$Patient_ID),".NJ_all_plasma.png"),units="in",width=12,height=10)
+    png(filename=paste0(output_dir,sep,unique(full_data$Patient_ID),".NJ_all_plasma.png"),units="in",width=12,height=10)
       p=ape::plot.phylo(NJ_tree_plasma)
       p
     dev.off()
@@ -1797,7 +1797,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     NJ_data_tissue=phangorn::NJ(dist_matrix_tissue)
     NJ_tree_tissue=ape::ladderize(NJ_data_tissue)
 
-    png(filename=paste0(unique(output_dir,sep,plasma$Patient_ID),".NJ_all_plasma.png"),units="in",width=12,height=10)
+    png(filename=paste0(unique(output_dir,sep,full_data$Patient_ID),".NJ_all_tissue.png"),units="in",width=12,height=10)
       p=ape::plot.phylo(NJ_tree_tissue)
       p
     dev.off()
