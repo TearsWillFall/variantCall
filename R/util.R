@@ -1769,7 +1769,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     solution$change=ifelse(solution$cn==2,0,ifelse(solution$cn>2,1,-1))
     solution_wider=tidyr::pivot_wider(solution,id_cols="V4",names_from="sample",values_from="change")
     solution_matrix=solution_wider[,-1]
-    write.table(file=paste0(output_dir,sep,unique(full_data$Patient_ID),".Distance.matrix.txt"),x=solution_wider,quote=FALSE,row.names=FALSE,col.names=TRUE)
+    write.table(file=paste0(output_dir,sep,unique(full_data$Patient_ID),".Sample.Matrix.txt"),x=solution_wider,quote=FALSE,row.names=FALSE,col.names=TRUE)
 
     dist_matrix_all=dist(t(solution_matrix))
     NJ_data_all=phangorn::NJ(dist_matrix_all)
