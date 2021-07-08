@@ -1710,9 +1710,10 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
     full_data$cn=ifelse(full_data$chr=="X",  full_data$cn+1,  full_data$cn)
     full_data=full_data %>% dplyr::mutate(CN=ifelse(cn>2,"GAIN",ifelse(cn<2,"LOSS","NEUTRAL")))
     full_data=full_data %>% dplyr::mutate(CNs=ifelse(CN=="GAIN"|CN=="LOSS","CNA","NEUTRAL"))
+    full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy)
 
-    plasma=full_data %>% dplyr::filter(Origin=="Plasma") %>% dplyr::mutate(Anatomy=as.Date(lubridate::dmy(Timepoint_ID)))
-    p1=ggplot(plasma %>% dplyr::group_by(sample,CN,Anatomy,CNs)%>% dplyr::summarise(Count=dplyr::n()))+geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(.~lubridate::dmy(Anatomy))+
+    plasma=full_data %>% dplyr::filter(Origin=="Plasma")
+    p1=ggplot(plasma %>% dplyr::group_by(sample,CN,Anatomy,CNs)%>% dplyr::summarise(Count=dplyr::n()))+geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(.~lubridate::dmy(ID))+
     theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(plasma$Patient_ID)," Plasma"),subtitle="Somatic copy number uncorrected") +theme(strip.text.x = element_text(size = 6))
     ggsave(paste0(output_dir,sep,unique(plasma$Patient_ID),"_SCNA_count_Plasma.png"),p1)
 
@@ -1720,8 +1721,8 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
 
     if(dim(tissue)[1]>0){
-      p2=ggplot(tissue %>% dplyr::group_by(sample,CN,Anatomy,CNs) %>% dplyr::summarise(Count=dplyr::n()) %>% dplyr::group_by(Anatomy)%>% dplyr::mutate(TotalCN=sum(Count[CN!="NEUTRAL"])))+
-      geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(~reorder(Anatomy,TotalCN))+theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(tissue$Patient_ID), " Tissue"),subtitle="Somatic copy number uncorrected")+theme(strip.text.x = element_text(size = 6))
+      p2=ggplot(tissue %>% dplyr::group_by(sample,CN,ID,CNs) %>% dplyr::summarise(Count=dplyr::n()) %>% dplyr::group_by(ID)%>% dplyr::mutate(TotalCN=sum(Count[CN!="NEUTRAL"])))+
+      geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(~reorder(ID,TotalCN))+theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(tissue$Patient_ID), " Tissue"),subtitle="Somatic copy number uncorrected")+theme(strip.text.x = element_text(size = 6))
       ggsave(paste0(output_dir,sep,unique(tissue$Patient_ID),"_SCNA_count_Tissue.png"),p2)
     }
 }
