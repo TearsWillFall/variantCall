@@ -1678,6 +1678,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 
     AI_per_gene_wider=AI_per_gene_wider[r_names,c_names]
 
+    print(AI_per_gene_wider)
     tc_and_ploidy_per_sample=tc_and_ploidy_per_sample %>% tidyr::drop_na()
     rownames(tc_and_ploidy_per_sample)=tc_and_ploidy_per_sample$ID
     tc_and_ploidy_per_sample=tc_and_ploidy_per_sample[r_names,]
