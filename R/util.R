@@ -1663,7 +1663,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     },mc.cores=jobs)
   },mc.cores=threads)
 
-    tc_and_ploidy_per_sample=full_data %>% dplyr::group_by(ID,adm,adm.max,adm.min,ploidy) %>% dplyr::distinct()
+    tc_and_ploidy_per_sample=full_data %>% dplyr::distinct(ID,adm,adm.max,adm.min,ploidy)
     print(tc_and_ploidy_per_sample)
     rows_ha = ComplexHeatmap::rowAnnotation(ploidy = tc_and_ploidy_per_sample$ploidy, tumour_fraction = ComplexHeatmap::anno_barplot(1-tc_and_ploidy_per_sample$adm))
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
