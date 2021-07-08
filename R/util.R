@@ -1681,8 +1681,9 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     tc_and_ploidy_per_sample=tc_and_ploidy_per_sample %>% tidyr::drop_na()
     rownames(tc_and_ploidy_per_sample)=tc_and_ploidy_per_sample$ID
     tc_and_ploidy_per_sample=tc_and_ploidy_per_sample[r_names,]
-    rows_ha = ComplexHeatmap::rowAnnotation(ploidy = ComplexHeatmap::anno_barplot(tc_and_ploidy_per_sample$ploidy,baseline=2), tmf =1-tc_and_ploidy_per_sample$adm)
-
+    col_fun = circlize::colorRamp2(c(0, 1), c("white", "red"))
+    col_fun2 = circlize::colorRamp2(c(0,max(tc_and_ploidy_per_sample$ploidy)), c("blue", "brown"))
+    rows_ha = ComplexHeatmap::rowAnnotation(ploidy = ComplexHeatmap::anno_barplot(tc_and_ploidy_per_sample$ploidy,baseline=2,col=col_fun2), tmf =ComplexHeatmap::anno_simple(1-tc_and_ploidy_per_sample$adm,col = col_fun))
     png(paste0(out_file_dir,"/",unique(full_data$Patient_ID),".log2_corrected_CLONET.png"),width=12,height=8,res=1200,units="in",type="cairo-png")
     ComplexHeatmap::draw(ComplexHeatmap::Heatmap(as.matrix(log2_corr_mtx),na_col="black",column_labels=c_names,
     row_labels=r_names,column_names_gp=grid::gpar(fontsize=7),cluster_rows=FALSE,cluster_columns=TRUE,
