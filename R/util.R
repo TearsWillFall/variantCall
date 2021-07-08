@@ -1720,7 +1720,7 @@ plot_cn_calls=function(cn_call_data="",sample_data="",output_dir=""){
     tissue=full_data %>% dplyr::filter(Origin!="Plasma")
 
     if(dim(tissue)[1]>0){
-      p2=ggplot(tissue %>% dplyr::group_by(sample,CN,Anatomy,Anatomy,CNs) %>% dplyr::summarise(Count=dplyr::n()) %>% dplyr::group_by(Anatomy)%>% dplyr::mutate(TotalCN=sum(Count[CN!="NEUTRAL"])))+
+      p2=ggplot(tissue %>% dplyr::group_by(sample,CN,Anatomy,CNs) %>% dplyr::summarise(Count=dplyr::n()) %>% dplyr::group_by(Anatomy)%>% dplyr::mutate(TotalCN=sum(Count[CN!="NEUTRAL"])))+
       geom_bar(stat="identity",aes(x=CNs,y=Count,fill=CN),col="black")+facet_grid(~reorder(Anatomy,TotalCN))+theme_classic()+theme(axis.text.x = element_text(angle = 90))+plot_annotation(title=paste0(unique(tissue$Patient_ID), " Tissue"),subtitle="Somatic copy number uncorrected")+theme(strip.text.x = element_text(size = 6))
       ggsave(paste0(output_dir,sep,unique(tissue$Patient_ID),"_SCNA_count_Tissue.png"),p2)
     }
