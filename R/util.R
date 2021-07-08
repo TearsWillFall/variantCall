@@ -1665,7 +1665,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
 
     tc_and_ploidy_per_sample=full_data %>% dplyr::distinct(ID,adm,adm.max,adm.min,ploidy)
     print(tc_and_ploidy_per_sample)
-    rows_ha = ComplexHeatmap::rowAnnotation(ploidy = tc_and_ploidy_per_sample$ploidy, tumour_fraction = ComplexHeatmap::anno_barplot(1-tc_and_ploidy_per_sample$adm))
+    rows_ha = ComplexHeatmap::rowAnnotation(ploidy = tc_and_ploidy_per_sample , tumour_fraction = 1-tc_and_ploidy_per_sample$adm)
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
     log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
     write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET_all_data.txt"),x=full_data,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
