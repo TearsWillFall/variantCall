@@ -1677,7 +1677,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     log2_corr_mtx=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),-1]
     rownames(AI_per_gene_wider)=AI_per_gene_wider[,1]
     AI_per_gene_wider=AI_per_gene_wider[r_names,c_names]
-
+    AI_per_gene_wider=data.frame(lapply(AI_per_gene_wider, function(x) {gsub(":", "\n", x)}))
     print(AI_per_gene_wider)
     dim(AI_per_gene_wider)
     dim(log2_corr_mtx)
@@ -1692,7 +1692,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     row_labels=r_names,column_names_gp=grid::gpar(fontsize=7),cluster_rows=FALSE,cluster_columns=TRUE,
     row_split=c(rep("Plasma",sum(!grepl("[aA-zZ]",r_names))),rep("Tissue",sum(grepl("[aA-zZ]",r_names)))),name="log2.cor",right_annotation = rows_ha, cell_fun = function(j, i, x, y, width, height, fill) {
         grid::grid.text(sprintf("%s",AI_per_gene_wider[i, j]), x, y, gp = grid::gpar(fontsize = 5))
-      },width=grid::unit(20,"in")))
+      },width=grid::unit(10,"in")))
     dev.off()
 }
 
