@@ -1678,7 +1678,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     png(paste0(out_file_dir,"/",unique(full_data$Patient_ID),".log2_corrected_CLONET.png"),width=12,height=8,res=1200,units="in",type="cairo-png")
     ComplexHeatmap::draw(ComplexHeatmap::Heatmap(as.matrix(log2_corr_mtx),na_col="black",column_labels=c_names,
     row_labels=r_names,column_names_gp=grid::gpar(fontsize=7),cluster_rows=FALSE,cluster_columns=TRUE,
-    row_split=c(rep("Plasma",sum(!grepl("[aA-zZ]",r_names))),rep("Tissue",sum(grepl("[aA-zZ]",r_names)))),name="log2.cor",top_annotation = column_ha))
+    row_split=c(rep("Plasma",sum(!grepl("[aA-zZ]",r_names))),rep("Tissue",sum(grepl("[aA-zZ]",r_names)))),name="log2.cor",left_annotation = column_ha))
     dev.off()
 }
 
