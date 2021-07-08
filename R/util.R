@@ -1627,8 +1627,8 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     full_data$Allelic_Imbalance=forcats::fct_rev(as.factor(ifelse(full_data$AllelicImbalance<=0.2,"E[AI] ≤ 0.2     ","E[AI] > 0.2     ")))
     full_data$Symbol=ifelse(grepl("CONTROL",full_data$pcf_gene_class),paste0(full_data$pcf_gene_symbol,"[C:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"),paste0(full_data$pcf_gene_symbol,"[T:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"))
     full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy)
+    full_data$AI=ifelse(full_data$AllelicImbalance<=0.2,"-",paste0(full_data$cnA.int,"/",full_data$cnA.int))
     write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".CLONET.txt"),x=full_data,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
-
 
     min.log2=min(full_data$log2,na.rm=TRUE)
     max.log2=max(full_data$log2,na.rm=TRUE)
@@ -1666,13 +1666,18 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     tc_and_ploidy_per_sample=full_data %>% dplyr::distinct(ID,adm,adm.max,adm.min,ploidy)
     print(tc_and_ploidy_per_sample)
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
+    AI_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(AI=paste0(AI,collapse="\n"))
     log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
-    write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET_all_data.txt"),x=full_data,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
+    AI_per_gene_wider=AI_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="AI")
     write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET_log2_corr_matrix.txt"),x=log2_corr_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
     c_names=as.character(unique(log2_corr_per_gene$Symbol))
     log2_corr_per_gene_wider=as.data.frame(log2_corr_per_gene_wider)
+    AI_per_gene_wider=as.data.frame(AI_per_gene_wider)
     r_names=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),1]
     log2_corr_mtx=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),-1]
+
+    AI_per_gene_wider=AI_per_gene_wider[r_names,c_names]
+
     tc_and_ploidy_per_sample=tc_and_ploidy_per_sample %>% tidyr::drop_na()
     rownames(tc_and_ploidy_per_sample)=tc_and_ploidy_per_sample$ID
     tc_and_ploidy_per_sample=tc_and_ploidy_per_sample[r_names,]
@@ -1681,7 +1686,9 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     png(paste0(out_file_dir,"/",unique(full_data$Patient_ID),".log2_corrected_CLONET.png"),width=12,height=8,res=1200,units="in",type="cairo-png")
     ComplexHeatmap::draw(ComplexHeatmap::Heatmap(as.matrix(log2_corr_mtx),na_col="black",column_labels=c_names,
     row_labels=r_names,column_names_gp=grid::gpar(fontsize=7),cluster_rows=FALSE,cluster_columns=TRUE,
-    row_split=c(rep("Plasma",sum(!grepl("[aA-zZ]",r_names))),rep("Tissue",sum(grepl("[aA-zZ]",r_names)))),name="log2.cor",right_annotation = rows_ha))
+    row_split=c(rep("Plasma",sum(!grepl("[aA-zZ]",r_names))),rep("Tissue",sum(grepl("[aA-zZ]",r_names)))),name="log2.cor",right_annotation = rows_ha,    cell_fun = function(j, i, x, y, width, height, fill) {
+        grid.text(sprintf("%.1f", AI_per_gene_wider[i, j]), x, y, gp = gpar(fontsize = 4))
+      }))
     dev.off()
 }
 
