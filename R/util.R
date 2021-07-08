@@ -1664,19 +1664,19 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
   },mc.cores=threads)
 
     tc_and_ploidy_per_sample=full_data %>% dplyr::distinct(ID,adm,adm.max,adm.min,ploidy)
-    print(tc_and_ploidy_per_sample)
     log2_corr_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(meanLog2corr=mean(log2.corr))
     AI_per_gene=full_data %>% dplyr::group_by(Symbol,ID) %>% dplyr::summarise(AI=paste0(AI,collapse="\n"))
     log2_corr_per_gene_wider=log2_corr_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="meanLog2corr")
     AI_per_gene_wider=AI_per_gene %>% tidyr::pivot_wider(id_cols="ID",names_from="Symbol",values_from="AI")
     write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET_log2_corr_matrix.txt"),x=log2_corr_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
-    write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET_log2_corr_matrix.txt"),x=AI_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
+    write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".Allelic_Imbalance_CLONET_AI_matrix.txt"),x=AI_per_gene_wider,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
     c_names=as.character(unique(log2_corr_per_gene$Symbol))
     log2_corr_per_gene_wider=as.data.frame(log2_corr_per_gene_wider)
     AI_per_gene_wider=as.data.frame(AI_per_gene_wider)
     r_names=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),1]
     log2_corr_mtx=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),-1]
-
+    rownames(AI_per_gene_wider)=AI_per_gene_wider[,1]
+    rownames(AI_per_gene_wider)=AI_per_gene_wider[,-1]
     AI_per_gene_wider=AI_per_gene_wider[r_names,c_names]
 
     print(AI_per_gene_wider)
