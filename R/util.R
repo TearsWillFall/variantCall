@@ -1676,7 +1676,6 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     r_names=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),1]
     log2_corr_mtx=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),-1]
     rownames(AI_per_gene_wider)=AI_per_gene_wider[,1]
-    rownames(AI_per_gene_wider)=AI_per_gene_wider[,-1]
     AI_per_gene_wider=AI_per_gene_wider[r_names,c_names]
 
     print(AI_per_gene_wider)
