@@ -1805,4 +1805,19 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
       p=ape::plot.phylo(NJ_tree_tissue)
       p
     dev.off()
+
+    tp=solution_matrix
+    rownames(tp)=solution_wider[,1]
+    tp_pos=parallel::mcsapply(1:ncol(tp),FUN=function(x){
+      tp[,x]!=dplyr::lag(tp[,x])
+    },mc.cores=threads)
+    tp_pos[1,]=FALSE
+    dummy_tp=tp
+    dummy_tp[!is.na(dummy_tp)]=0
+    dummy_tp[ts_point]=1
+    tp_all=dummy_tp[rowSums(dummy_tp)>1,]
+
+    png(paste0(out_file_dir,"/",unique(full_data$Patient_ID),".transition_points.png"),width=12,height=8,res=1200,units="in",type="cairo-png")
+    ComplexHeatmap::draw(ComplexHeatmap::Heatmap(tp_all,row_names_gp=grid::gpar(fontsize=5),clustering_distance_rows=function(m) dist(m,method="manhattan"),clustering_distance_columns=function(m) dist(m,method="manhattan")))
+    dev.off()
 }
