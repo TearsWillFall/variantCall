@@ -1673,7 +1673,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     log2_corr_per_gene_wider=as.data.frame(log2_corr_per_gene_wider)
     r_names=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),1]
     log2_corr_mtx=log2_corr_per_gene_wider[rowSums(is.na(log2_corr_per_gene_wider))<(ncol(log2_corr_per_gene_wider)-1),-1]
-    tc_and_ploidy_per_sample=tc_and_ploidy_per_sample %>% dplyr::drop_na()
+    tc_and_ploidy_per_sample=tc_and_ploidy_per_sample %>% tidyr::drop_na()
     rows_ha = ComplexHeatmap::rowAnnotation(ploidy = tc_and_ploidy_per_sample$ploidy , tumour_fraction = ComplexHeatmap::anno_barplot(1-tc_and_ploidy_per_sample$adm))
 
     dim(log2_corr_mtx)
