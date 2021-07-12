@@ -941,6 +941,7 @@ format_segment_data=function(seg_file="",dir_segment="",pattern="",cols_to_keep=
   })
   data=dplyr::bind_rows(data)
   names(data)[c(1,2,3,5,6,ncol(data))]=c("chr","start","end","log2","cn","sample")
+  data$log2=ifelse(data$chr=="X",data$log2+1,data$log2)
   data=data[,c(cols_to_keep)]
 
   sep="/"
@@ -1627,7 +1628,7 @@ plot_allelic_imbalance=function(clonet_dir="",sample_data="",output_dir="",gene_
     full_data$Allelic_Imbalance=forcats::fct_rev(as.factor(ifelse(full_data$AllelicImbalance<=0.2,"E[AI] ≤ 0.2     ","E[AI] > 0.2     ")))
     full_data$Symbol=ifelse(grepl("CONTROL",full_data$pcf_gene_class),paste0(full_data$pcf_gene_symbol,"[C:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"),paste0(full_data$pcf_gene_symbol,"[T:","'",full_data$chr.y,substring(full_data$band,1,1),"'","]"))
     full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy)
-    full_data$AI=ifelse(full_data$chr.x=="X",trunc(2**full_data$log2.corr)+1,ifelse(full_data$AllelicImbalance<=0.2|is.na(full_data$AllelicImbalance),"-",paste0(full_data$cnA.int,"/",full_data$cnB.int)))
+    full_data$AI=ifelse(full_data$chr.x=="X",trunc(2**full_data$log2.corr),ifelse(full_data$AllelicImbalance<=0.2|is.na(full_data$AllelicImbalance),"-",paste0(full_data$cnA.int,"/",full_data$cnB.int)))
     write.table(file=paste0(out_file_dir,"/",unique(full_data$Patient_ID),".CLONET.txt"),x=full_data,quote=FALSE,row.names=FALSE,col.names=TRUE,sep="\t")
 
     min.log2=min(full_data$log2,na.rm=TRUE)
