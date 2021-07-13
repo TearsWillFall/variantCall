@@ -13,7 +13,10 @@ call_clonet(
   vcf = "",
   bam_dir = "",
   segment_data = "",
+  cn_call_data = "",
+  gene_data = "",
   patient_id = "",
+  ref_bins = "",
   germ_pattern = "GL",
   sample_data = "",
   min_snp_cov = 10,
@@ -52,9 +55,13 @@ call_clonet(
 
 \item{bam_dir}{\link{REQUIRED} Path to directory with BAM files.}
 
-\item{segment_data}{\link{REQUIRED} Path to file with formated segment data.}
+\item{cn_call_data}{\link{REQUIRED} Path to file with formated CN call data.}
+
+\item{gene_data}{\link{REQUIRED} Path to file with gene information.}
 
 \item{patient_id}{Patient ID. Default Patient}
+
+\item{ref_bins}{\link{REQUIRED} Path to file with binned reference genome.}
 
 \item{germ_pattern}{Germline pattern. Default GL}
 

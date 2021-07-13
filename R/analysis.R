@@ -198,8 +198,11 @@ call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip
 #' @param bin_path5 Path to CLONET. Default tools/CLONET/CLONET.R
 #' @param vcf [REQUIRED] Path to VCF file with heterozygous SNPs.
 #' @param bam_dir [REQUIRED] Path to directory with BAM files.
-#' @param segment_data [REQUIRED] Path to file with formated segment data.
+#' @param cn_call_data [REQUIRED] Path to file with formated CN call data.
+#' @param gene_data [REQUIRED] Path to file with gene information.
+#' @param ref_bins [REQUIRED] Path to file with binned reference genome.
 #' @param patient_id Patient ID. Default Patient
+#' @param sample_data Path to files with sample info
 #' @param sample_data Path to files with sample info
 #' @param germ_pattern Germline pattern. Default GL
 #' @param min_snp_cov Minimum tumor coverage for informative SNPs. Default 10.
@@ -225,7 +228,8 @@ call_vep=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/htslib/bgzip
 
 call_clonet=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",
 bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",
-bin_path5="tools/CLONET/CLONET.R",vcf="",bam_dir="",segment_data="",patient_id="",germ_pattern="GL",sample_data="",
+bin_path5="tools/CLONET/CLONET.R",vcf="",bam_dir="",segment_data="",cn_call_data="",
+gene_data="",patient_id="",ref_bins="",germ_pattern="GL",sample_data="",
 min_snp_cov=10,min_nsnps=10,min_seg_cov=20,equal_betaThr=0.9,max_homo_dels=0.01,
 del_log_thr=c(-1,-0.25),alpha_par=0.9,clonal_thr=0.85,beta_thr=0.85,
 stages=c(1,2,3,4,5,6),comp_ref_map_bias=FALSE,beta_decimals=3,ale_imb_thr=0.5,
@@ -266,7 +270,9 @@ beta_method="STM",adm_method="2D",verbose=FALSE,output_dir="",jobs=1,threads=3){
   system(paste("Rscript",bin_path5,clonet_config))
 
   plot_celullarity(clonet_dir=paste0(out_file_dir,"/OUTPUT/Results"),sample_data=sample_data,output_dir=paste0(out_file_dir,"/OUTPUT/Results"))
-
+  plot_cn_calls(cn_call_data=cn_call_data,sample_data=sample_data,output_dir=paste0(out_file_dir,"/OUTPUT/Results"))
+  plot_allelic_imbalance(clonet_dir=clonet_dir,sample_data=sample_data,output_dir=paste0(out_file_dir,"/OUTPUT/Results"),gene_data=gene_data,jobs=jobs,threads=threads)
+  plot_evolutionary_distance(cn_call_data=cn_call_data,sample_data=sample_data,ref_bins=ref_bins,output_dir=paste0(out_file_dir,"/OUTPUT/Results"),threads=jobs*threads)
 }
 
 
