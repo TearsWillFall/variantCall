@@ -1292,16 +1292,16 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
       names(files3)="BAM_path"
       files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
       files=dplyr::left_join(files2,files3,by="Sample")
-      parallel::mclapply(x=1:nrow(files),FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},mc.cores=threads)
+      parallel::mclapply(X=1:nrow(files),FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},mc.cores=threads)
 
     }else{
       files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
       files3=files3[grepl("bam$",files3)]
-      parallel::mclapply(x=1:length(files3), FUN=function(x){call_ASEQ(vcf=unfil_vcf,bam=as.character(files3[x]),mrq=mq,bin_path=bin_path4,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},mc.cores=threads)
+      parallel::mclapply(X=1:length(files3), FUN=function(x){call_ASEQ(vcf=unfil_vcf,bam=as.character(files3[x]),mrq=mq,bin_path=bin_path4,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},mc.cores=threads)
     }
 
     files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
-    parallel::mclapply(x=as.data.frame(files3),FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,mc.cores=threads)
+    parallel::mclapply(X=as.data.frame(files3),FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,mc.cores=threads)
     files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern=".snp")
     tumor_snps=files[!grepl(germ_pattern,files)]
     germ_snps=files[grepl(germ_pattern,files)]
