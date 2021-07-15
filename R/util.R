@@ -1301,7 +1301,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
       parallel::mclapply(X=1:length(files3), FUN=function(x){call_ASEQ(vcf=unfil_vcf,bam=as.character(files3[x]),mrq=mq,bin_path=bin_path4,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=threads,verbose=verbose)},mc.cores=jobs)
     }
 
-    files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ",stringsAsFactors=FALSE)
+    files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
     parallel::mclapply(X=1:length(files3),FUN=function(x){format_ASEQ_pileup(file=files3[x],verbose=verbose,output_dir=out_file_dir)},mc.cores=jobs*threads)
     files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern=".snp")
     tumor_snps=files[!grepl(germ_pattern,files)]
