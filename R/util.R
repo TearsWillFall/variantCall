@@ -1824,12 +1824,10 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     tp_pos=dplyr::bind_cols(parallel::mclapply(1:ncol(tp),FUN=function(x){
       tp[,x]!=dplyr::lag(tp[,x])
     },mc.cores=threads))
-    rownames(tp)=solution_wider[,1]
-    colnames(tp)=colnames(solution_wider)
+    rownames(tp_pos)=solution_wider[,1]
+    colnames(tp_pos)=colnames(solution_wider)
     tp_pos[1,]=FALSE
-    dummy_tp=tp
-    dummy_tp[!is.na(dummy_tp)]=0
-    dummy_tp[ts_point]=1
+    tp_pos=tp_pos*1
     tp_all=dummy_tp[rowSums(dummy_tp)>1,]
 
     png(paste0(out_file_dir,"/",unique(full_data$Patient_ID),".transition_points.png"),width=12,height=8,res=1200,units="in",type="cairo-png")
