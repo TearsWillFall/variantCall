@@ -271,7 +271,7 @@ call_clonet=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/
 
   plot_celullarity(clonet_dir=paste0(out_file_dir,"/OUTPUT/Results"),sample_data=sample_data,output_dir=paste0(out_file_dir,"/OUTPUT/Results"))
   plot_cn_calls(cn_call_data=cn_call_data,sample_data=sample_data,output_dir=paste0(out_file_dir,"/OUTPUT/Results"))
-  plot_allelic_imbalance(clonet_dir=clonet_dir,sample_data=sample_data,output_dir=paste0(out_file_dir,"/OUTPUT/Results"),gene_data=gene_data,jobs=jobs,threads=threads)
+  plot_allelic_imbalance(clonet_dir=paste0(out_file_dir,"/OUTPUT/Results"),sample_data=sample_data,output_dir=paste0(out_file_dir,"/OUTPUT/Results"),gene_data=gene_data,jobs=jobs,threads=threads)
   plot_evolutionary_distance(cn_call_data=cn_call_data,sample_data=sample_data,ref_bins=ref_bins,output_dir=paste0(out_file_dir,"/OUTPUT/Results"),threads=jobs*threads)
 }
 
