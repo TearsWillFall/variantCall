@@ -248,7 +248,7 @@ call_clonet=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/
   format_SNP_data(bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,
   bin_path4=bin_path4,unfil_vcf=vcf,bam_dir=bam_dir,germ_pattern=germ_pattern,
   patient_id=patient_id,verbose=verbose,qual=20,
-  output_dir=out_file_dir,threads=threads*jobs)
+  output_dir=out_file_dir,threads=threads,jobs=jobs)
 
   snp_dir=paste0(out_file_dir,"/",patient_id,"_PROCESSED_SNPs/RESULTS")
 

@@ -1263,10 +1263,11 @@ get_pileup_summary=function(bam="",bin_path="tools/gatk/gatk",db="",interval="",
 #' @param output_dir Path to the output directory.
 #' @param verbose Enables progress messages. Default FALSE.
 #' @param remove_tmp Remove temporary files. Default TRUE
-#' @param threads Number of threads to use. Default 3
+#' @param jobs Number of jobs to do in parallel. Default 1
+#' @param threads Number of threads to use per job. Default 3
 #' @export
 
-format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf="",unfil_vcf_dir="",bam_dir="",germ_pattern="GL",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",threads=3,remove_tmp=TRUE){
+format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/htslib/bgzip",bin_path3="tools/htslib/tabix",bin_path4="tools/ASEQ/binaries/linux64/ASEQ",unfil_vcf="",unfil_vcf_dir="",bam_dir="",germ_pattern="GL",qual=30,mq=40,min_cov=20,patient_id="",verbose=FALSE,output_dir="",jobs=1,threads=3,remove_tmp=TRUE){
     sep="/"
     if(output_dir==""){
       sep=""
@@ -1279,7 +1280,7 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
       files0=list.files(unfil_vcf_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
       files0=files0[grepl("vcf.gz$",files0)]
 
-      parallel::mclapply(X=as.data.frame(files0),FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,mc.cores=threads)
+      parallel::mclapply(X=as.data.frame(files0),FUN=vcf_filter_variants,bin_path=bin_path,bin_path2=bin_path2,bin_path3=bin_path3,qual=qual,mq=mq,state="het",type="snp",filter="PASS",verbose=verbose,output_dir=out_file_dir,mc.cores=jobs*threads)
       files2=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="FILTERED")
       files2=files2[grepl("vcf$",files2)]
       files2=as.data.frame(files2)
@@ -1292,16 +1293,16 @@ format_SNP_data=function(bin_path="tools/bcftools/bcftools",bin_path2="tools/hts
       names(files3)="BAM_path"
       files3$Sample=apply(files3,1,FUN=ULPwgs::get_sample_name)
       files=dplyr::left_join(files2,files3,by="Sample")
-      parallel::mclapply(X=1:nrow(files),FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},mc.cores=threads)
+      parallel::mclapply(X=1:nrow(files),FUN=function(x){call_ASEQ(vcf=as.character(files[x,1]),bin_path=bin_path4,bam=as.character(files[x,3]),mrq=mq,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=threads,verbose=verbose)},mc.cores=jobs)
 
     }else{
       files3=list.files(bam_dir,recursive=TRUE,full.names=TRUE,pattern=patient_id)
       files3=files3[grepl("bam$",files3)]
-      parallel::mclapply(X=1:length(files3), FUN=function(x){call_ASEQ(vcf=unfil_vcf,bam=as.character(files3[x]),mrq=mq,bin_path=bin_path4,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=1,verbose=verbose)},mc.cores=threads)
+      parallel::mclapply(X=1:length(files3), FUN=function(x){call_ASEQ(vcf=unfil_vcf,bam=as.character(files3[x]),mrq=mq,bin_path=bin_path4,mbq=qual,mdc=min_cov,output_dir=out_file_dir,threads=threads,verbose=verbose)},mc.cores=jobs)
     }
 
     files3=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern="PILEUP.ASEQ")
-    parallel::mclapply(X=as.data.frame(files3),FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,mc.cores=threads)
+    parallel::mclapply(X=as.data.frame(files3),FUN=format_ASEQ_pileup,verbose=verbose,output_dir=out_file_dir,mc.cores=jobs*threads)
     files=list.files(out_file_dir,recursive=TRUE,full.names=TRUE,pattern=".snp")
     tumor_snps=files[!grepl(germ_pattern,files)]
     germ_snps=files[grepl(germ_pattern,files)]
