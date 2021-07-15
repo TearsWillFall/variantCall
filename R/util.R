@@ -1821,10 +1821,11 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     dev.off()
 
     tp=solution_matrix
-    rownames(tp)=solution_wider[,1]
-    tp_pos=parallel::mcsapply(1:ncol(tp),FUN=function(x){
+    tp_pos=dplyr::bind_cols(parallel::mclapply(1:ncol(tp),FUN=function(x){
       tp[,x]!=dplyr::lag(tp[,x])
-    },mc.cores=threads)
+    },mc.cores=threads))
+    rownames(tp)=solution_wider[,1]
+    colnames(tp)=colnames(solution_wider)
     tp_pos[1,]=FALSE
     dummy_tp=tp
     dummy_tp[!is.na(dummy_tp)]=0
