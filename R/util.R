@@ -1820,12 +1820,12 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
       p
     dev.off()
 
-    tp=solution_matrix
+    tp=solution_wider[,-1]
     tp_pos=dplyr::bind_cols(parallel::mclapply(1:ncol(tp),FUN=function(x){
       tp[,x]!=dplyr::lag(tp[,x])
     },mc.cores=threads))
     rownames(tp_pos)=solution_wider[,1]
-    colnames(tp_pos)=colnames(solution_wider)
+    colnames(tp_pos)=colnames(solution_wider[,-1])
     tp_pos[1,]=FALSE
     tp_pos=tp_pos*1
     tp_all=dummy_tp[rowSums(dummy_tp)>1,]
