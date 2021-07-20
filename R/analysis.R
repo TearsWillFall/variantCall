@@ -1693,12 +1693,10 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
 #' @param vep_dir [REQUIRED] Path to VEP executable directory. Default path tools/ensembl/vep
 #' @param vep_data [REQUIRED] Path to VEP data directory. Default path ~/.vep
 #' @param ref_genome [REQUIRED] Path to reference genome fasta file.
-#' @param vcf_overlay [REQUIRED] Path to vcf overlay to use as source.
-#' @param output_dir [OPTIONAL] Path to the output directory.
-#' @param verbose [OPTIONAL]  Enables progress messages. Default False.
-#' @param threads [OPTIONAL]  Number of threads to use. Default 3.
-#' @param targeted [OPTIONAL]  Sequencing data is exome/targeted. Default FALSE
-#' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
+#' @param vcf [REQUIRED] Path to vcf to annotate.
+#' @param patient_id [OPTIONAL] Patient ID. If not given the name of the first sample in alphanumerical order will be used.
+#' @param verbose [OPTIONAL] Extra verbose. Default FALSE.
+#' @param output_dir [OPTIONAL] Directory to output
 #' @export
 
 call_vep_maf=function(bin_path="tools/vcf2maf/vcf2maf.pl",vep_dir="tools/ensembl/vep",vep_data="~/.vep",
@@ -1731,12 +1729,12 @@ vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
   if(verbose){
     print(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
     paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
-    vcf_dir, " --vep-data ", vep_source, " --tumor-id ",sample_name,norm))
+    vep_dir, " --vep-data ", vep_source, " --tumor-id ",sample_name,norm))
 
   }
   system(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
   paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
-  vcf_dir, " --vep-data ", vep_source, " --tumor-id ",sample_name,norm))
+  vep, " --vep-data ", vep_source, " --tumor-id ",sample_name,norm))
 
 
 }

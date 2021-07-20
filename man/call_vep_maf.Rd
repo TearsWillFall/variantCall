@@ -23,19 +23,15 @@ call_vep_maf(
 
 \item{vep_data}{\link{REQUIRED} Path to VEP data directory. Default path ~/.vep}
 
-\item{verbose}{\link{OPTIONAL}  Enables progress messages. Default False.}
+\item{vcf}{\link{REQUIRED} Path to vcf to annotate.}
 
-\item{output_dir}{\link{OPTIONAL} Path to the output directory.}
+\item{verbose}{\link{OPTIONAL} Extra verbose. Default FALSE.}
+
+\item{output_dir}{\link{OPTIONAL} Directory to output}
+
+\item{patient_id}{\link{OPTIONAL} Patient ID. If not given the name of the first sample in alphanumerical order will be used.}
 
 \item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
-
-\item{vcf_overlay}{\link{REQUIRED} Path to vcf overlay to use as source.}
-
-\item{threads}{\link{OPTIONAL}  Number of threads to use. Default 3.}
-
-\item{targeted}{\link{OPTIONAL}  Sequencing data is exome/targeted. Default FALSE}
-
-\item{output_name}{\link{OPTIONAL} Name for the output. If not given the name of the first sample in alphanumerical order will be used.}
 }
 \description{
 This function annotates a VCF file using VEP, and then generates a
