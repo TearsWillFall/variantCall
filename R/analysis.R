@@ -1721,19 +1721,18 @@ vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
       dir.create(out_file_dir)
   }
 
-  normal=""
   if (normal_id!=""){
-    normal=paste0(" --normal-id ",normal_id)
+    normal_id=paste0(" --normal-id ",normal_id)
   }
 
   if(verbose){
-    print(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ", 
+    print(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
     paste0(out_file_dir,"/",sample_name,".vep.maf") ," --ref-genome ",ref_genome," --vep-path ",
-    vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal))
+    vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal_id))
 
   }
   system(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
   paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
-  vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal))
+  vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal_id))
 
 }
