@@ -1713,6 +1713,7 @@ vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
 
   sample_name=ULPwgs::get_sample_name(vcf)
 
+
   if(patient_id==""){
     out_file_dir=paste0(output_dir,sep,sample_name,"_ANNOTATED")
   }else{

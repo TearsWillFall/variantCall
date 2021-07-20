@@ -25,7 +25,6 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 #' @param verbose [OPTIONAL] Enables progress messages. Default False.
 #' @export
 
-
 check_and_unzip=function(file="",preserve=TRUE,verbose=FALSE){
   if(grepl("compressed",system(paste0("file ",file),intern=TRUE))){
     if(preserve){
@@ -33,7 +32,7 @@ check_and_unzip=function(file="",preserve=TRUE,verbose=FALSE){
     }else{
       system("gunzip ",file)
     }
-    return(sub(".tar.gz","",file))
+    return(tools::file_path_sans_ext(file,compression=TRUE))
   }else{
     return(filter)
   }
