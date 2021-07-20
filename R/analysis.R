@@ -1698,7 +1698,7 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
 #' @param verbose [OPTIONAL] Extra verbose. Default FALSE.
 #' @param output_dir [OPTIONAL] Directory to output
 #' @export
- 
+
 call_vep_maf=function(bin_path="tools/vcf2maf/vcf2maf.pl",vep_dir="tools/ensembl/vep",vep_data="~/.vep",
 vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
 
@@ -1721,19 +1721,19 @@ vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
       dir.create(out_file_dir)
   }
 
-  norm=""
+  normal=""
   if (normal_id!=""){
-    norm=paste0(" --normal-id ",normal_id)
+    normal=paste0(" --normal-id ",normal_id)
   }
 
   if(verbose){
-    print(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
-    paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
-    vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,norm))
+    print(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ", 
+    paste0(out_file_dir,"/",sample_name,".vep.maf") ," --ref-genome ",ref_genome," --vep-path ",
+    vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal))
 
   }
   system(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
   paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
-  vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,norm))
+  vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal))
 
 }
