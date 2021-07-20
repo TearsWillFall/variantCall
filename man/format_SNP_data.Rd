@@ -19,6 +19,7 @@ format_SNP_data(
   patient_id = "",
   verbose = FALSE,
   output_dir = "",
+  jobs = 1,
   threads = 3,
   remove_tmp = TRUE
 )
@@ -52,7 +53,9 @@ format_SNP_data(
 
 \item{output_dir}{Path to the output directory.}
 
-\item{threads}{Number of threads to use. Default 3}
+\item{jobs}{Number of jobs to do in parallel. Default 1}
+
+\item{threads}{Number of threads to use per job. Default 3}
 
 \item{remove_tmp}{Remove temporary files. Default TRUE}
 }

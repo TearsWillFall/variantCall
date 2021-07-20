@@ -1701,7 +1701,6 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
 #' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
 #' @export
 
-
 call_vep_maf=function(bin_path="tools/vcf2maf/vcf2maf.pl",vep_dir="tools/ensembl/vep",vep_data="~/.vep",
 vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
 
