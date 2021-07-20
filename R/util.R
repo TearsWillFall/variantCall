@@ -35,7 +35,7 @@ check_and_unzip=function(file="",preserve=TRUE,verbose=FALSE){
     file=tools::file_path_sans_ext(file,compression=TRUE)
     return(file)
   }else{
-    return(filter)
+    return(file)
   }
 }
 
