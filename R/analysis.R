@@ -1736,5 +1736,4 @@ vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
   paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
   vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,norm))
 
-
 }
