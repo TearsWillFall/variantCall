@@ -1734,7 +1734,7 @@ vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
   }
   system(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
   paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
-  vep, " --vep-data ", vep_source, " --tumor-id ",sample_name,norm))
+  vep_dir, " --vep-data ", vep_source, " --tumor-id ",sample_name,norm))
 
 
 }
