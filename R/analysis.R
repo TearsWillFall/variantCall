@@ -1680,3 +1680,63 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
   system(paste("rm -rf ",paste0(out_file_dir,"/RESULTS/INDELs/*_SPLIT")))
 
 }
+
+
+
+#' Variant annotation in MAF format
+#'
+#' This function annotates a VCF file using VEP, and then generates a
+#' corresponding MAF file for it.
+#'
+#'
+#' @param bin_path [REQUIRED] Path to vcf2maf executable. Default path tools/vcf2maf/vcf2maf.pl
+#' @param vep_dir [REQUIRED] Path to VEP executable directory. Default path tools/ensembl/vep
+#' @param vep_data [REQUIRED] Path to VEP data directory. Default path ~/.vep
+#' @param ref_genome [REQUIRED] Path to reference genome fasta file.
+#' @param vcf_overlay [REQUIRED] Path to vcf overlay to use as source.
+#' @param output_dir [OPTIONAL] Path to the output directory.
+#' @param verbose [OPTIONAL]  Enables progress messages. Default False.
+#' @param threads [OPTIONAL]  Number of threads to use. Default 3.
+#' @param targeted [OPTIONAL]  Sequencing data is exome/targeted. Default FALSE
+#' @param output_name [OPTIONAL] Name for the output. If not given the name of the first sample in alphanumerical order will be used.
+#' @export
+
+
+call_vep_maf=function(bin_path="tools/vcf2maf/vcf2maf.pl",vep_dir="tools/ensembl/vep",vep_data="~/.vep",
+vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
+
+  sep="/"
+
+  if(output_dir==""){
+    sep=""
+  }
+
+  sample_name=ULPwgs::get_sample_name(vcf)
+
+  if(patient_id==""){
+    out_file_dir=paste0(output_dir,sep,sample_name,"_ANNOTATED")
+  }else{
+    out_file_dir=paste0(output_dir,sep,patient_id,"_ANNOTATED")
+  }
+
+  if (!dir.exists(out_file_dir)){
+      dir.create(out_file_dir)
+  }
+
+  norm=""
+  if (normal_id!=""){
+    norm=paste0(" --normal-id ",normal_id)
+  }
+
+  if(verbose){
+    print(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
+    paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
+    vcf_dir, " --vep-data ", vep_source, " --tumor-id ",sample_name,norm))
+
+  }
+  system(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
+  paste0(out_file_dir,"/",sample_name,".vep.maf")," --ref-genome ",ref_genome," --vep-path ",
+  vcf_dir, " --vep-data ", vep_source, " --tumor-id ",sample_name,norm))
+
+
+}

@@ -16,6 +16,29 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
   system(paste0(bin_path," -fp vcf ",file))
 }
 
+#' Check and unzip gz compressed file
+#'
+#' This function takes a file checks if its compressed and uncompresses if true.
+#'
+#' @param file  [REQUIRED] Path to file
+#' @param preserve  [OPTIONAL] Preserve original file. Default TRUE
+#' @param verbose [OPTIONAL] Enables progress messages. Default False.
+#' @export
+
+
+check_and_unzip=function(file="",preserve=TRUE,verbose=FALSE){
+  if(grepl("compressed",system(paste0("file ",file),intern=TRUE))){
+    if(preserve){
+        system("gunzip -k ",file)
+    }else{
+      system("gunzip ",file)
+    }
+    return(sub(".tar.gz","",file))
+  }else{
+    return(filter)
+  }
+}
+
 
 #' Get SV type from svaba generated VCF
 #'
