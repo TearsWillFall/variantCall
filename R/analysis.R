@@ -972,7 +972,7 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",var_dir="",bed_snps="",output_dir="",verbose=FALSE,threads=3){
+process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",,bin_path6="tools/vcf2maf/vcf2maf.pl",var_dir="",bed_snps="",output_dir="",vep_data="~/.vep",verbose=FALSE,threads=3){
 
   sep="/"
   if(output_dir==""){
@@ -982,16 +982,16 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   files=system(paste0("find ",var_dir," |grep vcf.gz$"),intern=TRUE)
 
 
-  # Platypus pipeline variants
-
-  platypus=files[grepl("PLATYPUS",files)]
-  platypus_snps=platypus[grepl("SNPs",platypus)]
-  platypus_snps_germline=platypus_snps[grepl("GERMLINE",platypus_snps)]
-  platypus_snps_somatic=platypus_snps[grepl("SOMATIC",platypus_snps)]
-  platypus_indels=platypus[grepl("INDELs",platypus)]
-  platypus_indels_germline=platypus_indels[grepl("GERMLINE",platypus_indels)]
-  platypus_indels_somatic=platypus_indels[grepl("SOMATIC",platypus_indels)]
-
+  # # Platypus pipeline variants
+  #
+  # platypus=files[grepl("PLATYPUS",files)]
+  # platypus_snps=platypus[grepl("SNPs",platypus)]
+  # platypus_snps_germline=platypus_snps[grepl("GERMLINE",platypus_snps)]
+  # platypus_snps_somatic=platypus_snps[grepl("SOMATIC",platypus_snps)]
+  # platypus_indels=platypus[grepl("INDELs",platypus)]
+  # platypus_indels_germline=platypus_indels[grepl("GERMLINE",platypus_indels)]
+  # platypus_indels_somatic=platypus_indels[grepl("SOMATIC",platypus_indels)]
+  #
 
   # GATK pipeline variants
 
@@ -1042,13 +1042,13 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
 
   ### Generate sets for SNPs
-  generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_germline,haplotypecaller_snps,strelka_snps_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2"))
+  generate_sets(bin_path=bin_path3,vcf=c(haplotypecaller_snps,strelka_snps_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SNPs_SETS"),verbose=verbose,threads=threads,set_names=c("HaplotypeCaller","Strelka2"))
 
   ### Generate sets for INDELs
-  generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_germline,haplotypecaller_indels,strelka_indels_germline,svaba_indels_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2","svaba"))
+  generate_sets(bin_path=bin_path3,vcf=c(haplotypecaller_indels,strelka_indels_germline,svaba_indels_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/INDELs_SETS"),verbose=verbose,threads=threads,set_names=c("HaplotypeCaller","Strelka2","svaba"))
 
   ### Generate sets for SVs
-  generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_germline,svaba_sv_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SVs_SETS"),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
+  generate_sets(bin_path=bin_path3,vcf=c(svaba_sv_germline),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/SVs_SETS"),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
 
 
   ### Annotate VCFs in SETS
@@ -1058,19 +1058,19 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   vcf_sets=vcf_sets[grepl("vcf",vcf_sets)]
   vcf_sets=vcf_sets[grepl("0000",vcf_sets)]
   vcf_sets_SNPs=vcf_sets[grepl("SNPs",vcf_sets)]
-  vcf_sets_SNPs=vcf_sets_SNPs[grepl("SET_3",vcf_sets_SNPs)]
+  vcf_sets_SNPs=vcf_sets_SNPs[grepl("SET_2",vcf_sets_SNPs)]
   vcf_sets_INDELs=vcf_sets[grepl("INDELs",vcf_sets)]
-  vcf_sets_INDELs=vcf_sets_INDELs[grepl("SET_4",vcf_sets_INDELs)]
+  vcf_sets_INDELs=vcf_sets_INDELs[grepl("SET_3",vcf_sets_INDELs)]
   vcf_sets_SVs=vcf_sets[grepl("SVs",vcf_sets)]
-  vcf_sets_SVs=vcf_sets_SVs[grepl("SET_4",vcf_sets_SVs)]
-  set_names=c("PLATYPUS","HAPLOTYPECALLER","STRELKA2")
+  vcf_sets_SVs=vcf_sets_SVs[grepl("SET_3",vcf_sets_SVs)]
+  set_names=c("HAPLOTYPECALLER","STRELKA2")
 
   lapply(X=vcf_sets_SNPs,FUN=function(x){
     out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
     call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
   })
 
-  set_names=c("PLATYPUS","HAPLOTYPECALLER","STRELKA2","SVABA")
+  set_names=c("HAPLOTYPECALLER","STRELKA2","SVABA")
   lapply(X=vcf_sets_INDELs,FUN=function(x){
     out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
     call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
@@ -1083,55 +1083,54 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   })
 
 
-
   if (!dir.exists(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))){
     dir.create(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))
   }
 
-  system(paste("cp",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_3/",patient_id,".PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_SNPs/")))
+  system(paste("cp",paste0(out_file_dir,"/GERMLINE/SNPs_SETS/SETS/SET_2/",patient_id,".HAPLOTYPECALLER_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_SNPs/")))
 
   if (!dir.exists(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))){
     dir.create(paste0(out_file_dir,"/GERMLINE/HQ_INDELs/"))
   }
-  system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_4/",patient_id,".PLATYPUS_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/")))
+  system(paste("cp",paste0(out_file_dir,"/GERMLINE/INDELs_SETS/SETS/SET_3/",patient_id,".HAPLOTYPECALLER_VEP/*"), paste0(out_file_dir,"/GERMLINE/HQ_INDELs/")))
 
   ## GENERATE DATA FOR SNPs
 
   ### Generate a VCF with common SNPs MAF>1%
-  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".PLATYPUS.VEP.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS"))
+  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".HAPLOTYPECALLER.VEP.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS"))
 
   ### Generate a VCF with rare SNPs MAF<1% or no MAF
-  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".PLATYPUS.VEP.vcf"),filter="\'(MAX_AF < 0.01 or not MAX_AF)\'",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/RARE_VARIANTS"))
+  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/",patient_id,".HAPLOTYPECALLER.VEP.vcf"),filter="\'(MAX_AF < 0.01 or not MAX_AF)\'",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/RARE_VARIANTS"))
 
   ### Select Heterozygous SNPs for common SNPs
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/",patient_id,"_FILTERED_VEP/",patient_id,".FILTERED.VEP.vcf"),bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",state="het",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS"))
 
-  ### Generate an Unique Set of Heterozygous SNPs found in all samples
-  vcf_sets(bin_path=bin_path3,vcf=c(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),platypus_snps_somatic),set_formula=paste0("=",(length(platypus_snps_somatic)+1)),filter="PASS",output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/SETS/SET_",(length(platypus_snps_somatic)+1)),verbose=verbose)
-
   ### Select heterozygous SNPs part of the panel
-  vcf_intersect_bed(bed=bed_snps,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/PANEL"),vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/SETS/SET_",(length(platypus_snps_somatic)+1),"/0000.vcf"),output_name=patient_id)
+  vcf_intersect_bed(bed=bed_snps,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/PANEL"),vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_name=patient_id)
 
   ## GENERATE DATA FOR INDELS
 
   ### Generate a VCF with common INDELs MAF>1%
-  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".PLATYPUS.VEP.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/COMMON_VARIANTS"))
+  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".HAPLOTYPECALLER.VEP.vcf"),filter="MAX_AF > 0.01",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/COMMON_VARIANTS"))
 
   ### Generate a VCF with rare INDELs MAF<1% or no MAF
-  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".PLATYPUS.VEP.vcf"),filter="\'(MAX_AF < 0.01 or not MAX_AF)\'",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/RARE_VARIANTS"))
-
+  filter_VEP(bin_path=bin_path2,bin_path2=bin_path4,bin_path3=bin_path5,unf_vcf=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/",patient_id,".HAPLOTYPECALLER.VEP.vcf"),filter="\'(MAX_AF < 0.01 or not MAX_AF)\'",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_INDELs/RARE_VARIANTS"))
 
   ## Start processing SOMATIC variants
 
-  lapply(1:length(platypus_snps_somatic),FUN=function(x){
+  lapply(2:length(mutect_snps),FUN=function(x){
     ### Generate sets for SNPs
-    generate_sets(bin_path=bin_path3,vcf=c(platypus_snps_somatic[x],mutect_snps[x],strelka_snps_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(platypus_snps_somatic[x])),verbose=verbose,threads=threads,set_names=c("Platypus","Mutect2","Strelka2"))
+    generate_sets(bin_path=bin_path3,vcf=c(mutect_snps[x],strelka_snps_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("MUTECT2","STRELKA2"))
+    call_vep_maf(bin_path=bin_path6,vep_dir=basename(dirname(bin_path)),vep_data="~/.vep",
+    vcf=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x]),"/SET_2/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x]),"/SET_2"),patient_id=patient_id,normal_id=ULPwgs::get_sample_name(mutect_snps[1]),ref_genome=ref_genome,tumour_id=ULPwgs::get_sample_name(mutect_snps[x]))
 
     ### Generate sets for INDELs
-    generate_sets(bin_path=bin_path3,vcf=c(platypus_indels_somatic[x],mutect_indels[x],strelka_indels_somatic[x],svaba_indels_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(platypus_snps_somatic[x])),verbose=verbose,threads=threads,set_names=c("Platypus","HaplotypeCaller","Strelka2","svaba"))
+    generate_sets(bin_path=bin_path3,vcf=c(mutect_indels[x],strelka_indels_somatic[x],svaba_indels_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("MUTECT2","STRELKA2","SVABA"))
+    call_vep_maf(bin_path=bin_path6,vep_dir=basename(dirname(bin_path)),vep_data=vep_data,
+    vcf=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(mutect_snps[x]),"/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x]),"/SET_2"),patient_id=patient_id,normal_id=ULPwgs::get_sample_name(mutect_snps[1]),ref_genome=ref_genome,tumour_id=ULPwgs::get_sample_name(mutect_snps[x]))
 
     ### Generate sets for SVs
-    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[x],svaba_somatic_sv_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(platypus_snps_somatic[x])),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
+    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[x],svaba_somatic_sv_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("STRELKA2","SVABA"))
   })
 
 
@@ -1694,13 +1693,15 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
 #' @param vep_data [REQUIRED] Path to VEP data directory. Default path ~/.vep
 #' @param ref_genome [REQUIRED] Path to reference genome fasta file.
 #' @param vcf [REQUIRED] Path to vcf to annotate.
+#' @param tumour_id [OPTIONAL] Tumour ID in VCF. If not given file name will be used.
+#' @param normal_id [OPTIONAL] Normal ID
 #' @param patient_id [OPTIONAL] Patient ID. If not given the name of the first sample in alphanumerical order will be used.
 #' @param verbose [OPTIONAL] Extra verbose. Default FALSE.
 #' @param output_dir [OPTIONAL] Directory to output
 #' @export
 
 call_vep_maf=function(bin_path="tools/vcf2maf/vcf2maf.pl",vep_dir="tools/ensembl/vep",vep_data="~/.vep",
-vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
+vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome="",tumour_id=""){
 
   sep="/"
 
@@ -1708,7 +1709,12 @@ vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome=""){
     sep=""
   }
 
-  sample_name=ULPwgs::get_sample_name(vcf)
+  if(tumour_id==""){
+      sample_name=ULPwgs::get_sample_name(vcf)
+  }else{
+      sample_name=ULPwgs::get_sample_name(tumour_id)
+  }
+
   vcf=check_and_unzip(file=vcf,verbose=verbose)
 
   if(patient_id==""){
