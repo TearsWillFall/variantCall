@@ -14,7 +14,8 @@ call_vep_maf(
   patient_id = "",
   normal_id = "",
   ref_genome = "",
-  tumour_id = ""
+  tumour_id = "",
+  threads = 3
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ call_vep_maf(
 \item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
 
 \item{tumour_id}{\link{OPTIONAL} Tumour ID in VCF. If not given file name will be used.}
+
+\item{threads}{\link{OPTIONAL} Number of threads}
 }
 \description{
 This function annotates a VCF file using VEP, and then generates a

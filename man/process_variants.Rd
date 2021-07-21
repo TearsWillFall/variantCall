@@ -15,7 +15,9 @@ process_variants(
   bin_path6 = "tools/vcf2maf/vcf2maf.pl",
   var_dir = "",
   bed_snps = "",
+  ref_genome = "",
   output_dir = "",
+  germ_pattern = "GL",
   vep_data = "~/.vep",
   verbose = FALSE,
   threads = 3
@@ -37,6 +39,8 @@ process_variants(
 \item{bed_snps}{\link{REQUIRED} Path to BED with Panel SNPs}
 
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
+
+\item{germ_pattern}{\link{OPTIONAL} Pattern for normale samples}
 
 \item{vep_data}{\link{REQUIRED} Path to VEP data directory.}
 

@@ -1142,11 +1142,6 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
 
 
-
-
-
-
-
   ### Keep only Heterozygous SNPs found across all samples for this patient
   #generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="HETEROZYGOUS_SNPs_SETS",verbose=verbose,threads=threads)
 
