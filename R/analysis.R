@@ -1122,17 +1122,17 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
 
   lapply(2:length(mutect_snps),FUN=function(x){
     ### Generate sets for SNPs
-    generate_sets(bin_path=bin_path3,vcf=c(mutect_snps[x],strelka_snps_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2"))
+    generate_sets(bin_path=bin_path3,vcf=c(mutect_snps[x],strelka_snps_somatic[grepl(ULPwgs::get_sample_name(mutect_snps[x]),strelka_snps_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2"))
     call_vep_maf(bin_path=bin_path6,vep_dir=basename(dirname(bin_path)),vep_data="~/.vep",
     vcf=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x]),"/SET_2/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x]),"/SET_2"),patient_id=patient_id,normal_id=ULPwgs::get_sample_name(mutect_snps[1]),ref_genome=ref_genome,tumour_id=ULPwgs::get_sample_name(mutect_snps[x]))
 
     ### Generate sets for INDELs
-    generate_sets(bin_path=bin_path3,vcf=c(mutect_indels[x],strelka_indels_somatic[x],svaba_indels_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2","svaba"))
+    generate_sets(bin_path=bin_path3,vcf=c(mutect_indels[x],strelka_indels_somatic[grepl(ULPwgs::get_sample_name(mutect_snps[x]),strelka_snps_somatic)],svaba_indels_somatic[grepl(ULPwgs::get_sample_name(mutect_snps[x]),svaba_indels_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2","svaba"))
     call_vep_maf(bin_path=bin_path6,vep_dir=basename(dirname(bin_path)),vep_data=vep_data,
     vcf=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(mutect_snps[x]),"/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",ULPwgs::get_sample_name(mutect_snps[x]),"/SET_2"),patient_id=patient_id,normal_id=ULPwgs::get_sample_name(mutect_snps[1]),ref_genome=ref_genome,tumour_id=ULPwgs::get_sample_name(mutect_snps[x]))
 
     ### Generate sets for SVs
-    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[x],svaba_somatic_sv_somatic[x]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("Srelka2","svaba"))
+    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[grepl(ULPwgs::get_sample_name(mutect_snps[x]),strelka_sv_somatic)],svaba_sv_somatic[grepl(ULPwgs::get_sample_name(mutect_snps[x]),svaba_sv_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",ULPwgs::get_sample_name(mutect_snps[x])),verbose=verbose,threads=threads,set_names=c("Srelka2","svaba"))
   })
 
 
