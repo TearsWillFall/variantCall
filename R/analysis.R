@@ -1108,7 +1108,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   vcf_filter_variants(unfil_vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/",patient_id,"_FILTERED_VEP/",patient_id,".FILTERED.VEP.vcf"),bin_path=bin_path3,bin_path2=bin_path4,bin_path3=bin_path5,qual="",mq="",state="het",verbose=verbose,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS"))
 
   ### Select heterozygous SNPs part of the panel
-  vcf_intersect_bed(bed=bed_snps,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/PANEL"),vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf.gz"),output_name=patient_id)
+  vcf_intersect_bed(bed=bed_snps,output_dir=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/PANEL"),vcf=paste0(out_file_dir,"/GERMLINE/HQ_SNPs/COMMON_VARIANTS/HETEROZYGOUS/",patient_id,"_FILTERED/",patient_id,".FILTERED.vcf"),output_name=patient_id)
 
   ## GENERATE DATA FOR INDELS
 
@@ -1698,12 +1698,13 @@ call_platypus=function(bin_path="tools/platypus/Platypus.py",bin_path2="tools/bc
 #' @param tumour_id [OPTIONAL] Tumour ID in VCF. If not given file name will be used.
 #' @param normal_id [OPTIONAL] Normal ID
 #' @param patient_id [OPTIONAL] Patient ID. If not given the name of the first sample in alphanumerical order will be used.
+#' @param threads [OPTIONAL] Number of threads
 #' @param verbose [OPTIONAL] Extra verbose. Default FALSE.
 #' @param output_dir [OPTIONAL] Directory to output
 #' @export
 
 call_vep_maf=function(bin_path="tools/vcf2maf/vcf2maf.pl",vep_dir="tools/ensembl/vep",vep_data="~/.vep",
-vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome="",tumour_id=""){
+vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome="",tumour_id="",threads=3){
 
   sep="/"
 
@@ -1736,11 +1737,11 @@ vcf="",verbose=FALSE,output_dir="",patient_id="",normal_id="",ref_genome="",tumo
   if(verbose){
     print(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
     paste0(out_file_dir,"/",sample_name,".vep.maf") ," --ref-fasta ",ref_genome," --vep-path ",
-    vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal_id))
+    vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal_id, " --vep-forks",threads))
 
   }
   system(paste("perl ",bin_path, " --input-vcf ", vcf," --output-maf ",
   paste0(out_file_dir,"/",sample_name,".vep.maf") ," --ref-fasta ",ref_genome," --vep-path ",
-  vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal_id))
+  vep_dir, " --vep-data ", vep_data, " --tumor-id ",sample_name,normal_id, " --vep-forks",threads))
 
 }
