@@ -974,7 +974,7 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",bin_path6="tools/vcf2maf/vcf2maf.pl",var_dir="",bed_snps="",output_dir="",vep_data="~/.vep",verbose=FALSE,threads=3){
+process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",bin_path6="tools/vcf2maf/vcf2maf.pl",var_dir="",bed_snps="",output_dir="",vep_data="~/.vep",verbose=FALSE,threads=3,ref_genome=""){
 
   sep="/"
   if(output_dir==""){
