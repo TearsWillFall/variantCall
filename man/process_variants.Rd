@@ -12,9 +12,11 @@ process_variants(
   bin_path3 = "tools/bcftools/bcftools",
   bin_path4 = "tools/htslib/bgzip",
   bin_path5 = "tools/htslib/tabix",
+  bin_path6 = "tools/vcf2maf/vcf2maf.pl",
   var_dir = "",
   bed_snps = "",
   output_dir = "",
+  vep_data = "~/.vep",
   verbose = FALSE,
   threads = 3
 )
@@ -28,13 +30,15 @@ process_variants(
 
 \item{bin_path4}{\link{REQUIRED} Path to bgzip. Default tools/htslib/bgzip}
 
-\item{bin_path5}{\link{REQUIRED} Path to tabix. Default tools/htslib/tabix}
+\item{bin_path5}{\link{REQUIRED} Path to vaf2maf. Default tools/vaf2maf/vaf2maf.pl}
 
 \item{var_dir}{\link{REQUIRED} Path to variant directory.}
 
 \item{bed_snps}{\link{REQUIRED} Path to BED with Panel SNPs}
 
 \item{output_dir}{\link{OPTIONAL} Path to the output directory.}
+
+\item{vep_data}{\link{REQUIRED} Path to VEP data directory.}
 
 \item{verbose}{\link{DEFAULT==FALSE} Enables progress messages.}
 

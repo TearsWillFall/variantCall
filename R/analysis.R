@@ -965,14 +965,16 @@ call_sv_manta=function(bin_path="tools/manta-1.6.0/build/bin/configManta.py",tum
 #' @param bin_path3 [REQUIRED] Path to bcftools binary. Default tools/bcftools/bcftools
 #' @param bin_path4 [REQUIRED] Path to bgzip. Default tools/htslib/bgzip
 #' @param bin_path5 [REQUIRED] Path to tabix. Default tools/htslib/tabix
+#' @param bin_path5 [REQUIRED] Path to vaf2maf. Default tools/vaf2maf/vaf2maf.pl
 #' @param var_dir [REQUIRED] Path to variant directory.
+#' @param vep_data [REQUIRED] Path to VEP data directory.
 #' @param bed_snps [REQUIRED] Path to BED with Panel SNPs
 #' @param output_dir [OPTIONAL] Path to the output directory.
 #' @param threads [OPTIONAL] Number of threads per job. Default 3
 #' @param verbose [DEFAULT==FALSE] Enables progress messages.
 #' @export
 
-process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",,bin_path6="tools/vcf2maf/vcf2maf.pl",var_dir="",bed_snps="",output_dir="",vep_data="~/.vep",verbose=FALSE,threads=3){
+process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ensembl-vep/filter_vep",bin_path3="tools/bcftools/bcftools",bin_path4="tools/htslib/bgzip",bin_path5="tools/htslib/tabix",bin_path6="tools/vcf2maf/vcf2maf.pl",var_dir="",bed_snps="",output_dir="",vep_data="~/.vep",verbose=FALSE,threads=3){
 
   sep="/"
   if(output_dir==""){

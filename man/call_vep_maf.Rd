@@ -13,7 +13,8 @@ call_vep_maf(
   output_dir = "",
   patient_id = "",
   normal_id = "",
-  ref_genome = ""
+  ref_genome = "",
+  tumour_id = ""
 )
 }
 \arguments{
@@ -31,7 +32,11 @@ call_vep_maf(
 
 \item{patient_id}{\link{OPTIONAL} Patient ID. If not given the name of the first sample in alphanumerical order will be used.}
 
+\item{normal_id}{\link{OPTIONAL} Normal ID}
+
 \item{ref_genome}{\link{REQUIRED} Path to reference genome fasta file.}
+
+\item{tumour_id}{\link{OPTIONAL} Tumour ID in VCF. If not given file name will be used.}
 }
 \description{
 This function annotates a VCF file using VEP, and then generates a
