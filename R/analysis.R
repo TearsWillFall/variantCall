@@ -1124,13 +1124,15 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   somatic_sample_names=sample_names[!grepl(germ_pattern,sample_names)]
   germline_sample_name=sample_names[grepl(germ_pattern,sample_names)]
   lapply(somatic_sample_names,FUN=function(x){
+    print(x)
+    print(somatic_sample_names)
     ### Generate sets for SNPs
     generate_sets(bin_path=bin_path3,vcf=c(mutect_snps[grepl(x,somatic_sample_names)],strelka_snps_somatic[grepl(x,strelka_snps_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2"))
     call_vep_maf(bin_path=bin_path6,vep_dir=dirname(bin_path),vep_data="~/.vep",
     vcf=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",x,"/SETS/SET_2/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",x,"/SETS/SET_2"),patient_id=patient_id,normal_id=germline_sample_name,ref_genome=ref_genome,tumour_id=x)
 
     ### Generate sets for INDELs
-    generate_sets(bin_path=bin_path3,vcf=c(mutect_indels[grepl(x,mutect_indels)],strelka_indels_somatic[grepl(x,strelka_snps_somatic)],svaba_indels_somatic[grepl(x,svaba_indels_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2","svaba"))
+    generate_sets(bin_path=bin_path3,vcf=c(mutect_indels[grepl(x,mutect_indels)],strelka_indels_somatic[grepl(x,strelka_indels_somatic)],svaba_indels_somatic[grepl(x,svaba_indels_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2","svaba"))
     call_vep_maf(bin_path=bin_path6,vep_dir=dirname(bin_path),vep_data=vep_data,
     vcf=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x,"/SETS/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x,"/SETS/SET_2"),patient_id=patient_id,normal_id=germline_sample_name,ref_genome=ref_genome,tumour_id=x)
 
