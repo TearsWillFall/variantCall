@@ -1018,7 +1018,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   strelka_indels_somatic=strelka_indels[grepl("SOMATIC",strelka_indels)]
   strelka_sv=strelka[grepl("SVs",strelka)]
   strelka_sv_germline=strelka_sv[grepl("GERMLINE",strelka_sv)]
-  strelka_sv_somatic=strelka_sv[grepl("SOMATIC",strelka_sv)]
+  strelka_sv_somatic=strelka_sv[!grepl("GERMLINE",strelka_sv)]
   # svaba pipeline variants
 
   svaba=files[grepl("SVABA",files)]
@@ -1028,7 +1028,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   svaba_indels_somatic=svaba_indels[grepl("SOMATIC",svaba_indels)]
   svaba_indels_somatic=svaba_indels_somatic[!grepl("germline",svaba_indels_somatic)]
   svaba_sv_germline=svaba_sv[grepl("/GERMLINE",svaba_sv)]
-  svaba_sv_somatic=svaba_sv[grepl("SOMATIC",svaba_sv)]
+  svaba_sv_somatic=svaba_sv[!grepl("GERMLINE",svaba_sv)]
 
   ## Start processing GERMLINE variants
   patient_id=ULPwgs::get_sample_name(haplotypecaller_snps)
@@ -1123,7 +1123,7 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   sample_names=lapply(mutect_snps,FUN=ULPwgs::get_sample_name)
   somatic_sample_names=sample_names[!grepl(germ_pattern,sample_names)]
   germline_sample_name=sample_names[grepl(germ_pattern,sample_names)]
-  lapply(somatic_sample_names,FUN=function(x){
+  parallel::mclapply(somatic_sample_names,FUN=function(x){
     ### Generate sets for SNPs
     generate_sets(bin_path=bin_path3,vcf=c(mutect_snps[grepl(x,mutect_snps)],strelka_snps_somatic[grepl(x,strelka_snps_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2"))
     call_vep_maf(bin_path=bin_path6,vep_dir=dirname(bin_path),vep_data="~/.vep",
@@ -1135,8 +1135,8 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
     vcf=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x,"/SETS/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x,"/SETS/SET_2"),patient_id=patient_id,normal_id=germline_sample_name,ref_genome=ref_genome,tumour_id=x)
 
     ### Generate sets for SVs
-    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[grepl(x,strelka_sv_somatic)],svaba_sv_somatic[grepl(x,svaba_sv_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
-  })
+    generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[grepl(x,strelka_sv_somatic)],svaba_sv_somatic[grepl(x,svaba_sv_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SVs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
+  },mc.cores=threads)
 
 
 

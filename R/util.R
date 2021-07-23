@@ -191,16 +191,6 @@ vcf_communality =function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",outp
 
 
 
-
-
-
-
-
-
-
-
-
-
 #' Get SV type from svaba generated VCF
 #'
 #' As given by sfrenk comment on https://github.com/walaj/svaba/issues/4 annotates SV based on its breakpoints
@@ -1856,4 +1846,15 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
     png(paste0(out_file_dir,"/",unique(full_data$Patient_ID),".transition_points.png"),width=12,height=8,res=1200,units="in",type="cairo-png")
     ComplexHeatmap::draw(ComplexHeatmap::Heatmap(tp_all,row_names_gp=grid::gpar(fontsize=5),clustering_distance_rows=function(m) dist(m,method="manhattan"),clustering_distance_columns=function(m) dist(m,method="manhattan")))
     dev.off()
+}
+
+
+fill_maf=function(vcf="",maf=""){
+  cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
+  cols <- strsplit(cols,"\t")[[1]]
+  table_vcf=read.table(vcf,stringsAsFactors=FALSE,header=FALSE,col.names=cols)
+  maf_vcf=read.table(vcf,stringsAsFactors=FALSE,header=TRUE)
+  parallel::mclapply(1:nrows(),)
+  maf_vcf$rc_ref_tumour=
+
 }
