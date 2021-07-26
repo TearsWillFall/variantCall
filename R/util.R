@@ -191,6 +191,13 @@ vcf_communality =function(bin_path="tools/bcftools/bcftools",vcf="",vcf2="",outp
 
 
 
+
+
+
+
+
+
+
 #' Get SV type from svaba generated VCF
 #'
 #' As given by sfrenk comment on https://github.com/walaj/svaba/issues/4 annotates SV based on its breakpoints
@@ -1849,12 +1856,38 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
 }
 
 
-fill_maf=function(vcf="",maf=""){
-  cols <- system(paste0('grep -v "##" ', vcf,' | grep "#" | sed s/#//'),intern=TRUE)
-  cols <- strsplit(cols,"\t")[[1]]
-  table_vcf=read.table(vcf,stringsAsFactors=FALSE,header=FALSE,col.names=cols)
-  maf_vcf=read.table(vcf,stringsAsFactors=FALSE,header=TRUE)
-  parallel::mclapply(1:nrows(),)
-  maf_vcf$rc_ref_tumour=
 
+#' This function merges a group of files in MAF format
+
+#' This function takes the path to the directory with MAF files and
+#' concatenates them into a single file
+#'
+#' @param maf_dir Path to maf file dir
+#' @param recursive Reads all files in the directory recursively. Default TRUE
+#' @param pattern  Pattern to identify MAF files with. Default "maf"
+#' @param generate_file Generate an output file. Default TRUE
+#' @param output_name Output file name without extension. Default "merged"
+#' @param output_dir Path to output directory.
+#' @param threads Number of threads to use.
+#' @export
+
+merge_maf=function(maf_dir="",recursive=FALSE,pattern=".maf",threads=3,generate_file=TRUE,output_name="merged",output_dir=""){
+  files=list.files(maf_dir,pattern=pattern,recursive=recursive)
+  dat=parallel::mclapply(files,FUN=function(x){
+    read.table(x,sep="\t",quote="\\",header=TRUE)
+  },mc.cores=threads)
+  dat=dplyr::bind_rows(dat)
+  if (generate_file){
+    sep="/"
+    if(output_dir==""){
+      sep=""
+    }
+
+    if (!dir.exists(output_dir)& output_dir!=""){
+        dir.create(output_dir,recursive=TRUE)
+    }
+    out_file=paste0(output_dir,sep,output_name,".maf")
+    write.table(dat,file=out_file,sep="\t",quote=FALSE,col.names=TRUE,row.names=FALSE)
+  }
+  return(dat)
 }
