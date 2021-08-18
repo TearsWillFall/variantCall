@@ -1874,7 +1874,7 @@ plot_evolutionary_distance=function(cn_call_data="",sample_data="",ref_bins="",o
 merge_maf=function(maf_dir="",recursive=FALSE,pattern=".maf",threads=3,generate_file=TRUE,output_name="merged",output_dir=""){
   files=list.files(maf_dir,pattern=pattern,recursive=recursive)
   dat=parallel::mclapply(files,FUN=function(x){
-    read.table(x,sep="\t",quote="\\",header=TRUE,stringsAsFactors=FALSE)
+    read.table(x,sep="\t",quote="\\",header=TRUE,colClasses="character")
   },mc.cores=threads)
   dat=dplyr::bind_rows(dat)
   if (generate_file){
