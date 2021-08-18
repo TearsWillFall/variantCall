@@ -1891,3 +1891,31 @@ merge_maf=function(maf_dir="",recursive=FALSE,pattern=".maf",threads=3,generate_
   }
   return(dat)
 }
+
+#' This function processes a MAF file
+
+#' This function takes the path to a MAF file and processes the variant infomation
+#' contained within it
+#'
+#' @param maf Path to MAF file
+#' @param sample_data Path to file with sample information
+#' @param gen_data Path to file with gen to take into account
+#' @param generate_file Generate an output file. Default TRUE
+#' @param output_name Output file name without extension. Default "merged"
+#' @param output_dir Path to output directory.
+#' @param threads Number of threads to use.
+#' @export
+
+process_maf=function(maf="",sample_data="",gen_data=""){
+  maf_data=read.table(maf,header=TRUE,stringsAsFactors=FALSE)
+  maf_data$IMPORTANCE=ifelse(grepl("sense|Frame|Splice|Start",maf_data$Variant_Classification)&maf_data$IMPACT!="LOW","HIGH","LOW")
+  if (gen_data!=""){
+    gen=read.table(gen_data,header=TRUE,stringsAsFactors=FALSE)
+    maf_data$RELEVANCE=ifelse(maf_data$Hugo_Symbol %in% gen$hgnc_gene_symbol,"RELEVANT","NOT-RELEVANT")
+    maf_data=dplyr::left_join(maf_data,gen,by=c("Hugo_Symbol"="hgnc_gene_symbol"))
+  }
+  sample_info=read.table(sample_data,header=TRUE,stringsAsFactors=FALSE)
+  full_data=fuzzyjoin::fuzzy_inner_join(maf_data,sample_info, by = c("Tumor_Sample_Barcode" = "Sample_name_corrected"), match_fun = stringr::str_detect)
+  full_data$ID=ifelse(full_data$Origin=="Plasma",as.character(lubridate::dmy(full_data$Timepoint_ID)),full_data$Anatomy)
+  print(summary(full_data %>% select(IMPORTANCE,RELEVANCE,pcf_gene_class)))
+}
