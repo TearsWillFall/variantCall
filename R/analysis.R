@@ -1068,22 +1068,22 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   vcf_sets_SVs=vcf_sets_SVs[grepl("SET_3",vcf_sets_SVs)]
   set_names=c("HAPLOTYPECALLER","STRELKA2")
 
-  lapply(X=vcf_sets_SNPs,FUN=function(x){
-    out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
-    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
-  })
-
-  set_names=c("HAPLOTYPECALLER","STRELKA2","SVABA")
-  lapply(X=vcf_sets_INDELs,FUN=function(x){
-    out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
-    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
-  })
-
-  set_names=c("STRELKA","SVABA")
-  lapply(X=vcf_sets_SVs,FUN=function(x){
-    out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
-    call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
-  })
+  # lapply(X=vcf_sets_SNPs,FUN=function(x){
+  #   out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
+  #   call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
+  # })
+  #
+  # set_names=c("HAPLOTYPECALLER","STRELKA2","SVABA")
+  # lapply(X=vcf_sets_INDELs,FUN=function(x){
+  #   out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
+  #   call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
+  # })
+  #
+  # set_names=c("STRELKA","SVABA")
+  # lapply(X=vcf_sets_SVs,FUN=function(x){
+  #   out_file_name=paste0(patient_id,".",set_names[as.numeric(ULPwgs::get_sample_name(x))+1])
+  #   call_vep(bin_path=bin_path,bin_path2=bin_path4,bin_path3=bin_path5,vcf=x,verbose=verbose,output_dir=dirname(x),output_name=out_file_name,threads=threads);
+  # })
 
 
   if (!dir.exists(paste0(out_file_dir,"/GERMLINE/HQ_SNPs/"))){
@@ -1126,25 +1126,22 @@ process_variants=function(bin_path="tools/ensembl-vep/vep",bin_path2="tools/ense
   parallel::mclapply(somatic_sample_names,FUN=function(x){
     ### Generate sets for SNPs
     generate_sets(bin_path=bin_path3,vcf=c(mutect_snps[grepl(x,mutect_snps)],strelka_snps_somatic[grepl(x,strelka_snps_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2"))
-    call_vep_maf(bin_path=bin_path6,vep_dir=dirname(bin_path),vep_data="~/.vep",
+    call_vep_maf(bin_path=bin_path6,vep_dir=dirname(bin_path),vep_data=vep_data,
     vcf=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",x,"/SETS/SET_2/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/",x,"/SETS/SET_2"),patient_id=patient_id,normal_id=germline_sample_name,ref_genome=ref_genome,tumour_id=x)
 
     ### Generate sets for INDELs
     generate_sets(bin_path=bin_path3,vcf=c(mutect_indels[grepl(x,mutect_indels)],strelka_indels_somatic[grepl(x,strelka_indels_somatic)],svaba_indels_somatic[grepl(x,svaba_indels_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Mutect2","Strelka2","svaba"))
     call_vep_maf(bin_path=bin_path6,vep_dir=dirname(bin_path),vep_data=vep_data,
-    vcf=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x,"/SETS/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x,"/SETS/SET_2"),patient_id=patient_id,normal_id=germline_sample_name,ref_genome=ref_genome,tumour_id=x)
+    vcf=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x,"/SETS/SET_3/0000.vcf"),verbose=verbose,output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/",x,"/SETS/SET_3"),patient_id=patient_id,normal_id=germline_sample_name,ref_genome=ref_genome,tumour_id=x)
 
     ### Generate sets for SVs
     generate_sets(bin_path=bin_path3,vcf=c(strelka_sv_somatic[grepl(x,strelka_sv_somatic)],svaba_sv_somatic[grepl(x,svaba_sv_somatic)]),filter="PASS",output_dir=paste0(out_file_dir,"/SOMATIC/SVs_SETS/",x),verbose=verbose,threads=threads,set_names=c("Strelka2","svaba"))
   },mc.cores=threads)
 
   ### Merge MAFs with SNP variants
-  merge_maf(maf_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS/"),recursive=TRUE,pattern=".maf",threads=threads,generate_file=TRUE,output_name=paste0(patient_id,"_SNPs"),output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS"))
+  merge_maf(maf_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS"),recursive=TRUE,pattern=".maf",threads=threads,generate_file=TRUE,output_name=paste0(patient_id,"_SNPs"),output_dir=paste0(out_file_dir,"/SOMATIC/SNPs_SETS"))
   ### Merge MAFs with INDEL variants
-  merge_maf(maf_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS/"),recursive=TRUE,pattern=".maf",threads=threads,generate_file=TRUE,output_name=paste0(patient_id,"_SNPs"),output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS"))
-
-
-
+  merge_maf(maf_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS"),recursive=TRUE,pattern=".maf",threads=threads,generate_file=TRUE,output_name=paste0(patient_id,"_SNPs"),output_dir=paste0(out_file_dir,"/SOMATIC/INDELs_SETS"))
 
   ### Keep only Heterozygous SNPs found across all samples for this patient
   #generate_sets(bin_path=bin_path2,vcf=vcf,filter="PASS",output_dir="HETEROZYGOUS_SNPs_SETS",verbose=verbose,threads=threads)
