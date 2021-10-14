@@ -27,12 +27,12 @@ tab_indx=function(bin_path="tools/htslib/tabix",file="",verbose=FALSE){
 
 check_and_unzip=function(file="",preserve=TRUE,verbose=FALSE){
   if(grepl("compressed",system(paste0("file ",file),intern=TRUE))){
+    file_name=tools::file_path_sans_ext(file,compression=TRUE)
     if(preserve){
-        system(paste0("gunzip -k ",file))
+        system(paste0("gunzip ",file ,">",file_name))
     }else{
       system(paste0("gunzip ",file))
     }
-    file=tools::file_path_sans_ext(file,compression=TRUE)
     return(file)
   }else{
     return(file)
