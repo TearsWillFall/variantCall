@@ -33,6 +33,7 @@ check_and_unzip=function(file="",preserve=TRUE,verbose=FALSE){
     }else{
       system(paste0("gunzip ",file))
     }
+    file=file_name
     return(file)
   }else{
     return(file)
